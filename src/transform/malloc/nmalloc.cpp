@@ -45,7 +45,6 @@ public:
     }
 
     ~MallocPass() {
-        printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
         _ofs.close();        
     }
 

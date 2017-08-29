@@ -37,7 +37,7 @@ define i32 @C() #0 {
 define i32 @D() #0 {
 
   %1 = alloca i32, align 4
-  %2 = call noalias i8* @ben_malloc(i32 1, i64 1) #2
+  %2 = call noalias i8* @ben_malloc(i32 3, i64 1) #2
   %3 = load i32* %1
   ret i32 %3
 }
