@@ -2,7 +2,7 @@
 // Created by tlaber on 8/18/17.
 //
 
-
+#include <algorithm>
 #include <set>
 #include <utilities/macros.h>
 #include <asmParser/sysDict.h>
@@ -185,15 +185,16 @@ public:
         std::map<Instruction*, int> users_offsets;
         std::vector<Instruction*> other_callers;
         if (!final) {
-            for (auto uit = users.begin(); uit != users.end(); ++uit) {
-                Instruction* I = *uit;
-                DILocation *loc = I->debug_loc();
-                guarantee(loc, "This pass needs full debug info, please compile with -g");
-                if (Strings::conatins(filename, loc->filename())) {
-                    users_offsets[I] = std::abs(line-loc->line());
-                }
-                else {
-                    zpl("should be in %s", filename.c_str())
+            for (auto I: calleef->user_list()) {
+                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                    DILocation *loc = ci->debug_loc();
+                    guarantee(loc, "This pass needs full debug info, please compile with -g");
+                    if (Strings::conatins(filename, loc->filename())) {
+                        users_offsets[I] = std::abs(line-loc->line());
+                    }
+                    else {
+                        other_callers.push_back(I);
+                    }
                 }
             }
 
@@ -216,6 +217,10 @@ public:
                     final = closest_I;
                 }
             }
+        }
+
+        if (!final && !other_callers.empty()) {
+            final = other_callers[0];
         }
 
         if (_caller.empty() && final) {
@@ -261,7 +266,7 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        //clone_call_path(_stack);
+                        clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;
@@ -313,6 +318,7 @@ public:
     }
 
     void clone_call_path(std::vector<Instruction*>& stack) {
+        string new_callee;
         for (int i = 0; i < stack.size(); ++i) {
             CallInst* ci = dynamic_cast<CallInst*>(stack[i]);
             guarantee(ci, " ");
@@ -341,6 +347,23 @@ public:
             }
             else {
                 cloned_ci->replace_callee(callee->name()+'.'+std::to_string(_path_counter));
+            }
+        }
+
+        string top_caller = stack[stack.size()-1]->owner();
+        if (top_caller != "main") {
+
+        }
+    }
+
+    void update_top_caller(std::vector<Instruction*>& stack) {
+        Function* caller = stack[stack.size()-1]->function();
+        auto users = caller->user_list();
+        for (auto I: users) {
+            if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                if (std::find(stack.begin(), stack.end(), ci) != stack.end()) {
+
+                }
             }
         }
     }
