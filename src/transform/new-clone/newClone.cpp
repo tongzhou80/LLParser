@@ -34,27 +34,27 @@ class NewClonePass: public Pass {
     bool PrintCloning;
     bool MatchVerbose;
     bool TracingVerbose;
-    std::set<string> _black;
-    bool _has_overlapped_path;
+
     std::ofstream _ofs;
-    std::map<Function*, std::set<Instruction*> > _callers;  // partial callers
     std::vector<Instruction*> _stack;
+    string _caller;
+    string _callee;
     int _path_counter;
+    int _cxt_counter;
     //const int FUNC_MAX_LEN = 1024;
 public:
     NewClonePass() {
         set_is_module_pass();
 
-        _has_overlapped_path = false;
-
         PrintCloning = false;
         MatchVerbose = 1;
         TracingVerbose = false;
         _path_counter = 1;
+        _cxt_counter = 0;
     }
 
     ~NewClonePass() {
-        printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
+
     }
 
     int match_header(string& line) {
@@ -66,48 +66,65 @@ public:
     }
 
     Instruction* match_callsite(string & line) {
-        char caller_callee[FUNC_MAX_LEN] = {0};
-        //char callee_name[FUNC_MAX_LEN] = {0};
-        char file[FUNC_MAX_LEN] = {0};
-        char line_num[64];
+        int pos1 = line.find(' ');
+        string bt_symbol = line.substr(0, pos1);
+        string fileline = line.substr(pos1+1);
 
-        int matched = sscanf(line.c_str(), "(%[^)])%[^:]:%s", caller_callee, file, line_num);
-
-        guarantee(matched == 3, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
-
-
-        string s = string(caller_callee);
-        int pos = s.find(' ');
-        guarantee(pos != s.npos, " ");
-        string caller = s.substr(0, pos);
-        string callee = s.substr(pos+1);
-        if (!callee.empty()) {
-            return approximately_match(caller, callee, file, atoi(line_num));
+        if (bt_symbol != "()") {
+            int pos2 = bt_symbol.find('+');
+            _caller = bt_symbol.substr(1, pos2-1);
+            string offset = bt_symbol.substr(pos2+1);
         }
         else {
-            return approximately_match_alloc(caller, file, atoi(line_num));
+            _caller = "";
         }
 
-//
-//        Function *callee = SysDict::module()->get_function(callee_name);
-//        guarantee(callee, "Callee %s not found", callee_name);
-//        auto &users = callee->user_list();
-//        for (auto uit = users.begin(); uit != users.end(); ++uit) {
-//            Instruction* I = *uit;
-//            DILocation *loc = I->debug_loc();
-//            guarantee(loc, "This pass needs full debug info, please compile with -g");
-//            if (loc->filename() == string(file) &&
-//                loc->line() == line_num &&
-//                loc->column() == column) {
-//                //I->dump();
-//                add_partial_caller(callee, I);
-//            }
-//        }
+        int pos3 = fileline.find(':');
+        string file = fileline.substr(0, pos3);
+        int line_num = std::stoi(fileline.substr(pos3+1));
 
+        Instruction* ret = NULL;
+
+        if (_callee.empty()) {
+            ret = approximately_match_alloc(file, line_num);
+            //return approximately_match(file, line_num);
+        }
+        else {
+            ret = approximately_match(file, line_num);
+        }
+        _callee = _caller;
+        return ret;
     }
+//
+//    Instruction* match_callsite(string & line) {
+//        char caller_callee[FUNC_MAX_LEN] = {0};
+//        //char callee_name[FUNC_MAX_LEN] = {0};
+//        char file[FUNC_MAX_LEN] = {0};
+//        char line_num[64];
+//
+//        int matched = sscanf(line.c_str(), "(%[^)])%[^:]:%s", caller_callee, file, line_num);
+//
+//        guarantee(matched == 3, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
+//
+//
+//        string s = string(caller_callee);
+//        int pos = s.find(' ');
+//        guarantee(pos != s.npos, " ");
+//        string caller = s.substr(0, pos);
+//        string callee = s.substr(pos+1);
+//        if (!callee.empty()) {
+//            return approximately_match(caller, callee, file, atoi(line_num));
+//        }
+//        else {
+//            return approximately_match_alloc(caller, file, atoi(line_num));
+//        }
+//
+//    }
 
-    Instruction* approximately_match_alloc(string caller, string filename, int line) {
-        Function* callerf = SysDict::module()->get_function(caller);
+    Instruction* approximately_match_alloc(string filename, int line) {
+        guarantee(!_caller.empty(), " ");
+        Function* callerf = SysDict::module()->get_function(_caller);
+        zpl("caller: %p", callerf)
         std::map<Instruction*, int> offsets;
         for (auto bit = callerf->begin(); bit != callerf->end(); ++bit) {
             BasicBlock* B = *bit;
@@ -143,24 +160,15 @@ public:
     }
 
 
-    Instruction* approximately_match(string caller, string callee, string filename, int line) {
-        Function* callerf = SysDict::module()->get_function(caller);
-        Function* calleef = SysDict::module()->get_function(callee);
+    Instruction* approximately_match(string filename, int line) {
+        Function* calleef = SysDict::module()->get_function(_callee);
         Instruction* final = NULL;
-        guarantee(calleef && callerf, " ");
+        guarantee(calleef, " ");
         auto users = calleef->user_list();
-
-        if (users.size() == 0) {
-            return NULL;
-        }
 
         // level 0
         if (users.size() == 1) {
             final = users[0];
-        }
-
-        if (caller == "BZ2_bzReadOpen") {
-            //zpl("kkk")
         }
 
         // level 1
@@ -170,38 +178,46 @@ public:
                 Instruction* I = *uit;
                 DILocation *loc = I->debug_loc();
                 guarantee(loc, "This pass needs full debug info, please compile with -g");
-                if (I->parent()->parent() == callerf && Strings::conatins(filename, loc->filename())) {
+                if (Strings::conatins(filename, loc->filename())) {
                     users_offsets[I] = std::abs(line-loc->line());
                 }
             }
 
             if (users_offsets.size() == 0) {
-                //guarantee(0, "call for statistics");
-                return NULL;
+                final = NULL;
             }
             else if (users_offsets.size() == 1) {
                 final = users_offsets.begin()->first;
             }
-        }
-
-        // level 2
-        int closest = users_offsets.begin()->second;
-        Instruction* closest_I = users_offsets.begin()->first;
-        if (!final) {
-            for (auto it = users_offsets.begin(); it != users_offsets.end(); ++it) {
-                if (it->second < closest) {
-                    closest = it->second;
-                    closest_I = it->first;
+            else {
+                int closest = users_offsets.begin()->second;
+                Instruction* closest_I = users_offsets.begin()->first;
+                if (!final) {
+                    for (auto it = users_offsets.begin(); it != users_offsets.end(); ++it) {
+                        if (it->second < closest) {
+                            closest = it->second;
+                            closest_I = it->first;
+                        }
+                    }
+                    final = closest_I;
                 }
             }
-            final = closest_I;
+        }
+
+        if (_caller.empty() && final) {
+            _caller = final->owner();
         }
 
         if (MatchVerbose) {
-            DILocation *loc = final->debug_loc();
-            guarantee(loc, "This pass needs full debug info, please compile with -g");
-            printf("(%s, %s, %s, %d) => (%s, %s, %s, %d)\n", caller.c_str(), callee.c_str(), filename.c_str(), line,
-                   loc->function().c_str(), callee.c_str(), loc->filename().c_str(), loc->line());
+            if (final) {
+                DILocation *loc = final->debug_loc();
+                guarantee(loc, "This pass needs full debug info, please compile with -g");
+                printf("(%s, %s, %s, %d) => (%s, %s, %s, %d)\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line,
+                       loc->function().c_str(), _callee.c_str(), loc->filename().c_str(), loc->line());
+
+            } else {
+                printf("(%s, %s, %s, %d) => None\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line);
+            }
         }
         return final;
     }
@@ -214,6 +230,7 @@ public:
         std::vector<XPS_CallSite*> callstack;
         bool is_header = true;
         int recognized = 0;
+
         while (std::getline(ifs, line)) {
             // got a whole call stack
             if (line.empty()) {
@@ -232,7 +249,10 @@ public:
                         clone_call_path(_stack);
                         _path_counter++;
                     }
+                    _cxt_counter++;
                     _stack.clear();
+                    _caller.clear();
+                    _callee.clear();
                 }
             }
             else {
@@ -247,7 +267,7 @@ public:
                 }
             }
         }
-        zpl("recog: %d", recognized);
+        zpl("recog: %d, path: %d, cxt: %d", recognized, _path_counter, _cxt_counter);
     }
 
     bool insert_declaration(string oldname, string newname, bool add_id=true) {
@@ -378,14 +398,7 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         
-        string out = SysDict::filename();
-        if (out.empty()) {
-            out = "new";
-        }
-        out += ".newClone";
-        if (SysArgs::has_property("output")) {
-            out = SysArgs::get_property("output");
-        }
+        string out = SysDict::filename() + '.' + name();
 
         zpl("counter: %d", _path_counter);
         SysDict::module()->print_to_file(out);
