@@ -42,7 +42,7 @@ void SysDict::destroy() {
 
 Module* SysDict::module() {
     guarantee(modules.size() > 0, " ");
-    llparser()->module();
+    return llparser()->module();
 }
 
 const string& SysDict::filename() {

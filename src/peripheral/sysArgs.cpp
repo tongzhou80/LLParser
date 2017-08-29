@@ -43,7 +43,7 @@ void SysArgs::init(SoptInitArgs* initArgs) {
             string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4);
             //parser->parse("../../test/fortran/a.ll");
             //parser->parse("../../test/clone/clone3.ll");
-            //string p = "../../test/fortran/shell_lam.fppized.o.ll";
+            path = "../../test/fortran/spec_backtrace.o.ll";
             //path = "../../test/clone/clone3.ll";
             add_target_file(path);
         }
