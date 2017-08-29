@@ -67,7 +67,6 @@ Instruction* SysDict::worker_fetch_instruction() {
     Locks::inst_stack_lock->lock();
     Instruction* ret = NULL;
     if (!_inst_stack.empty()) {
-
         ret = _inst_stack.at(_inst_stack.size()-1);
         _inst_stack.pop_back();
     }

@@ -775,21 +775,6 @@ Module* LLParser::parse() {
     SysDict::add_module(this);
 
 
-    pthread_t* tids = NULL;
-    int thread_num = 1;
-    if (ParallelInstruction) {
-        tids = new pthread_t[thread_num];
-    }
-
-    for (int i = 0; i < thread_num; ++i) {
-        if (ParallelInstruction) {
-            pthread_create(&tids[i], NULL, (void* (*)(void*))instparser_start, NULL);
-        }
-    }
-
-
-
-
     getline_nonempty();
     parse_header(module());
     parse_module_level_asms();
@@ -803,12 +788,6 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     SysDict::module()->resolve_debug_info();
-
-    set_done();
-    if (ParallelInstruction) {
-        for (int i = 0; i < thread_num; i++)
-            pthread_join(tids[i], NULL);
-    }
 
 
     SysDict::module()->check_after_parse();

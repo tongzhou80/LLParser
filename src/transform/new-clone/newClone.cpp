@@ -79,9 +79,19 @@ public:
             _caller = "";
         }
 
+        /* remove (discriminator x) */
+        int pos4 = fileline.find(' ');
+        if (pos4 != fileline.npos) {
+            fileline = fileline.substr(0, pos4);
+        }
+
         int pos3 = fileline.find(':');
         string file = fileline.substr(0, pos3);
-        int line_num = std::stoi(fileline.substr(pos3+1));
+        string lino_str = fileline.substr(pos3+1);
+        int line_num = -1;
+        if (Strings::is_number(lino_str)) {
+            line_num = std::stoi(lino_str);
+        }
 
         Instruction* ret = NULL;
 
@@ -93,6 +103,7 @@ public:
             ret = approximately_match(file, line_num);
         }
         _callee = _caller;
+        zpl("new callee: %s", _callee.c_str())
         return ret;
     }
 //
@@ -124,7 +135,6 @@ public:
     Instruction* approximately_match_alloc(string filename, int line) {
         guarantee(!_caller.empty(), " ");
         Function* callerf = SysDict::module()->get_function(_caller);
-        zpl("caller: %p", callerf)
         std::map<Instruction*, int> offsets;
         for (auto bit = callerf->begin(); bit != callerf->end(); ++bit) {
             BasicBlock* B = *bit;
@@ -173,6 +183,7 @@ public:
 
         // level 1
         std::map<Instruction*, int> users_offsets;
+        std::vector<Instruction*> other_callers;
         if (!final) {
             for (auto uit = users.begin(); uit != users.end(); ++uit) {
                 Instruction* I = *uit;
@@ -180,6 +191,9 @@ public:
                 guarantee(loc, "This pass needs full debug info, please compile with -g");
                 if (Strings::conatins(filename, loc->filename())) {
                     users_offsets[I] = std::abs(line-loc->line());
+                }
+                else {
+                    zpl("should be in %s", filename.c_str())
                 }
             }
 
@@ -206,6 +220,7 @@ public:
 
         if (_caller.empty() && final) {
             _caller = final->owner();
+            zpl("infer caller: %s", _caller.c_str())
         }
 
         if (MatchVerbose) {
@@ -246,7 +261,7 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        clone_call_path(_stack);
+                        //clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;
