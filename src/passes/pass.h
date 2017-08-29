@@ -32,11 +32,20 @@ class Pass {
     bool _is_parse_time;
     std::map<std::string, std::string> _args;
     pass_unloader _unloader;
+    string _name;
 public:
     Pass();
 
     int priority()                  { return _priority; }
     void set_priority(int p)        { _priority = p; }
+
+    const string &name() const {
+        return _name;
+    }
+
+    void set_name(const string &_name) {
+        Pass::_name = _name;
+    }
 
     void parse_arguments(std::string args);
     std::string get_argument(std::string key);
@@ -121,7 +130,9 @@ public:
 #define REGISTER_PASS(classname) \
     extern "C" Pass* __load_pass_##classname() { \
         printf("dynamically load pass " #classname "!\n"); \
-        return new classname(); \
+        Pass* p = new classname(); \
+        p->set_name(#classname); \
+        return p; \
     } \
     extern "C" Pass* __unload_pass_##classname(classname* p) { \
         printf("dynamically unload pass " #classname "!\n"); \

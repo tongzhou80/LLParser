@@ -391,53 +391,6 @@ public:
         SysDict::module()->print_to_file(out);
     }
 
-    void do_clone(Function* f, Module *module) {
-        if (TracingVerbose) {
-            printf("inpsect func: %s\n", f->name_as_c_str());
-        }
-
-        // not allow loop in the call graph
-        if (_black.find(f->name()) != _black.end()) {
-            return;
-            guarantee(0, "should not recheck a node: %s", f->name().c_str());
-        }
-        else {
-            _black.insert(f->name());
-        }
-
-        auto& users = f->user_list();
-        //auto& users = _callers[f];
-        auto users_copy = users;
-//    if (users_copy.size() > 1) {
-//        if (f->name() == "BZ2_bzReadOpen") {
-//            zpl("%s is called in ", f->name().c_str());
-//            for (auto u: users) {
-//                zpl("  %s", u->function()->name().c_str());
-//            }
-//        }
-//    }
-        int num = 0;
-        for (auto it = users_copy.begin(); it != users_copy.end(); ++it, ++num) {
-            CallInst* ci = dynamic_cast<CallInst*>(*it);
-            guarantee(ci, " ");
-            if (num > 0) {
-                _has_overlapped_path = true;  // set the flag to scan again
-                Function* fclone = f->clone();
-                module->append_new_function(fclone);
-
-                if (PrintCloning) {
-                    printf("cloned %s to %s\n", f->name_as_c_str(), fclone->name_as_c_str());
-                }
-                ci->replace_callee(fclone->name());
-            }
-
-            if (_black.find(ci->function()->name()) == _black.end()) {
-                do_clone(ci->function(), module);
-            }
-
-        }
-    }
-
     //bool do_finalization(Module* module);
 };
 
