@@ -39,7 +39,7 @@ entry:
 define i32 @D() #0 !dbg !19 {
 entry:
   %retval = alloca i32, align 4
-  %call = call noalias i8* @ben_malloc(i32 1, i64 1) #2, !dbg !20
+  %call = call noalias i8* @ben_malloc(i32 2, i64 1) #2, !dbg !20
   %0 = load i32, i32* %retval, align 4, !dbg !21
   ret i32 %0, !dbg !21
 }

@@ -16,8 +16,14 @@ Pass::Pass() {
     _is_instruction_pass = false;
 
     _is_parse_time = false;
+
+    _unloader = NULL;
 }
 
+void Pass::unload() {
+    guarantee(_unloader, " ");
+    _unloader(this);
+}
 
 void Pass::parse_arguments(string args) {
     auto pairs = Strings::split(args, '?');

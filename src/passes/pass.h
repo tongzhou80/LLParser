@@ -13,6 +13,11 @@ class Module;
 class Function;
 class BasicBlock;
 class Instruction;
+class Pass;
+
+
+typedef Pass* (*pass_loader)();
+typedef void (*pass_unloader)(Pass*);
 
 
 /* represent an immutable pass */
@@ -26,6 +31,7 @@ class Pass {
 
     bool _is_parse_time;
     std::map<std::string, std::string> _args;
+    pass_unloader _unloader;
 public:
     Pass();
 
@@ -35,6 +41,9 @@ public:
     void parse_arguments(std::string args);
     std::string get_argument(std::string key);
     bool has_argument(std::string key);
+
+    void set_unloader(pass_unloader v)                     { _unloader = v; }
+    void unload();
 
     bool is_global_pass()                          { return _is_global_pass; }
     bool is_module_pass()                          { return _is_module_pass; }
@@ -81,13 +90,13 @@ public:
         printf("Pass.epilogue called: used for parse time passes, execute after all the parsing is done\n");
     }
 
-    virtual bool do_initialization() {
-        printf("Pass.do_initialization called: do nothing\n");
-    }
-
-    virtual bool do_finalization() {
-        printf("Pass.do_finalization called: do nothing\n");
-    }
+//    virtual bool do_initialization() {
+//        printf("Pass.do_initialization called: do nothing\n");
+//    }
+//
+//    virtual bool do_finalization() {
+//        printf("Pass.do_finalization called: do nothing\n");
+//    }
 
     virtual bool do_initialization(Module* M) {
         printf("Pass.do_initialization on module called: do nothing\n");
@@ -105,18 +114,8 @@ public:
         printf("Pass.do_finalization on module called: do nothing\n");
     }
 
-//    virtual bool do_initialization() {
-//        printf("Pass.do_initialization called: do nothing\n");
-//    }
-//
-//    virtual bool do_finalization() {
-//        printf("Pass.do_finalization called: do nothing\n");
-//    }
 };
 
-
-/* for plugins */
-typedef Pass* (*pluggable_pass_loader)();
 
 
 #define REGISTER_PASS(classname) \
@@ -128,8 +127,6 @@ typedef Pass* (*pluggable_pass_loader)();
         printf("dynamically unload pass " #classname "!\n"); \
         delete p; \
     } \
-
-
 
 
 #endif //LLPARSER_PASS_H

@@ -127,18 +127,22 @@ PassManager::PassManager() {
 }
 
 PassManager::~PassManager() {
-    /* need to call __unload_pass, can't delete */
-//    for (int i = 0; i < _module_passes.size(); ++i) {
-//        delete _module_passes[i];
-//    }
-//
-//    for (int i = 0; i < _function_passes.size(); ++i) {
-//        delete _function_passes[i];
-//    }
-//
-//    for (int i = 0; i < _basic_block_passes.size(); ++i) {
-//        delete _basic_block_passes[i];
-//    }
+    /* Must unload, can't delete */
+    for (auto p: _global_passes) {
+        p->unload();
+    }
+
+    for (auto p: _module_passes) {
+        p->unload();
+    }
+
+    for (auto p: _function_passes) {
+        p->unload();
+    }
+
+    for (auto p: _basic_block_passes) {
+        p->unload();
+    }
 }
 
 void PassManager::init() {
@@ -202,7 +206,7 @@ void PassManager::add_pass(string name) {
     if (ld_path != "") {
         _pass_lib_path = ld_path;
     }
-    char path[1024], loader[1024];
+    char path[1024], loader[1024], unloader[1024];
 
     string pass_name = name;
     string args;
@@ -224,10 +228,12 @@ void PassManager::add_pass(string name) {
         guarantee(p1 != pass_name.npos && p2 != pass_name.npos, "Not a valid shared library object ");
         string classname = pass_name.substr(p1, p2-p1);
         sprintf(loader, "__load_pass_%sPass", classname.c_str());
+        sprintf(unloader, "__unload_pass_%sPass", classname.c_str());
     }
     else { /* otherwise use ld-pass-path */
         sprintf(path, "%s/lib%s.so", _pass_lib_path.c_str(), pass_name.c_str());
         sprintf(loader, "__load_pass_%sPass", pass_name.c_str());
+        sprintf(unloader, "__unload_pass_%sPass", pass_name.c_str());
     }
 
 
@@ -235,12 +241,16 @@ void PassManager::add_pass(string name) {
     void *passso = dlopen(path, RTLD_NOW);
     //zpl("passso %p", passso);
     if (passso) {
-        pluggable_pass_loader ldp = (pluggable_pass_loader)dlsym(passso, loader);
-        if (ldp == NULL) {
-            throw PassNotRegisteredError("pass " + pass_name + " does not have a loader and an unloader.\n"
+        pass_loader ldp = (pass_loader)dlsym(passso, loader);
+        pass_unloader unldp = (pass_unloader)dlsym(passso, unloader);
+        if (ldp == NULL || unldp == NULL) {
+            throw PassNotRegisteredError("pass " + pass_name + " does not have a loader or an unloader.\n"
                                                                        "Please add 'REGISTER_PASS(yourclassname)' at the end of your pass source file");
         }
+
         Pass* pass_obj = ldp();
+        pass_obj->set_unloader(unldp);
+        
         if (!args.empty()) {
             pass_obj->parse_arguments(args);
         }
@@ -251,14 +261,8 @@ void PassManager::add_pass(string name) {
 
 }
 
-//Pass* PassManager::get_pass(std::vector<Pass*>& passes, int i) {
-//    if (ParallelModule) {
-//
-//    }
-//    else {
-//        return NULL;
-//    }
-//}
+
+// apply passes
 
 void PassManager::apply_global_passes() {
     std::vector<Pass*>& passes = _global_passes;
@@ -295,24 +299,7 @@ void PassManager::apply_passes(BasicBlock *bb) {
     }
 }
 
-void PassManager::apply_initializations() {
-    std::vector<Pass*>& passes = _module_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->do_initialization();
-    }
-}
-
-void PassManager::apply_finalization(Module *module) {
-    std::vector<Pass*>& passes = _function_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->do_finalization(module);
-    }
-
-    std::vector<Pass*>& passes2 = _basic_block_passes;
-    for (int i = 0; i < passes2.size(); ++i) {
-        int mutated = passes2[i]->do_finalization(module);
-    }
-}
+// initialization and finalization
 
 void PassManager::apply_initializations(Module *module) {
     std::vector<Pass*>& passes = _function_passes;

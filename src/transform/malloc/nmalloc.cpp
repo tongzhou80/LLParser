@@ -34,10 +34,19 @@ public:
     MallocPass() {
         _test_mode = 0;
         set_is_module_pass();
+
+        _counter = 1;
+        init_targets();
+        _ofs.open("alloc-guide.txt");
+
+        _ofs << std::setiosflags(std::ios::left);
+        _ofs << std::setw(10) << "id" << std::setw(10) << "tier" << std::setw(20) << "location" << std::endl;
+
     }
 
     ~MallocPass() {
         printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
+        _ofs.close();        
     }
 
     void init_targets() {
@@ -120,6 +129,19 @@ public:
 
     bool run_on_module(Module* module) {
         do_replacement();
+        
+        string out = SysDict::filename();
+        if (out.empty()) {
+            out = "new";
+        }
+        out += ".malloc";
+        if (SysArgs::has_property("output")) {
+            out = SysArgs::get_property("output");
+        }
+
+        zpl("counter: %d", _counter);
+
+        module->print_to_file(out);
     }
 
     bool insert_declaration(string oldname, string newname, bool add_id=true) {
@@ -351,31 +373,6 @@ public:
 
         newinst->copy_metadata_from(old);
         return newinst;
-    }
-
-    bool do_initialization(Module* module) {
-        _counter = 1;
-        init_targets();
-        _ofs.open("alloc-guide.txt");
-
-        _ofs << std::setiosflags(std::ios::left);
-        _ofs << std::setw(10) << "id" << std::setw(10) << "tier" << std::setw(20) << "location" << std::endl;
-    }
-
-    bool do_finalization(Module* module) {
-        _ofs.close();
-
-        string out = SysDict::filename();
-        if (out.empty()) {
-            out = "new";
-        }
-        out += ".malloc";
-        if (SysArgs::has_property("output")) {
-            out = SysArgs::get_property("output");
-        }
-
-        zpl("counter: %d", _counter);
-        module->print_to_file(out);
     }
 
 };
