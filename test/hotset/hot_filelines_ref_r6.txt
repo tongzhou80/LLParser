@@ -1,0 +1,69 @@
+0 0xffffffff
+src/spec.c:92
+src/spec.c:306
+??:0
+??:?
+
+2 0xffffffff
+src/bzlib.c:1006
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+3 0xffffffff
+src/bzlib.c:226
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+4 0xffffffff
+src/bzlib.c:235
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+5 0xffffffff
+src/bzlib.c:236
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+6 0xffffffff
+src/bzlib.c:238
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+7 0xffffffff
+src/bzlib.c:1183
+src/bzip2.c:573
+src/spec.c:355
+??:0
+??:?
+
+8 0xffffffff
+src/bzlib.c:566
+src/bzlib.c:1203
+src/bzip2.c:573
+src/spec.c:355
+??:0
+??:?
+
+9 0xffffffff
+src/decompress.c:259
+src/bzlib.c:899
+src/bzlib.c:1273
+src/bzip2.c:578
+src/spec.c:355
+??:0
+??:?
+

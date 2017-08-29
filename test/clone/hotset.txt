@@ -1,0 +1,15 @@
+malloc clone1.c:38:5
+D clone1.c:30:5
+C clone1.c:22:5
+A clone1.c:42:5
+
+malloc clone1.c:38:5
+D clone1.c:30:5
+C clone1.c:21:5
+A clone1.c:42:5
+
+malloc clone1.c:38:5
+D clone1.c:30:5
+C clone1.c:26:5
+B clone1.c:43:5
+

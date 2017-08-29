@@ -1,0 +1,1398 @@
+; ModuleID = 'ComputeList.C'
+source_filename = "ComputeList.C"
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+
+%class.ComputeList = type { i32, i32, %class.SelfCompute*, %class.PairCompute* }
+%class.SelfCompute = type { i32, %class.Pairlists, i32, double }
+%class.Pairlists = type { i16*, i32, i32 }
+%class.PairCompute = type { i32, i32, i32, i32, %class.Pairlists, i32, double }
+%struct._IO_FILE = type { i32, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, %struct._IO_marker*, %struct._IO_FILE*, i32, i32, i64, i16, i8, [1 x i8], i8*, i64, i8*, i8*, i8*, i8*, i64, i32, [20 x i8] }
+%struct._IO_marker = type { %struct._IO_marker*, %struct._IO_FILE*, i32 }
+%class.PatchList = type { i32, i32, i32, i32, i32, %class.Patch*, %class.Lattice*, double* }
+%class.Patch = type <{ i32, [4 x i8], %struct.CompAtom*, %struct.CompAtomExt*, %class.Vector*, %class.Vector*, %class.Vector*, i32, [4 x i8] }>
+%struct.CompAtom = type { %class.Vector, float, i16, i8, i8 }
+%class.Vector = type { double, double, double }
+%struct.CompAtomExt = type { i32 }
+%class.Lattice = type opaque
+
+@.str = private unnamed_addr constant [19 x i8] c"COMPUTEPAIR_BEGIN\0A\00", align 1
+@.str.2 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@.str.4 = private unnamed_addr constant [13 x i8] c"%d %d %d %d\0A\00", align 1
+@.str.6 = private unnamed_addr constant [17 x i8] c"COMPUTEPAIR_END\0A\00", align 1
+@str = private unnamed_addr constant [26 x i8] c"Missing COMPUTEPAIR_BEGIN\00"
+@str.8 = private unnamed_addr constant [24 x i8] c"Missing COMPUTEPAIR_END\00"
+@str.9 = private unnamed_addr constant [23 x i8] c"paircompute read error\00"
+@str.10 = private unnamed_addr constant [27 x i8] c"numPairComputes read error\00"
+@_ZN11ComputeListC1Ev = alias void (%class.ComputeList*), void (%class.ComputeList*)* @_ZN11ComputeListC2Ev
+@_ZN11ComputeListD1Ev = alias void (%class.ComputeList*), void (%class.ComputeList*)* @_ZN11ComputeListD2Ev
+
+
+;
+define void @_ZN11ComputeListC2Ev(%class.ComputeList* nocapture %this) unnamed_addr #0 align 2 !dbg !58 {
+entry:
+  tail call void @llvm.dbg.value(metadata %class.ComputeList* %this, i64 0, metadata !429, metadata !431), !dbg !432
+  %0 = bitcast %class.ComputeList* %this to i8*, !dbg !433
+  call void @llvm.memset.p0i8.i64(i8* %0, i8 0, i64 24, i32 8, i1 false), !dbg !434
+  ret void, !dbg !433
+}
+
+;
+declare void @llvm.dbg.declare(metadata, metadata, metadata) #1
+
+;
+define void @_ZN11ComputeListD2Ev(%class.ComputeList* nocapture readonly %this) unnamed_addr #2 align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) !dbg !436 {
+entry:
+  tail call void @llvm.dbg.value(metadata %class.ComputeList* %this, i64 0, metadata !438, metadata !431), !dbg !439
+  %selfComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 2, !dbg !440
+  %0 = load %class.SelfCompute*, %class.SelfCompute** %selfComputes, align 8, !dbg !440, !tbaa !442
+  %isnull = icmp eq %class.SelfCompute* %0, null, !dbg !448
+  br i1 %isnull, label %delete.end10, label %delete.notnull, !dbg !448
+
+delete.notnull:                                   ; preds = %entry
+  %1 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %0, i64 -1, i32 3, !dbg !449
+  %2 = bitcast double* %1 to i8*, !dbg !449
+  %3 = bitcast double* %1 to i64*, !dbg !449
+  %4 = load i64, i64* %3, align 8, !dbg !449
+  %arraydestroy.isempty = icmp eq i64 %4, 0, !dbg !449
+  br i1 %arraydestroy.isempty, label %arraydestroy.done9, label %arraydestroy.body.preheader, !dbg !449
+
+arraydestroy.body.preheader:                      ; preds = %delete.notnull
+  %delete.end = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %0, i64 %4, !dbg !449
+  br label %arraydestroy.body, !dbg !451
+
+arraydestroy.body:                                ; preds = %arraydestroy.body.preheader, %invoke.cont
+  %arraydestroy.elementPast = phi %class.SelfCompute* [ %arraydestroy.element, %invoke.cont ], [ %delete.end, %arraydestroy.body.preheader ], !dbg !451
+  %arraydestroy.element = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arraydestroy.elementPast, i64 -1, !dbg !451
+  tail call void @llvm.dbg.value(metadata %class.SelfCompute* %arraydestroy.element, i64 0, metadata !453, metadata !431), !dbg !456
+  %data.i.i = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arraydestroy.elementPast, i64 -1, i32 1, i32 0, !dbg !458
+  %5 = load i16*, i16** %data.i.i, align 8, !dbg !458, !tbaa !466
+  %isnull.i.i = icmp eq i16* %5, null, !dbg !468
+  br i1 %isnull.i.i, label %invoke.cont, label %delete.notnull.i.i, !dbg !468
+
+delete.notnull.i.i:                               ; preds = %arraydestroy.body
+  %6 = bitcast i16* %5 to i8*, !dbg !469
+  tail call void @ben_free(i32 3, i8* %6) #10, !dbg !469
+  br label %invoke.cont, !dbg !469
+
+invoke.cont:                                      ; preds = %delete.notnull.i.i, %arraydestroy.body
+  %arraydestroy.done8 = icmp eq %class.SelfCompute* %arraydestroy.element, %0, !dbg !471
+  br i1 %arraydestroy.done8, label %arraydestroy.done9.loopexit, label %arraydestroy.body, !dbg !471
+
+arraydestroy.done9.loopexit:                      ; preds = %invoke.cont
+  br label %arraydestroy.done9, !dbg !473
+
+arraydestroy.done9:                               ; preds = %arraydestroy.done9.loopexit, %delete.notnull
+  tail call void @ben_free(i32 4, i8* %2) #10, !dbg !473
+  br label %delete.end10, !dbg !473
+
+delete.end10:                                     ; preds = %arraydestroy.done9, %entry
+  %pairComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 3, !dbg !475
+  %7 = load %class.PairCompute*, %class.PairCompute** %pairComputes, align 8, !dbg !475, !tbaa !476
+  %isnull11 = icmp eq %class.PairCompute* %7, null, !dbg !477
+  br i1 %isnull11, label %delete.end29, label %delete.notnull12, !dbg !477
+
+delete.notnull12:                                 ; preds = %delete.end10
+  %8 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %7, i64 -1, i32 6, !dbg !478
+  %9 = bitcast double* %8 to i8*, !dbg !478
+  %10 = bitcast double* %8 to i64*, !dbg !478
+  %11 = load i64, i64* %10, align 8, !dbg !478
+  %arraydestroy.isempty14 = icmp eq i64 %11, 0, !dbg !478
+  br i1 %arraydestroy.isempty14, label %arraydestroy.done28, label %arraydestroy.body15.preheader, !dbg !478
+
+arraydestroy.body15.preheader:                    ; preds = %delete.notnull12
+  %delete.end13 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %7, i64 %11, !dbg !478
+  br label %arraydestroy.body15, !dbg !479
+
+arraydestroy.body15:                              ; preds = %arraydestroy.body15.preheader, %invoke.cont19
+  %arraydestroy.elementPast16 = phi %class.PairCompute* [ %arraydestroy.element17, %invoke.cont19 ], [ %delete.end13, %arraydestroy.body15.preheader ], !dbg !479
+  %arraydestroy.element17 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arraydestroy.elementPast16, i64 -1, !dbg !479
+  tail call void @llvm.dbg.value(metadata %class.PairCompute* %arraydestroy.element17, i64 0, metadata !480, metadata !431), !dbg !483
+  %data.i.i31 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arraydestroy.elementPast16, i64 -1, i32 4, i32 0, !dbg !485
+  %12 = load i16*, i16** %data.i.i31, align 8, !dbg !485, !tbaa !466
+  %isnull.i.i32 = icmp eq i16* %12, null, !dbg !488
+  br i1 %isnull.i.i32, label %invoke.cont19, label %delete.notnull.i.i33, !dbg !488
+
+delete.notnull.i.i33:                             ; preds = %arraydestroy.body15
+  %13 = bitcast i16* %12 to i8*, !dbg !489
+  tail call void @ben_free(i32 5, i8* %13) #10, !dbg !489
+  br label %invoke.cont19, !dbg !489
+
+invoke.cont19:                                    ; preds = %delete.notnull.i.i33, %arraydestroy.body15
+  %arraydestroy.done27 = icmp eq %class.PairCompute* %arraydestroy.element17, %7, !dbg !490
+  br i1 %arraydestroy.done27, label %arraydestroy.done28.loopexit, label %arraydestroy.body15, !dbg !490
+
+arraydestroy.done28.loopexit:                     ; preds = %invoke.cont19
+  br label %arraydestroy.done28, !dbg !491
+
+arraydestroy.done28:                              ; preds = %arraydestroy.done28.loopexit, %delete.notnull12
+  tail call void @ben_free(i32 6, i8* %9) #10, !dbg !491
+  br label %delete.end29, !dbg !491
+
+delete.end29:                                     ; preds = %arraydestroy.done28, %delete.end10
+  ret void, !dbg !492
+}
+
+;
+declare i32 @__gxx_personality_v0(...)
+
+;
+declare void @_ZdaPv(i8*) local_unnamed_addr #3
+
+;
+declare void @ben_free(i32, i8*) local_unnamed_addr #3
+
+;
+define i32 @_ZN11ComputeList8readfileEP8_IO_FILEP9PatchList(%class.ComputeList* %this, %struct._IO_FILE* nocapture %file, %class.PatchList* nocapture readonly %patchList) local_unnamed_addr #2 align 2 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) !dbg !493 {
+entry:
+  %buf = alloca [1024 x i8], align 16
+  %p1 = alloca i32, align 4
+  %i1 = alloca i32, align 4
+  %p2 = alloca i32, align 4
+  %i2 = alloca i32, align 4
+  tail call void @llvm.dbg.value(metadata %class.ComputeList* %this, i64 0, metadata !495, metadata !431), !dbg !510
+  tail call void @llvm.dbg.value(metadata %struct._IO_FILE* %file, i64 0, metadata !496, metadata !431), !dbg !511
+  tail call void @llvm.dbg.value(metadata %class.PatchList* %patchList, i64 0, metadata !497, metadata !431), !dbg !512
+  %0 = getelementptr inbounds [1024 x i8], [1024 x i8]* %buf, i64 0, i64 0, !dbg !513
+  call void @llvm.lifetime.start(i64 1024, i8* nonnull %0) #9, !dbg !513
+  tail call void @llvm.dbg.declare(metadata [1024 x i8]* %buf, metadata !498, metadata !431), !dbg !514
+  %call = call i8* @fgets(i8* nonnull %0, i32 1024, %struct._IO_FILE* %file), !dbg !515
+  %tobool = icmp eq i8* %call, null, !dbg !515
+  br i1 %tobool, label %if.then, label %lor.lhs.false, !dbg !517
+
+lor.lhs.false:                                    ; preds = %entry
+  %call3 = call i32 @strcmp(i8* nonnull %0, i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str, i64 0, i64 0)) #11, !dbg !518
+  %tobool4 = icmp eq i32 %call3, 0, !dbg !518
+  br i1 %tobool4, label %if.end, label %if.then, !dbg !520
+
+if.then:                                          ; preds = %lor.lhs.false, %entry
+  %puts = call i32 @puts(i8* getelementptr inbounds ([26 x i8], [26 x i8]* @str, i64 0, i64 0)), !dbg !522
+  br label %cleanup74, !dbg !524
+
+if.end:                                           ; preds = %lor.lhs.false
+  %numPairComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 1, !dbg !525
+  %call6 = call i32 (%struct._IO_FILE*, i8*, ...) @fscanf(%struct._IO_FILE* %file, i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.2, i64 0, i64 0), i32* %numPairComputes), !dbg !527
+  %cmp = icmp eq i32 %call6, 1, !dbg !528
+  br i1 %cmp, label %if.end9, label %if.then7, !dbg !529
+
+if.then7:                                         ; preds = %if.end
+  %puts92 = call i32 @puts(i8* getelementptr inbounds ([27 x i8], [27 x i8]* @str.10, i64 0, i64 0)), !dbg !530
+  br label %cleanup74, !dbg !532
+
+if.end9:                                          ; preds = %if.end
+  %1 = load i32, i32* %numPairComputes, align 4, !dbg !533, !tbaa !534
+  %2 = sext i32 %1 to i64, !dbg !535
+  %3 = call { i64, i1 } @llvm.umul.with.overflow.i64(i64 %2, i64 48), !dbg !535
+  %4 = extractvalue { i64, i1 } %3, 1, !dbg !535
+  %5 = extractvalue { i64, i1 } %3, 0, !dbg !535
+  %6 = call { i64, i1 } @llvm.uadd.with.overflow.i64(i64 %5, i64 8), !dbg !535
+  %7 = extractvalue { i64, i1 } %6, 1, !dbg !535
+  %8 = or i1 %4, %7, !dbg !535
+  %9 = extractvalue { i64, i1 } %6, 0, !dbg !535
+  %10 = select i1 %8, i64 -1, i64 %9, !dbg !535
+  %call11 = call i8* @ben_malloc(i32 1, i64 %10) #12, !dbg !535
+  %11 = bitcast i8* %call11 to i64*, !dbg !535
+  store i64 %2, i64* %11, align 16, !dbg !535
+  %12 = getelementptr inbounds i8, i8* %call11, i64 8, !dbg !535
+  %13 = bitcast i8* %12 to %class.PairCompute*, !dbg !535
+  %isempty = icmp eq i32 %1, 0, !dbg !535
+  br i1 %isempty, label %arrayctor.cont.thread, label %new.ctorloop, !dbg !535
+
+arrayctor.cont.thread:                            ; preds = %if.end9
+  %pairComputes114 = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 3, !dbg !536
+  %14 = bitcast %class.PairCompute** %pairComputes114 to i8**, !dbg !538
+  store i8* %12, i8** %14, align 8, !dbg !538, !tbaa !476
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  br label %for.end, !dbg !540
+
+new.ctorloop:                                     ; preds = %if.end9
+  %arrayctor.end = getelementptr inbounds %class.PairCompute, %class.PairCompute* %13, i64 %2, !dbg !542
+  br label %arrayctor.loop, !dbg !542
+
+arrayctor.loop:                                   ; preds = %invoke.cont, %new.ctorloop
+  %arrayctor.cur = phi %class.PairCompute* [ %13, %new.ctorloop ], [ %arrayctor.next, %invoke.cont ], !dbg !543
+  call void @llvm.dbg.value(metadata %class.PairCompute* %arrayctor.cur, i64 0, metadata !545, metadata !431), !dbg !548
+  call void @llvm.dbg.value(metadata %class.Pairlists* %pairlists.i, i64 0, metadata !550, metadata !431), !dbg !553
+  %size.i.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 0, i32 4, i32 2, !dbg !555
+  store i32 10, i32* %size.i.i, align 4, !dbg !555, !tbaa !556
+  %call.i4.i93 = invoke i8* @_Znam(i64 20) #12          to label %invoke.cont unwind label %lpad, !dbg !557
+
+invoke.cont:                                      ; preds = %arrayctor.loop
+  %pairlists.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 0, i32 4, !dbg !559
+  %15 = bitcast %class.Pairlists* %pairlists.i to i8**, !dbg !560
+  store i8* %call.i4.i93, i8** %15, align 8, !dbg !560, !tbaa !466
+  %pairlistsValid.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 0, i32 5, !dbg !561
+  store i32 0, i32* %pairlistsValid.i, align 8, !dbg !564, !tbaa !565
+  %arrayctor.next = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 1, !dbg !568
+  %arrayctor.done = icmp eq %class.PairCompute* %arrayctor.next, %arrayctor.end, !dbg !568
+  br i1 %arrayctor.done, label %arrayctor.cont, label %arrayctor.loop, !dbg !568
+
+arrayctor.cont:                                   ; preds = %invoke.cont
+  %pairComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 3, !dbg !536
+  %16 = bitcast %class.PairCompute** %pairComputes to i8**, !dbg !538
+  store i8* %12, i8** %16, align 8, !dbg !538, !tbaa !476
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  %cmp15108 = icmp sgt i32 %1, 0, !dbg !570
+  br i1 %cmp15108, label %for.body.lr.ph, label %for.end, !dbg !540
+
+for.body.lr.ph:                                   ; preds = %arrayctor.cont
+  %17 = bitcast i32* %p1 to i8*
+  %18 = bitcast i32* %i1 to i8*
+  %19 = bitcast i32* %p2 to i8*
+  %20 = bitcast i32* %i2 to i8*
+  br label %for.body, !dbg !540
+
+for.body:                                         ; preds = %for.body.lr.ph, %if.end20
+  %indvars.iv112 = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next113, %if.end20 ]
+  call void @llvm.lifetime.start(i64 4, i8* nonnull %17) #9, !dbg !572
+  call void @llvm.lifetime.start(i64 4, i8* nonnull %18) #9, !dbg !572
+  call void @llvm.lifetime.start(i64 4, i8* nonnull %19) #9, !dbg !572
+  call void @llvm.lifetime.start(i64 4, i8* nonnull %20) #9, !dbg !572
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !509, metadata !431), !dbg !573
+  store i32 0, i32* %i2, align 4, !dbg !574, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !508, metadata !431), !dbg !576
+  store i32 0, i32* %p2, align 4, !dbg !577, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !507, metadata !431), !dbg !578
+  store i32 0, i32* %i1, align 4, !dbg !579, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !503, metadata !431), !dbg !580
+  store i32 0, i32* %p1, align 4, !dbg !581, !tbaa !575
+  call void @llvm.dbg.value(metadata i32* %p1, i64 0, metadata !503, metadata !582), !dbg !580
+  call void @llvm.dbg.value(metadata i32* %i1, i64 0, metadata !507, metadata !582), !dbg !578
+  call void @llvm.dbg.value(metadata i32* %p2, i64 0, metadata !508, metadata !582), !dbg !576
+  call void @llvm.dbg.value(metadata i32* %i2, i64 0, metadata !509, metadata !582), !dbg !573
+  %call16 = call i32 (%struct._IO_FILE*, i8*, ...) @fscanf(%struct._IO_FILE* %file, i8* getelementptr inbounds ([13 x i8], [13 x i8]* @.str.4, i64 0, i64 0), i32* nonnull %p1, i32* nonnull %i1, i32* nonnull %p2, i32* nonnull %i2), !dbg !583
+  %cmp17 = icmp eq i32 %call16, 4, !dbg !585
+  br i1 %cmp17, label %if.end20, label %if.then18, !dbg !586
+
+if.then18:                                        ; preds = %for.body
+  %puts91 = call i32 @puts(i8* getelementptr inbounds ([23 x i8], [23 x i8]* @str.9, i64 0, i64 0)), !dbg !587
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %20) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %19) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %18) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %17) #9, !dbg !589
+  br label %cleanup74
+
+lpad:                                             ; preds = %arrayctor.loop
+  %21 = landingpad { i8*, i32 }
+          cleanup, !dbg !590
+  %22 = extractvalue { i8*, i32 } %21, 0, !dbg !590
+  %23 = extractvalue { i8*, i32 } %21, 1, !dbg !590
+  %arraydestroy.isempty = icmp eq %class.PairCompute* %13, %arrayctor.cur, !dbg !591
+  br i1 %arraydestroy.isempty, label %arraydestroy.done13, label %arraydestroy.body.preheader, !dbg !591
+
+arraydestroy.body.preheader:                      ; preds = %lpad
+  br label %arraydestroy.body, !dbg !593
+
+arraydestroy.body:                                ; preds = %arraydestroy.body.preheader, %invoke.cont12
+  %arraydestroy.elementPast = phi %class.PairCompute* [ %arraydestroy.element, %invoke.cont12 ], [ %arrayctor.cur, %arraydestroy.body.preheader ], !dbg !593
+  %arraydestroy.element = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arraydestroy.elementPast, i64 -1, !dbg !593
+  call void @llvm.dbg.value(metadata %class.PairCompute* %arraydestroy.element, i64 0, metadata !480, metadata !431), !dbg !595
+  %data.i.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arraydestroy.elementPast, i64 -1, i32 4, i32 0, !dbg !597
+  %24 = load i16*, i16** %data.i.i, align 8, !dbg !597, !tbaa !466
+  %isnull.i.i = icmp eq i16* %24, null, !dbg !599
+  br i1 %isnull.i.i, label %invoke.cont12, label %delete.notnull.i.i, !dbg !599
+
+delete.notnull.i.i:                               ; preds = %arraydestroy.body
+  %25 = bitcast i16* %24 to i8*, !dbg !600
+  call void @ben_free(i32 7, i8* %25) #10, !dbg !600
+  br label %invoke.cont12, !dbg !600
+
+invoke.cont12:                                    ; preds = %delete.notnull.i.i, %arraydestroy.body
+  %arraydestroy.done = icmp eq %class.PairCompute* %arraydestroy.element, %13, !dbg !601
+  br i1 %arraydestroy.done, label %arraydestroy.done13.loopexit, label %arraydestroy.body, !dbg !601
+
+arraydestroy.done13.loopexit:                     ; preds = %invoke.cont12
+  br label %arraydestroy.done13, !dbg !603
+
+arraydestroy.done13:                              ; preds = %arraydestroy.done13.loopexit, %lpad
+  call void @ben_free(i32 8, i8* nonnull %call11) #10, !dbg !603
+  br label %ehcleanup, !dbg !603
+
+if.end20:                                         ; preds = %for.body
+  %26 = load i32, i32* %p1, align 4, !dbg !605, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 %26, i64 0, metadata !503, metadata !431), !dbg !580
+  %27 = load %class.PairCompute*, %class.PairCompute** %pairComputes, align 8, !dbg !606, !tbaa !476
+  %patchId1 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %27, i64 %indvars.iv112, i32 0, !dbg !607
+  store i32 %26, i32* %patchId1, align 8, !dbg !608, !tbaa !609
+  %28 = load i32, i32* %i1, align 4, !dbg !610, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 %28, i64 0, metadata !507, metadata !431), !dbg !578
+  %image1 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %27, i64 %indvars.iv112, i32 1, !dbg !611
+  store i32 %28, i32* %image1, align 4, !dbg !612, !tbaa !613
+  %29 = load i32, i32* %p2, align 4, !dbg !614, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 %29, i64 0, metadata !508, metadata !431), !dbg !576
+  %patchId2 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %27, i64 %indvars.iv112, i32 2, !dbg !615
+  store i32 %29, i32* %patchId2, align 8, !dbg !616, !tbaa !617
+  %30 = load i32, i32* %i2, align 4, !dbg !618, !tbaa !575
+  call void @llvm.dbg.value(metadata i32 %30, i64 0, metadata !509, metadata !431), !dbg !573
+  %image2 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %27, i64 %indvars.iv112, i32 3, !dbg !619
+  store i32 %30, i32* %image2, align 4, !dbg !620, !tbaa !621
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %20) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %19) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %18) #9, !dbg !589
+  call void @llvm.lifetime.end(i64 4, i8* nonnull %17) #9, !dbg !589
+  %indvars.iv.next113 = add nuw i64 %indvars.iv112, 1, !dbg !622
+  %31 = load i32, i32* %numPairComputes, align 4, !dbg !624, !tbaa !534
+  %32 = sext i32 %31 to i64, !dbg !570
+  %cmp15 = icmp slt i64 %indvars.iv.next113, %32, !dbg !570
+  br i1 %cmp15, label %for.body, label %for.end.loopexit, !dbg !540, !llvm.loop !625
+
+for.end.loopexit:                                 ; preds = %if.end20
+  br label %for.end, !dbg !628
+
+for.end:                                          ; preds = %for.end.loopexit, %arrayctor.cont.thread, %arrayctor.cont
+  %call35 = call i8* @fgets(i8* nonnull %0, i32 1024, %struct._IO_FILE* %file), !dbg !628
+  %tobool36 = icmp eq i8* %call35, null, !dbg !628
+  br i1 %tobool36, label %if.then41, label %lor.lhs.false37, !dbg !630
+
+lor.lhs.false37:                                  ; preds = %for.end
+  %call39 = call i32 @strcmp(i8* nonnull %0, i8* getelementptr inbounds ([17 x i8], [17 x i8]* @.str.6, i64 0, i64 0)) #11, !dbg !631
+  %tobool40 = icmp eq i32 %call39, 0, !dbg !631
+  br i1 %tobool40, label %if.end43, label %if.then41, !dbg !633
+
+if.then41:                                        ; preds = %lor.lhs.false37, %for.end
+  %puts90 = call i32 @puts(i8* getelementptr inbounds ([24 x i8], [24 x i8]* @str.8, i64 0, i64 0)), !dbg !634
+  br label %cleanup74, !dbg !636
+
+if.end43:                                         ; preds = %lor.lhs.false37
+  %numPatches = getelementptr inbounds %class.PatchList, %class.PatchList* %patchList, i64 0, i32 4, !dbg !637
+  %33 = load i32, i32* %numPatches, align 8, !dbg !637, !tbaa !638
+  %numSelfComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 0, !dbg !640
+  store i32 %33, i32* %numSelfComputes, align 8, !dbg !641, !tbaa !642
+  %34 = sext i32 %33 to i64, !dbg !643
+  %35 = call { i64, i1 } @llvm.umul.with.overflow.i64(i64 %34, i64 40), !dbg !643
+  %36 = extractvalue { i64, i1 } %35, 1, !dbg !643
+  %37 = extractvalue { i64, i1 } %35, 0, !dbg !643
+  %38 = call { i64, i1 } @llvm.uadd.with.overflow.i64(i64 %37, i64 8), !dbg !643
+  %39 = extractvalue { i64, i1 } %38, 1, !dbg !643
+  %40 = or i1 %36, %39, !dbg !643
+  %41 = extractvalue { i64, i1 } %38, 0, !dbg !643
+  %42 = select i1 %40, i64 -1, i64 %41, !dbg !643
+  %call45 = call i8* @ben_malloc(i32 2, i64 %42) #12, !dbg !643
+  %43 = bitcast i8* %call45 to i64*, !dbg !643
+  store i64 %34, i64* %43, align 16, !dbg !643
+  %44 = getelementptr inbounds i8, i8* %call45, i64 8, !dbg !643
+  %45 = bitcast i8* %44 to %class.SelfCompute*, !dbg !643
+  %isempty46 = icmp eq i32 %33, 0, !dbg !643
+  br i1 %isempty46, label %arrayctor.cont62.thread, label %new.ctorloop47, !dbg !643
+
+arrayctor.cont62.thread:                          ; preds = %if.end43
+  %selfComputes116 = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 2, !dbg !644
+  %46 = bitcast %class.SelfCompute** %selfComputes116 to i8**, !dbg !645
+  store i8* %44, i8** %46, align 8, !dbg !645, !tbaa !442
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  br label %cleanup74, !dbg !646
+
+new.ctorloop47:                                   ; preds = %if.end43
+  %arrayctor.end48 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %45, i64 %34, !dbg !649
+  br label %arrayctor.loop49, !dbg !649
+
+arrayctor.loop49:                                 ; preds = %invoke.cont52, %new.ctorloop47
+  %arrayctor.cur50 = phi %class.SelfCompute* [ %45, %new.ctorloop47 ], [ %arrayctor.next60, %invoke.cont52 ], !dbg !650
+  call void @llvm.dbg.value(metadata %class.SelfCompute* %arrayctor.cur50, i64 0, metadata !651, metadata !431), !dbg !654
+  call void @llvm.dbg.value(metadata %class.Pairlists* %pairlists.i94, i64 0, metadata !550, metadata !431), !dbg !656
+  %size.i.i95 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 0, i32 1, i32 2, !dbg !658
+  store i32 10, i32* %size.i.i95, align 4, !dbg !658, !tbaa !556
+  %call.i4.i97 = invoke i8* @_Znam(i64 20) #12          to label %invoke.cont52 unwind label %lpad51, !dbg !659
+
+invoke.cont52:                                    ; preds = %arrayctor.loop49
+  %pairlists.i94 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 0, i32 1, !dbg !660
+  %47 = bitcast %class.Pairlists* %pairlists.i94 to i8**, !dbg !661
+  store i8* %call.i4.i97, i8** %47, align 8, !dbg !661, !tbaa !466
+  %pairlistsValid.i96 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 0, i32 2, !dbg !662
+  store i32 0, i32* %pairlistsValid.i96, align 8, !dbg !665, !tbaa !666
+  %arrayctor.next60 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 1, !dbg !668
+  %arrayctor.done61 = icmp eq %class.SelfCompute* %arrayctor.next60, %arrayctor.end48, !dbg !668
+  br i1 %arrayctor.done61, label %arrayctor.cont62, label %arrayctor.loop49, !dbg !668
+
+arrayctor.cont62:                                 ; preds = %invoke.cont52
+  %selfComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 2, !dbg !644
+  %48 = bitcast %class.SelfCompute** %selfComputes to i8**, !dbg !645
+  store i8* %44, i8** %48, align 8, !dbg !645, !tbaa !442
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !502, metadata !431), !dbg !539
+  %cmp65106 = icmp sgt i32 %33, 0, !dbg !669
+  %49 = bitcast i8* %44 to %class.SelfCompute*, !dbg !646
+  br i1 %cmp65106, label %for.body66.preheader, label %cleanup74, !dbg !646
+
+for.body66.preheader:                             ; preds = %arrayctor.cont62
+  %50 = add nsw i64 %34, -1, !dbg !672
+  %xtraiter = and i64 %34, 7, !dbg !672
+  %lcmp.mod = icmp eq i64 %xtraiter, 0, !dbg !672
+  br i1 %lcmp.mod, label %for.body66.prol.loopexit, label %for.body66.prol.preheader, !dbg !672
+
+for.body66.prol.preheader:                        ; preds = %for.body66.preheader
+  br label %for.body66.prol, !dbg !672
+
+for.body66.prol:                                  ; preds = %for.body66.prol, %for.body66.prol.preheader
+  %indvars.iv.prol = phi i64 [ %indvars.iv.next.prol, %for.body66.prol ], [ 0, %for.body66.prol.preheader ]
+  %prol.iter = phi i64 [ %prol.iter.sub, %for.body66.prol ], [ %xtraiter, %for.body66.prol.preheader ]
+  %patchId.prol = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.prol, i32 0, !dbg !672
+  %51 = trunc i64 %indvars.iv.prol to i32, !dbg !674
+  store i32 %51, i32* %patchId.prol, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.prol = add nuw nsw i64 %indvars.iv.prol, 1, !dbg !676
+  %prol.iter.sub = add i64 %prol.iter, -1, !dbg !646
+  %prol.iter.cmp = icmp eq i64 %prol.iter.sub, 0, !dbg !646
+  br i1 %prol.iter.cmp, label %for.body66.prol.loopexit.unr-lcssa, label %for.body66.prol, !dbg !646, !llvm.loop !678
+
+for.body66.prol.loopexit.unr-lcssa:               ; preds = %for.body66.prol
+  br label %for.body66.prol.loopexit, !dbg !672
+
+for.body66.prol.loopexit:                         ; preds = %for.body66.preheader, %for.body66.prol.loopexit.unr-lcssa
+  %indvars.iv.unr = phi i64 [ 0, %for.body66.preheader ], [ %indvars.iv.next.prol, %for.body66.prol.loopexit.unr-lcssa ]
+  %52 = icmp ult i64 %50, 7, !dbg !672
+  br i1 %52, label %cleanup74.loopexit, label %for.body66.preheader.new, !dbg !672
+
+for.body66.preheader.new:                         ; preds = %for.body66.prol.loopexit
+  br label %for.body66, !dbg !672
+
+for.body66:                                       ; preds = %for.body66, %for.body66.preheader.new
+  %indvars.iv = phi i64 [ %indvars.iv.unr, %for.body66.preheader.new ], [ %indvars.iv.next.7, %for.body66 ]
+  %patchId = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv, i32 0, !dbg !672
+  %53 = trunc i64 %indvars.iv to i32, !dbg !674
+  store i32 %53, i32* %patchId, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next = add nuw nsw i64 %indvars.iv, 1, !dbg !676
+  %patchId.1 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next, i32 0, !dbg !672
+  %54 = trunc i64 %indvars.iv.next to i32, !dbg !674
+  store i32 %54, i32* %patchId.1, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.1 = add nsw i64 %indvars.iv, 2, !dbg !676
+  %patchId.2 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.1, i32 0, !dbg !672
+  %55 = trunc i64 %indvars.iv.next.1 to i32, !dbg !674
+  store i32 %55, i32* %patchId.2, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.2 = add nsw i64 %indvars.iv, 3, !dbg !676
+  %patchId.3 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.2, i32 0, !dbg !672
+  %56 = trunc i64 %indvars.iv.next.2 to i32, !dbg !674
+  store i32 %56, i32* %patchId.3, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.3 = add nsw i64 %indvars.iv, 4, !dbg !676
+  %patchId.4 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.3, i32 0, !dbg !672
+  %57 = trunc i64 %indvars.iv.next.3 to i32, !dbg !674
+  store i32 %57, i32* %patchId.4, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.4 = add nsw i64 %indvars.iv, 5, !dbg !676
+  %patchId.5 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.4, i32 0, !dbg !672
+  %58 = trunc i64 %indvars.iv.next.4 to i32, !dbg !674
+  store i32 %58, i32* %patchId.5, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.5 = add nsw i64 %indvars.iv, 6, !dbg !676
+  %patchId.6 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.5, i32 0, !dbg !672
+  %59 = trunc i64 %indvars.iv.next.5 to i32, !dbg !674
+  store i32 %59, i32* %patchId.6, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.6 = add nsw i64 %indvars.iv, 7, !dbg !676
+  %patchId.7 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %49, i64 %indvars.iv.next.6, i32 0, !dbg !672
+  %60 = trunc i64 %indvars.iv.next.6 to i32, !dbg !674
+  store i32 %60, i32* %patchId.7, align 8, !dbg !674, !tbaa !675
+  %indvars.iv.next.7 = add nsw i64 %indvars.iv, 8, !dbg !676
+  %cmp65.7 = icmp slt i64 %indvars.iv.next.7, %34, !dbg !669
+  br i1 %cmp65.7, label %for.body66, label %cleanup74.loopexit.unr-lcssa, !dbg !646, !llvm.loop !680
+
+lpad51:                                           ; preds = %arrayctor.loop49
+  %61 = landingpad { i8*, i32 }
+          cleanup, !dbg !683
+  %62 = extractvalue { i8*, i32 } %61, 0, !dbg !683
+  %63 = extractvalue { i8*, i32 } %61, 1, !dbg !683
+  %arraydestroy.isempty53 = icmp eq %class.SelfCompute* %45, %arrayctor.cur50, !dbg !684
+  br i1 %arraydestroy.isempty53, label %arraydestroy.done59, label %arraydestroy.body54.preheader, !dbg !684
+
+arraydestroy.body54.preheader:                    ; preds = %lpad51
+  br label %arraydestroy.body54, !dbg !685
+
+arraydestroy.body54:                              ; preds = %arraydestroy.body54.preheader, %invoke.cont57
+  %arraydestroy.elementPast55 = phi %class.SelfCompute* [ %arraydestroy.element56, %invoke.cont57 ], [ %arrayctor.cur50, %arraydestroy.body54.preheader ], !dbg !685
+  %arraydestroy.element56 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arraydestroy.elementPast55, i64 -1, !dbg !685
+  call void @llvm.dbg.value(metadata %class.SelfCompute* %arraydestroy.element56, i64 0, metadata !453, metadata !431), !dbg !686
+  %data.i.i98 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arraydestroy.elementPast55, i64 -1, i32 1, i32 0, !dbg !688
+  %64 = load i16*, i16** %data.i.i98, align 8, !dbg !688, !tbaa !466
+  %isnull.i.i99 = icmp eq i16* %64, null, !dbg !690
+  br i1 %isnull.i.i99, label %invoke.cont57, label %delete.notnull.i.i100, !dbg !690
+
+delete.notnull.i.i100:                            ; preds = %arraydestroy.body54
+  %65 = bitcast i16* %64 to i8*, !dbg !691
+  call void @ben_free(i32 9, i8* %65) #10, !dbg !691
+  br label %invoke.cont57, !dbg !691
+
+invoke.cont57:                                    ; preds = %delete.notnull.i.i100, %arraydestroy.body54
+  %arraydestroy.done58 = icmp eq %class.SelfCompute* %arraydestroy.element56, %45, !dbg !692
+  br i1 %arraydestroy.done58, label %arraydestroy.done59.loopexit, label %arraydestroy.body54, !dbg !692
+
+arraydestroy.done59.loopexit:                     ; preds = %invoke.cont57
+  br label %arraydestroy.done59, !dbg !693
+
+arraydestroy.done59:                              ; preds = %arraydestroy.done59.loopexit, %lpad51
+  call void @ben_free(i32 10, i8* nonnull %call45) #10, !dbg !693
+  br label %ehcleanup, !dbg !694
+
+cleanup74.loopexit.unr-lcssa:                     ; preds = %for.body66
+  br label %cleanup74.loopexit, !dbg !590
+
+cleanup74.loopexit:                               ; preds = %for.body66.prol.loopexit, %cleanup74.loopexit.unr-lcssa
+  br label %cleanup74, !dbg !590
+
+cleanup74:                                        ; preds = %cleanup74.loopexit, %arrayctor.cont62.thread, %arrayctor.cont62, %if.then41, %if.then18, %if.then7, %if.then
+  %retval.3 = phi i32 [ -1, %if.then ], [ -2, %if.then7 ], [ -4, %if.then41 ], [ -3, %if.then18 ], [ 0, %arrayctor.cont62 ], [ 0, %arrayctor.cont62.thread ], [ 0, %cleanup74.loopexit ]
+  call void @llvm.lifetime.end(i64 1024, i8* nonnull %0) #9, !dbg !590
+  ret i32 %retval.3, !dbg !695
+
+ehcleanup:                                        ; preds = %arraydestroy.done59, %arraydestroy.done13
+  %exn.slot.0 = phi i8* [ %62, %arraydestroy.done59 ], [ %22, %arraydestroy.done13 ]
+  %ehselector.slot.0 = phi i32 [ %63, %arraydestroy.done59 ], [ %23, %arraydestroy.done13 ]
+  call void @llvm.lifetime.end(i64 1024, i8* nonnull %0) #9, !dbg !590
+  %lpad.val = insertvalue { i8*, i32 } undef, i8* %exn.slot.0, 0, !dbg !696
+  %lpad.val75 = insertvalue { i8*, i32 } %lpad.val, i32 %ehselector.slot.0, 1, !dbg !696
+  resume { i8*, i32 } %lpad.val75, !dbg !696
+}
+
+;
+declare void @llvm.lifetime.start(i64, i8* nocapture) #4
+
+;
+declare i8* @fgets(i8*, i32, %struct._IO_FILE* nocapture) local_unnamed_addr #5
+
+;
+declare i32 @strcmp(i8* nocapture, i8* nocapture) local_unnamed_addr #6
+
+;
+declare i32 @fscanf(%struct._IO_FILE* nocapture, i8* nocapture readonly, ...) local_unnamed_addr #5
+
+;
+declare { i64, i1 } @llvm.umul.with.overflow.i64(i64, i64) #1
+
+;
+declare { i64, i1 } @llvm.uadd.with.overflow.i64(i64, i64) #1
+
+;
+declare noalias nonnull i8* @_Znam(i64) local_unnamed_addr #7
+
+;
+declare noalias nonnull i8* @ben_malloc(i32, i64) local_unnamed_addr #7
+
+;
+declare void @llvm.lifetime.end(i64, i8* nocapture) #4
+
+;
+define void @_ZN11ComputeList11runComputesEP9PatchList(%class.ComputeList* nocapture readonly %this, %class.PatchList* %patchList) local_unnamed_addr #2 align 2 !dbg !697 {
+entry:
+  tail call void @llvm.dbg.value(metadata %class.ComputeList* %this, i64 0, metadata !699, metadata !431), !dbg !702
+  tail call void @llvm.dbg.value(metadata %class.PatchList* %patchList, i64 0, metadata !700, metadata !431), !dbg !703
+  tail call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !701, metadata !431), !dbg !704
+  tail call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !701, metadata !431), !dbg !704
+  %numSelfComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 0, !dbg !705
+  %0 = load i32, i32* %numSelfComputes, align 8, !dbg !705, !tbaa !642
+  %cmp19 = icmp sgt i32 %0, 0, !dbg !709
+  br i1 %cmp19, label %for.body.lr.ph, label %for.cond2.preheader, !dbg !710
+
+for.body.lr.ph:                                   ; preds = %entry
+  %selfComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 2
+  br label %for.body, !dbg !710
+
+for.cond2.preheader.loopexit:                     ; preds = %for.body
+  br label %for.cond2.preheader, !dbg !704
+
+for.cond2.preheader:                              ; preds = %for.cond2.preheader.loopexit, %entry
+  tail call void @llvm.dbg.value(metadata i32 0, i64 0, metadata !701, metadata !431), !dbg !704
+  %numPairComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 1, !dbg !712
+  %1 = load i32, i32* %numPairComputes, align 4, !dbg !712, !tbaa !534
+  %cmp317 = icmp sgt i32 %1, 0, !dbg !716
+  br i1 %cmp317, label %for.body4.lr.ph, label %for.end9, !dbg !717
+
+for.body4.lr.ph:                                  ; preds = %for.cond2.preheader
+  %pairComputes = getelementptr inbounds %class.ComputeList, %class.ComputeList* %this, i64 0, i32 3
+  br label %for.body4, !dbg !717
+
+for.body:                                         ; preds = %for.body.lr.ph, %for.body
+  %indvars.iv21 = phi i64 [ 0, %for.body.lr.ph ], [ %indvars.iv.next22, %for.body ]
+  %2 = load %class.SelfCompute*, %class.SelfCompute** %selfComputes, align 8, !dbg !719, !tbaa !442
+  %arrayidx = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %2, i64 %indvars.iv21, !dbg !719
+  tail call void @_ZN11SelfCompute6doWorkEP9PatchList(%class.SelfCompute* %arrayidx, %class.PatchList* %patchList), !dbg !721
+  %indvars.iv.next22 = add nuw i64 %indvars.iv21, 1, !dbg !722
+  %3 = load i32, i32* %numSelfComputes, align 8, !dbg !705, !tbaa !642
+  %4 = sext i32 %3 to i64, !dbg !709
+  %cmp = icmp slt i64 %indvars.iv.next22, %4, !dbg !709
+  br i1 %cmp, label %for.body, label %for.cond2.preheader.loopexit, !dbg !710, !llvm.loop !724
+
+for.body4:                                        ; preds = %for.body4.lr.ph, %for.body4
+  %indvars.iv = phi i64 [ 0, %for.body4.lr.ph ], [ %indvars.iv.next, %for.body4 ]
+  %5 = load %class.PairCompute*, %class.PairCompute** %pairComputes, align 8, !dbg !727, !tbaa !476
+  %arrayidx6 = getelementptr inbounds %class.PairCompute, %class.PairCompute* %5, i64 %indvars.iv, !dbg !727
+  tail call void @_ZN11PairCompute6doWorkEP9PatchList(%class.PairCompute* %arrayidx6, %class.PatchList* %patchList), !dbg !729
+  %indvars.iv.next = add nuw i64 %indvars.iv, 1, !dbg !730
+  %6 = load i32, i32* %numPairComputes, align 4, !dbg !712, !tbaa !534
+  %7 = sext i32 %6 to i64, !dbg !716
+  %cmp3 = icmp slt i64 %indvars.iv.next, %7, !dbg !716
+  br i1 %cmp3, label %for.body4, label %for.end9.loopexit, !dbg !717, !llvm.loop !732
+
+for.end9.loopexit:                                ; preds = %for.body4
+  br label %for.end9, !dbg !735
+
+for.end9:                                         ; preds = %for.end9.loopexit, %for.cond2.preheader
+  ret void, !dbg !735
+}
+
+;
+declare void @_ZN11SelfCompute6doWorkEP9PatchList(%class.SelfCompute*, %class.PatchList*) local_unnamed_addr #8
+
+;
+declare void @_ZN11PairCompute6doWorkEP9PatchList(%class.PairCompute*, %class.PatchList*) local_unnamed_addr #8
+
+;
+declare void @llvm.dbg.value(metadata, i64, metadata, metadata) #1
+
+;
+declare i32 @puts(i8* nocapture readonly) #9
+
+;
+declare void @llvm.memset.p0i8.i64(i8* nocapture writeonly, i8, i64, i32, i1) #4
+
+attributes #0 = { nounwind uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { nounwind readnone }
+attributes #2 = { uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nobuiltin nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #4 = { argmemonly nounwind }
+attributes #5 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #6 = { nounwind readonly "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #7 = { nobuiltin "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #8 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+avx,+fxsr,+mmx,+popcnt,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #9 = { nounwind }
+attributes #10 = { builtin nounwind }
+attributes #11 = { nounwind readonly }
+attributes #12 = { builtin }
+
+!llvm.dbg.cu = !{!0}
+!llvm.ident = !{!57}
+!llvm.module.flags = !{!55, !56}
+!0 = distinct !DICompileUnit(language: DW_LANG_C_plus_plus, file: !1, producer: "clang version 4.0.1 ", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug, enums: !2)
+!1 = !DIFile(filename: "ComputeList.C", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!2 = !{!3}
+!3 = !DICompositeType(tag: DW_TAG_enumeration_type, scope: !5, file: !4, line: 37, size: 32, elements: !53, identifier: "_ZTSN9PairlistsUt_E")
+!4 = !DIFile(filename: "./ComputeNonbondedUtil.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!5 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "Pairlists", file: !4, line: 36, size: 128, elements: !6, identifier: "_ZTS9Pairlists")
+!6 = !{!7, !11, !13, !14, !20, !24, !27, !28, !31, !34, !37, !38, !43, !46, !47, !50}
+!7 = !DIDerivedType(tag: DW_TAG_member, name: "data", scope: !5, file: !4, line: 38, baseType: !8, size: 64)
+!8 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !9, size: 64)
+!9 = !DIDerivedType(tag: DW_TAG_typedef, name: "plint", file: !4, line: 34, baseType: !10)
+!10 = !DIBasicType(name: "unsigned short", size: 16, encoding: DW_ATE_unsigned)
+!11 = !DIDerivedType(tag: DW_TAG_member, name: "curpos", scope: !5, file: !4, line: 39, baseType: !12, size: 32, offset: 64)
+!12 = !DIBasicType(name: "int", size: 32, encoding: DW_ATE_signed)
+!13 = !DIDerivedType(tag: DW_TAG_member, name: "size", scope: !5, file: !4, line: 40, baseType: !12, size: 32, offset: 96)
+!14 = !DISubprogram(name: "Pairlists", scope: !5, file: !4, line: 41, type: !15, isLocal: false, isDefinition: false, scopeLine: 41, flags: DIFlagPrototyped, isOptimized: true)
+!15 = !DISubroutineType(types: !16)
+!16 = !{null, !17, !18}
+!17 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !5, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!18 = !DIDerivedType(tag: DW_TAG_reference_type, baseType: !19, size: 64)
+!19 = !DIDerivedType(tag: DW_TAG_const_type, baseType: !5)
+!20 = !DISubprogram(name: "operator=", linkageName: "_ZN9PairlistsaSERKS_", scope: !5, file: !4, line: 42, type: !21, isLocal: false, isDefinition: false, scopeLine: 42, flags: DIFlagPrototyped, isOptimized: true)
+!21 = !DISubroutineType(types: !22)
+!22 = !{!23, !17, !18}
+!23 = !DIDerivedType(tag: DW_TAG_reference_type, baseType: !5, size: 64)
+!24 = !DISubprogram(name: "Pairlists", scope: !5, file: !4, line: 44, type: !25, isLocal: false, isDefinition: false, scopeLine: 44, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!25 = !DISubroutineType(types: !26)
+!26 = !{null, !17}
+!27 = !DISubprogram(name: "~Pairlists", scope: !5, file: !4, line: 45, type: !25, isLocal: false, isDefinition: false, scopeLine: 45, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!28 = !DISubprogram(name: "newlist", linkageName: "_ZN9Pairlists7newlistEi", scope: !5, file: !4, line: 46, type: !29, isLocal: false, isDefinition: false, scopeLine: 46, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!29 = !DISubroutineType(types: !30)
+!30 = !{!8, !17, !12}
+!31 = !DISubprogram(name: "newlist", linkageName: "_ZN9Pairlists7newlistEv", scope: !5, file: !4, line: 61, type: !32, isLocal: false, isDefinition: false, scopeLine: 61, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!32 = !DISubroutineType(types: !33)
+!33 = !{!8, !17}
+!34 = !DISubprogram(name: "newsize", linkageName: "_ZN9Pairlists7newsizeEi", scope: !5, file: !4, line: 65, type: !35, isLocal: false, isDefinition: false, scopeLine: 65, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!35 = !DISubroutineType(types: !36)
+!36 = !{null, !17, !12}
+!37 = !DISubprogram(name: "reset", linkageName: "_ZN9Pairlists5resetEv", scope: !5, file: !4, line: 69, type: !25, isLocal: false, isDefinition: false, scopeLine: 69, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!38 = !DISubprogram(name: "nextlist", linkageName: "_ZN9Pairlists8nextlistEPPtPi", scope: !5, file: !4, line: 70, type: !39, isLocal: false, isDefinition: false, scopeLine: 70, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!39 = !DISubroutineType(types: !40)
+!40 = !{null, !17, !41, !42}
+!41 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !8, size: 64)
+!42 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !12, size: 64)
+!43 = !DISubprogram(name: "getSize", linkageName: "_ZN9Pairlists7getSizeEv", scope: !5, file: !4, line: 74, type: !44, isLocal: false, isDefinition: false, scopeLine: 74, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!44 = !DISubroutineType(types: !45)
+!45 = !{!12, !17}
+!46 = !DISubprogram(name: "addIndex", linkageName: "_ZN9Pairlists8addIndexEv", scope: !5, file: !4, line: 76, type: !25, isLocal: false, isDefinition: false, scopeLine: 76, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!47 = !DISubprogram(name: "setIndexValue", linkageName: "_ZN9Pairlists13setIndexValueEt", scope: !5, file: !4, line: 79, type: !48, isLocal: false, isDefinition: false, scopeLine: 79, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!48 = !DISubroutineType(types: !49)
+!49 = !{null, !17, !9}
+!50 = !DISubprogram(name: "getIndexValue", linkageName: "_ZN9Pairlists13getIndexValueEv", scope: !5, file: !4, line: 83, type: !51, isLocal: false, isDefinition: false, scopeLine: 83, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!51 = !DISubroutineType(types: !52)
+!52 = !{!9, !17}
+!53 = !{!54}
+!54 = !DIEnumerator(name: "initsize", value: 10)
+!55 = !{i32 2, !"Dwarf Version", i32 4}
+!56 = !{i32 2, !"Debug Info Version", i32 3}
+!57 = !{!"clang version 4.0.1 "}
+!58 = distinct !DISubprogram(name: "ComputeList", linkageName: "_ZN11ComputeListC2Ev", scope: !59, file: !1, line: 11, type: !418, isLocal: false, isDefinition: true, scopeLine: 11, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !417, variables: !428)
+!59 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "ComputeList", file: !60, line: 16, size: 192, elements: !61, identifier: "_ZTS11ComputeList")
+!60 = !DIFile(filename: "./ComputeList.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!61 = !{!62, !63, !64, !397, !417, !421, !422, !425}
+!62 = !DIDerivedType(tag: DW_TAG_member, name: "numSelfComputes", scope: !59, file: !60, line: 19, baseType: !12, size: 32, flags: DIFlagPublic)
+!63 = !DIDerivedType(tag: DW_TAG_member, name: "numPairComputes", scope: !59, file: !60, line: 20, baseType: !12, size: 32, offset: 32, flags: DIFlagPublic)
+!64 = !DIDerivedType(tag: DW_TAG_member, name: "selfComputes", scope: !59, file: !60, line: 22, baseType: !65, size: 64, offset: 64, flags: DIFlagPublic)
+!65 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !66, size: 64)
+!66 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "SelfCompute", file: !67, line: 14, size: 320, elements: !68, identifier: "_ZTS11SelfCompute")
+!67 = !DIFile(filename: "./Compute.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!68 = !{!69, !293, !294, !295, !296, !297, !301, !302}
+!69 = !DIDerivedType(tag: DW_TAG_inheritance, scope: !66, baseType: !70)
+!70 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "ComputeNonbondedUtil", file: !4, line: 214, size: 8, elements: !71, identifier: "_ZTS20ComputeNonbondedUtil")
+!71 = !{!72, !78, !79, !80, !81, !82, !83, !84, !85, !86, !87, !88, !89, !90, !91, !92, !93, !96, !97, !100, !101, !102, !103, !104, !108, !113, !114, !115, !116, !117, !118, !120, !121, !122, !123, !124, !125, !126, !127, !128, !129, !130, !131, !132, !133, !134, !135, !136, !137, !138, !139, !140, !141, !142, !143, !144, !145, !146, !147, !148, !149, !150, !151, !152, !153, !154, !155, !156, !157, !158, !159, !160, !161, !162, !163, !164, !165, !166, !167, !168, !169, !170, !171, !172, !173, !174, !175, !176, !180, !181, !188, !193, !194, !195, !196, !197, !198, !199, !200, !201, !202, !203, !204, !205, !206, !207, !208, !209, !210, !211, !212, !213, !214, !215, !216, !217, !218, !219, !220, !221, !222, !223, !224, !225, !226, !227, !228, !229, !230, !231, !232, !233, !234, !235, !236, !237, !238, !239, !240, !241, !242, !243, !244, !245, !246, !247, !248, !249, !250, !251, !252, !253, !254, !255, !256, !257, !258, !259, !260, !261, !262, !263, !264, !265, !266, !267, !268, !269, !270, !271, !272, !273, !274, !275, !276, !277, !278, !279, !280, !281, !282, !283, !284, !285, !286, !287, !288}
+!72 = !DIDerivedType(tag: DW_TAG_member, name: "calcPair", scope: !70, file: !4, line: 223, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!73 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !74, size: 64)
+!74 = !DISubroutineType(types: !75)
+!75 = !{null, !76}
+!76 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !77, size: 64)
+!77 = !DICompositeType(tag: DW_TAG_structure_type, name: "nonbonded", file: !4, line: 171, flags: DIFlagFwdDecl, identifier: "_ZTS9nonbonded")
+!78 = !DIDerivedType(tag: DW_TAG_member, name: "calcPairEnergy", scope: !70, file: !4, line: 224, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!79 = !DIDerivedType(tag: DW_TAG_member, name: "calcSelf", scope: !70, file: !4, line: 225, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!80 = !DIDerivedType(tag: DW_TAG_member, name: "calcSelfEnergy", scope: !70, file: !4, line: 226, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!81 = !DIDerivedType(tag: DW_TAG_member, name: "calcFullPair", scope: !70, file: !4, line: 228, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!82 = !DIDerivedType(tag: DW_TAG_member, name: "calcFullPairEnergy", scope: !70, file: !4, line: 229, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!83 = !DIDerivedType(tag: DW_TAG_member, name: "calcFullSelf", scope: !70, file: !4, line: 230, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!84 = !DIDerivedType(tag: DW_TAG_member, name: "calcFullSelfEnergy", scope: !70, file: !4, line: 231, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!85 = !DIDerivedType(tag: DW_TAG_member, name: "calcMergePair", scope: !70, file: !4, line: 233, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!86 = !DIDerivedType(tag: DW_TAG_member, name: "calcMergePairEnergy", scope: !70, file: !4, line: 234, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!87 = !DIDerivedType(tag: DW_TAG_member, name: "calcMergeSelf", scope: !70, file: !4, line: 235, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!88 = !DIDerivedType(tag: DW_TAG_member, name: "calcMergeSelfEnergy", scope: !70, file: !4, line: 236, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!89 = !DIDerivedType(tag: DW_TAG_member, name: "calcSlowPair", scope: !70, file: !4, line: 238, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!90 = !DIDerivedType(tag: DW_TAG_member, name: "calcSlowPairEnergy", scope: !70, file: !4, line: 239, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!91 = !DIDerivedType(tag: DW_TAG_member, name: "calcSlowSelf", scope: !70, file: !4, line: 240, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!92 = !DIDerivedType(tag: DW_TAG_member, name: "calcSlowSelfEnergy", scope: !70, file: !4, line: 241, baseType: !73, flags: DIFlagPublic | DIFlagStaticMember)
+!93 = !DIDerivedType(tag: DW_TAG_member, name: "commOnly", scope: !70, file: !4, line: 258, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!94 = !DIDerivedType(tag: DW_TAG_typedef, name: "Bool", file: !95, line: 83, baseType: !12)
+!95 = !DIFile(filename: "./common.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!96 = !DIDerivedType(tag: DW_TAG_member, name: "fixedAtomsOn", scope: !70, file: !4, line: 259, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!97 = !DIDerivedType(tag: DW_TAG_member, name: "cutoff", scope: !70, file: !4, line: 260, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!98 = !DIDerivedType(tag: DW_TAG_typedef, name: "BigReal", file: !95, line: 65, baseType: !99)
+!99 = !DIBasicType(name: "double", size: 64, encoding: DW_ATE_float)
+!100 = !DIDerivedType(tag: DW_TAG_member, name: "cutoff2", scope: !70, file: !4, line: 261, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!101 = !DIDerivedType(tag: DW_TAG_member, name: "pairlistdist", scope: !70, file: !4, line: 262, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!102 = !DIDerivedType(tag: DW_TAG_member, name: "hgroupcutoff", scope: !70, file: !4, line: 263, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!103 = !DIDerivedType(tag: DW_TAG_member, name: "dielectric_1", scope: !70, file: !4, line: 264, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!104 = !DIDerivedType(tag: DW_TAG_member, name: "ljTable", scope: !70, file: !4, line: 265, baseType: !105, flags: DIFlagPublic | DIFlagStaticMember)
+!105 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !106, size: 64)
+!106 = !DIDerivedType(tag: DW_TAG_const_type, baseType: !107)
+!107 = !DICompositeType(tag: DW_TAG_class_type, name: "LJTable", file: !4, line: 18, flags: DIFlagFwdDecl, identifier: "_ZTS7LJTable")
+!108 = !DIDerivedType(tag: DW_TAG_member, name: "mol", scope: !70, file: !4, line: 266, baseType: !109, flags: DIFlagPublic | DIFlagStaticMember)
+!109 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !110, size: 64)
+!110 = !DIDerivedType(tag: DW_TAG_const_type, baseType: !111)
+!111 = !DICompositeType(tag: DW_TAG_class_type, name: "Molecule", file: !112, line: 36, flags: DIFlagFwdDecl, identifier: "_ZTS8Molecule")
+!112 = !DIFile(filename: "./Molecule.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!113 = !DIDerivedType(tag: DW_TAG_member, name: "r2_delta", scope: !70, file: !4, line: 267, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!114 = !DIDerivedType(tag: DW_TAG_member, name: "r2_delta_1", scope: !70, file: !4, line: 267, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!115 = !DIDerivedType(tag: DW_TAG_member, name: "rowsize", scope: !70, file: !4, line: 268, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!116 = !DIDerivedType(tag: DW_TAG_member, name: "columnsize", scope: !70, file: !4, line: 269, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!117 = !DIDerivedType(tag: DW_TAG_member, name: "r2_delta_exp", scope: !70, file: !4, line: 270, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!118 = !DIDerivedType(tag: DW_TAG_member, name: "table_alloc", scope: !70, file: !4, line: 271, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!119 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !98, size: 64)
+!120 = !DIDerivedType(tag: DW_TAG_member, name: "table_ener", scope: !70, file: !4, line: 272, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!121 = !DIDerivedType(tag: DW_TAG_member, name: "table_short", scope: !70, file: !4, line: 273, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!122 = !DIDerivedType(tag: DW_TAG_member, name: "table_noshort", scope: !70, file: !4, line: 274, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!123 = !DIDerivedType(tag: DW_TAG_member, name: "fast_table", scope: !70, file: !4, line: 275, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!124 = !DIDerivedType(tag: DW_TAG_member, name: "scor_table", scope: !70, file: !4, line: 276, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!125 = !DIDerivedType(tag: DW_TAG_member, name: "slow_table", scope: !70, file: !4, line: 277, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!126 = !DIDerivedType(tag: DW_TAG_member, name: "corr_table", scope: !70, file: !4, line: 278, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!127 = !DIDerivedType(tag: DW_TAG_member, name: "full_table", scope: !70, file: !4, line: 279, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!128 = !DIDerivedType(tag: DW_TAG_member, name: "vdwa_table", scope: !70, file: !4, line: 280, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!129 = !DIDerivedType(tag: DW_TAG_member, name: "vdwb_table", scope: !70, file: !4, line: 281, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!130 = !DIDerivedType(tag: DW_TAG_member, name: "r2_table", scope: !70, file: !4, line: 282, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!131 = !DIDerivedType(tag: DW_TAG_member, name: "scaling", scope: !70, file: !4, line: 283, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!132 = !DIDerivedType(tag: DW_TAG_member, name: "scale14", scope: !70, file: !4, line: 284, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!133 = !DIDerivedType(tag: DW_TAG_member, name: "switchOn", scope: !70, file: !4, line: 285, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!134 = !DIDerivedType(tag: DW_TAG_member, name: "switchOn_1", scope: !70, file: !4, line: 286, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!135 = !DIDerivedType(tag: DW_TAG_member, name: "switchOn2", scope: !70, file: !4, line: 287, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!136 = !DIDerivedType(tag: DW_TAG_member, name: "v_vdwa", scope: !70, file: !4, line: 288, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!137 = !DIDerivedType(tag: DW_TAG_member, name: "v_vdwb", scope: !70, file: !4, line: 289, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!138 = !DIDerivedType(tag: DW_TAG_member, name: "k_vdwa", scope: !70, file: !4, line: 290, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!139 = !DIDerivedType(tag: DW_TAG_member, name: "k_vdwb", scope: !70, file: !4, line: 291, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!140 = !DIDerivedType(tag: DW_TAG_member, name: "cutoff_3", scope: !70, file: !4, line: 292, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!141 = !DIDerivedType(tag: DW_TAG_member, name: "cutoff_6", scope: !70, file: !4, line: 293, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!142 = !DIDerivedType(tag: DW_TAG_member, name: "c0", scope: !70, file: !4, line: 294, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!143 = !DIDerivedType(tag: DW_TAG_member, name: "c1", scope: !70, file: !4, line: 295, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!144 = !DIDerivedType(tag: DW_TAG_member, name: "c3", scope: !70, file: !4, line: 296, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!145 = !DIDerivedType(tag: DW_TAG_member, name: "c5", scope: !70, file: !4, line: 297, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!146 = !DIDerivedType(tag: DW_TAG_member, name: "c6", scope: !70, file: !4, line: 298, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!147 = !DIDerivedType(tag: DW_TAG_member, name: "c7", scope: !70, file: !4, line: 299, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!148 = !DIDerivedType(tag: DW_TAG_member, name: "c8", scope: !70, file: !4, line: 300, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!149 = !DIDerivedType(tag: DW_TAG_member, name: "alchFepOn", scope: !70, file: !4, line: 303, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!150 = !DIDerivedType(tag: DW_TAG_member, name: "alchThermIntOn", scope: !70, file: !4, line: 304, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!151 = !DIDerivedType(tag: DW_TAG_member, name: "alchLambda", scope: !70, file: !4, line: 305, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!152 = !DIDerivedType(tag: DW_TAG_member, name: "alchLambda2", scope: !70, file: !4, line: 306, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!153 = !DIDerivedType(tag: DW_TAG_member, name: "alchVdwShiftCoeff", scope: !70, file: !4, line: 307, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!154 = !DIDerivedType(tag: DW_TAG_member, name: "alchElecLambdaStart", scope: !70, file: !4, line: 308, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!155 = !DIDerivedType(tag: DW_TAG_member, name: "alchVdwLambdaEnd", scope: !70, file: !4, line: 309, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!156 = !DIDerivedType(tag: DW_TAG_member, name: "Fep_WCA_repuOn", scope: !70, file: !4, line: 310, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!157 = !DIDerivedType(tag: DW_TAG_member, name: "Fep_WCA_dispOn", scope: !70, file: !4, line: 311, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!158 = !DIDerivedType(tag: DW_TAG_member, name: "WCA_rcut1", scope: !70, file: !4, line: 312, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!159 = !DIDerivedType(tag: DW_TAG_member, name: "WCA_rcut2", scope: !70, file: !4, line: 313, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!160 = !DIDerivedType(tag: DW_TAG_member, name: "alchDecouple", scope: !70, file: !4, line: 314, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!161 = !DIDerivedType(tag: DW_TAG_member, name: "lesOn", scope: !70, file: !4, line: 316, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!162 = !DIDerivedType(tag: DW_TAG_member, name: "lesFactor", scope: !70, file: !4, line: 317, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!163 = !DIDerivedType(tag: DW_TAG_member, name: "lesScaling", scope: !70, file: !4, line: 318, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!164 = !DIDerivedType(tag: DW_TAG_member, name: "lambda_table", scope: !70, file: !4, line: 320, baseType: !119, flags: DIFlagPublic | DIFlagStaticMember)
+!165 = !DIDerivedType(tag: DW_TAG_member, name: "pairInteractionOn", scope: !70, file: !4, line: 322, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!166 = !DIDerivedType(tag: DW_TAG_member, name: "pairInteractionSelf", scope: !70, file: !4, line: 323, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!167 = !DIDerivedType(tag: DW_TAG_member, name: "pressureProfileOn", scope: !70, file: !4, line: 325, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!168 = !DIDerivedType(tag: DW_TAG_member, name: "pressureProfileSlabs", scope: !70, file: !4, line: 326, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!169 = !DIDerivedType(tag: DW_TAG_member, name: "pressureProfileAtomTypes", scope: !70, file: !4, line: 327, baseType: !12, flags: DIFlagPublic | DIFlagStaticMember)
+!170 = !DIDerivedType(tag: DW_TAG_member, name: "pressureProfileThickness", scope: !70, file: !4, line: 328, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!171 = !DIDerivedType(tag: DW_TAG_member, name: "pressureProfileMin", scope: !70, file: !4, line: 329, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!172 = !DIDerivedType(tag: DW_TAG_member, name: "accelMDOn", scope: !70, file: !4, line: 331, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!173 = !DIDerivedType(tag: DW_TAG_member, name: "drudeNbthole", scope: !70, file: !4, line: 333, baseType: !94, flags: DIFlagPublic | DIFlagStaticMember)
+!174 = !DIDerivedType(tag: DW_TAG_member, name: "ewaldcof", scope: !70, file: !4, line: 336, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!175 = !DIDerivedType(tag: DW_TAG_member, name: "pi_ewaldcof", scope: !70, file: !4, line: 337, baseType: !98, flags: DIFlagPublic | DIFlagStaticMember)
+!176 = !DISubprogram(name: "ComputeNonbondedUtil", scope: !70, file: !4, line: 218, type: !177, isLocal: false, isDefinition: false, scopeLine: 218, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!177 = !DISubroutineType(types: !178)
+!178 = !{null, !179}
+!179 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !70, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!180 = !DISubprogram(name: "~ComputeNonbondedUtil", scope: !70, file: !4, line: 219, type: !177, isLocal: false, isDefinition: false, scopeLine: 219, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!181 = !DISubprogram(name: "select", linkageName: "_ZN20ComputeNonbondedUtil6selectEP13SimParametersP8MoleculeP7LJTable", scope: !70, file: !4, line: 220, type: !182, isLocal: false, isDefinition: false, scopeLine: 220, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!182 = !DISubroutineType(types: !183)
+!183 = !{null, !184, !186, !187}
+!184 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !185, size: 64)
+!185 = !DICompositeType(tag: DW_TAG_class_type, name: "SimParameters", file: !4, line: 20, flags: DIFlagFwdDecl, identifier: "_ZTS13SimParameters")
+!186 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !111, size: 64)
+!187 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !107, size: 64)
+!188 = !DISubprogram(name: "square", linkageName: "_ZN20ComputeNonbondedUtil6squareERKdS1_S1_", scope: !70, file: !4, line: 340, type: !189, isLocal: false, isDefinition: false, scopeLine: 340, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!189 = !DISubroutineType(types: !190)
+!190 = !{!98, !191, !191, !191}
+!191 = !DIDerivedType(tag: DW_TAG_reference_type, baseType: !192, size: 64)
+!192 = !DIDerivedType(tag: DW_TAG_const_type, baseType: !98)
+!193 = !DISubprogram(name: "calc_error", linkageName: "_ZN20ComputeNonbondedUtil10calc_errorEP9nonbonded", scope: !70, file: !4, line: 347, type: !74, isLocal: false, isDefinition: false, scopeLine: 347, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!194 = !DISubprogram(name: "calc_pair", linkageName: "_ZN20ComputeNonbondedUtil9calc_pairEP9nonbonded", scope: !70, file: !4, line: 349, type: !74, isLocal: false, isDefinition: false, scopeLine: 349, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!195 = !DISubprogram(name: "calc_pair_energy", linkageName: "_ZN20ComputeNonbondedUtil16calc_pair_energyEP9nonbonded", scope: !70, file: !4, line: 350, type: !74, isLocal: false, isDefinition: false, scopeLine: 350, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!196 = !DISubprogram(name: "calc_pair_fullelect", linkageName: "_ZN20ComputeNonbondedUtil19calc_pair_fullelectEP9nonbonded", scope: !70, file: !4, line: 351, type: !74, isLocal: false, isDefinition: false, scopeLine: 351, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!197 = !DISubprogram(name: "calc_pair_energy_fullelect", linkageName: "_ZN20ComputeNonbondedUtil26calc_pair_energy_fullelectEP9nonbonded", scope: !70, file: !4, line: 352, type: !74, isLocal: false, isDefinition: false, scopeLine: 352, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!198 = !DISubprogram(name: "calc_pair_merge_fullelect", linkageName: "_ZN20ComputeNonbondedUtil25calc_pair_merge_fullelectEP9nonbonded", scope: !70, file: !4, line: 353, type: !74, isLocal: false, isDefinition: false, scopeLine: 353, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!199 = !DISubprogram(name: "calc_pair_energy_merge_fullelect", linkageName: "_ZN20ComputeNonbondedUtil32calc_pair_energy_merge_fullelectEP9nonbonded", scope: !70, file: !4, line: 354, type: !74, isLocal: false, isDefinition: false, scopeLine: 354, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!200 = !DISubprogram(name: "calc_pair_slow_fullelect", linkageName: "_ZN20ComputeNonbondedUtil24calc_pair_slow_fullelectEP9nonbonded", scope: !70, file: !4, line: 355, type: !74, isLocal: false, isDefinition: false, scopeLine: 355, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!201 = !DISubprogram(name: "calc_pair_energy_slow_fullelect", linkageName: "_ZN20ComputeNonbondedUtil31calc_pair_energy_slow_fullelectEP9nonbonded", scope: !70, file: !4, line: 356, type: !74, isLocal: false, isDefinition: false, scopeLine: 356, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!202 = !DISubprogram(name: "calc_self", linkageName: "_ZN20ComputeNonbondedUtil9calc_selfEP9nonbonded", scope: !70, file: !4, line: 358, type: !74, isLocal: false, isDefinition: false, scopeLine: 358, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!203 = !DISubprogram(name: "calc_self_energy", linkageName: "_ZN20ComputeNonbondedUtil16calc_self_energyEP9nonbonded", scope: !70, file: !4, line: 359, type: !74, isLocal: false, isDefinition: false, scopeLine: 359, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!204 = !DISubprogram(name: "calc_self_fullelect", linkageName: "_ZN20ComputeNonbondedUtil19calc_self_fullelectEP9nonbonded", scope: !70, file: !4, line: 360, type: !74, isLocal: false, isDefinition: false, scopeLine: 360, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!205 = !DISubprogram(name: "calc_self_energy_fullelect", linkageName: "_ZN20ComputeNonbondedUtil26calc_self_energy_fullelectEP9nonbonded", scope: !70, file: !4, line: 361, type: !74, isLocal: false, isDefinition: false, scopeLine: 361, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!206 = !DISubprogram(name: "calc_self_merge_fullelect", linkageName: "_ZN20ComputeNonbondedUtil25calc_self_merge_fullelectEP9nonbonded", scope: !70, file: !4, line: 362, type: !74, isLocal: false, isDefinition: false, scopeLine: 362, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!207 = !DISubprogram(name: "calc_self_energy_merge_fullelect", linkageName: "_ZN20ComputeNonbondedUtil32calc_self_energy_merge_fullelectEP9nonbonded", scope: !70, file: !4, line: 363, type: !74, isLocal: false, isDefinition: false, scopeLine: 363, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!208 = !DISubprogram(name: "calc_self_slow_fullelect", linkageName: "_ZN20ComputeNonbondedUtil24calc_self_slow_fullelectEP9nonbonded", scope: !70, file: !4, line: 364, type: !74, isLocal: false, isDefinition: false, scopeLine: 364, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!209 = !DISubprogram(name: "calc_self_energy_slow_fullelect", linkageName: "_ZN20ComputeNonbondedUtil31calc_self_energy_slow_fullelectEP9nonbonded", scope: !70, file: !4, line: 365, type: !74, isLocal: false, isDefinition: false, scopeLine: 365, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!210 = !DISubprogram(name: "calc_pair_energy_fep", linkageName: "_ZN20ComputeNonbondedUtil20calc_pair_energy_fepEP9nonbonded", scope: !70, file: !4, line: 368, type: !74, isLocal: false, isDefinition: false, scopeLine: 368, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!211 = !DISubprogram(name: "calc_pair_energy_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil30calc_pair_energy_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 369, type: !74, isLocal: false, isDefinition: false, scopeLine: 369, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!212 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil36calc_pair_energy_merge_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 370, type: !74, isLocal: false, isDefinition: false, scopeLine: 370, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!213 = !DISubprogram(name: "calc_pair_energy_slow_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil35calc_pair_energy_slow_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 371, type: !74, isLocal: false, isDefinition: false, scopeLine: 371, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!214 = !DISubprogram(name: "calc_self_energy_fep", linkageName: "_ZN20ComputeNonbondedUtil20calc_self_energy_fepEP9nonbonded", scope: !70, file: !4, line: 372, type: !74, isLocal: false, isDefinition: false, scopeLine: 372, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!215 = !DISubprogram(name: "calc_self_energy_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil30calc_self_energy_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 373, type: !74, isLocal: false, isDefinition: false, scopeLine: 373, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!216 = !DISubprogram(name: "calc_self_energy_merge_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil36calc_self_energy_merge_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 374, type: !74, isLocal: false, isDefinition: false, scopeLine: 374, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!217 = !DISubprogram(name: "calc_self_energy_slow_fullelect_fep", linkageName: "_ZN20ComputeNonbondedUtil35calc_self_energy_slow_fullelect_fepEP9nonbonded", scope: !70, file: !4, line: 375, type: !74, isLocal: false, isDefinition: false, scopeLine: 375, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!218 = !DISubprogram(name: "calc_pair_energy_ti", linkageName: "_ZN20ComputeNonbondedUtil19calc_pair_energy_tiEP9nonbonded", scope: !70, file: !4, line: 377, type: !74, isLocal: false, isDefinition: false, scopeLine: 377, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!219 = !DISubprogram(name: "calc_pair_ti", linkageName: "_ZN20ComputeNonbondedUtil12calc_pair_tiEP9nonbonded", scope: !70, file: !4, line: 378, type: !74, isLocal: false, isDefinition: false, scopeLine: 378, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!220 = !DISubprogram(name: "calc_pair_energy_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil29calc_pair_energy_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 379, type: !74, isLocal: false, isDefinition: false, scopeLine: 379, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!221 = !DISubprogram(name: "calc_pair_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil22calc_pair_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 380, type: !74, isLocal: false, isDefinition: false, scopeLine: 380, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!222 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil35calc_pair_energy_merge_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 381, type: !74, isLocal: false, isDefinition: false, scopeLine: 381, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!223 = !DISubprogram(name: "calc_pair_merge_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil28calc_pair_merge_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 382, type: !74, isLocal: false, isDefinition: false, scopeLine: 382, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!224 = !DISubprogram(name: "calc_pair_energy_slow_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil34calc_pair_energy_slow_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 383, type: !74, isLocal: false, isDefinition: false, scopeLine: 383, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!225 = !DISubprogram(name: "calc_pair_slow_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil27calc_pair_slow_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 384, type: !74, isLocal: false, isDefinition: false, scopeLine: 384, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!226 = !DISubprogram(name: "calc_self_energy_ti", linkageName: "_ZN20ComputeNonbondedUtil19calc_self_energy_tiEP9nonbonded", scope: !70, file: !4, line: 385, type: !74, isLocal: false, isDefinition: false, scopeLine: 385, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!227 = !DISubprogram(name: "calc_self_ti", linkageName: "_ZN20ComputeNonbondedUtil12calc_self_tiEP9nonbonded", scope: !70, file: !4, line: 386, type: !74, isLocal: false, isDefinition: false, scopeLine: 386, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!228 = !DISubprogram(name: "calc_self_energy_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil29calc_self_energy_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 387, type: !74, isLocal: false, isDefinition: false, scopeLine: 387, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!229 = !DISubprogram(name: "calc_self_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil22calc_self_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 388, type: !74, isLocal: false, isDefinition: false, scopeLine: 388, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!230 = !DISubprogram(name: "calc_self_energy_merge_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil35calc_self_energy_merge_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 389, type: !74, isLocal: false, isDefinition: false, scopeLine: 389, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!231 = !DISubprogram(name: "calc_self_merge_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil28calc_self_merge_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 390, type: !74, isLocal: false, isDefinition: false, scopeLine: 390, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!232 = !DISubprogram(name: "calc_self_energy_slow_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil34calc_self_energy_slow_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 391, type: !74, isLocal: false, isDefinition: false, scopeLine: 391, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!233 = !DISubprogram(name: "calc_self_slow_fullelect_ti", linkageName: "_ZN20ComputeNonbondedUtil27calc_self_slow_fullelect_tiEP9nonbonded", scope: !70, file: !4, line: 392, type: !74, isLocal: false, isDefinition: false, scopeLine: 392, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!234 = !DISubprogram(name: "calc_pair_les", linkageName: "_ZN20ComputeNonbondedUtil13calc_pair_lesEP9nonbonded", scope: !70, file: !4, line: 395, type: !74, isLocal: false, isDefinition: false, scopeLine: 395, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!235 = !DISubprogram(name: "calc_pair_energy_les", linkageName: "_ZN20ComputeNonbondedUtil20calc_pair_energy_lesEP9nonbonded", scope: !70, file: !4, line: 396, type: !74, isLocal: false, isDefinition: false, scopeLine: 396, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!236 = !DISubprogram(name: "calc_pair_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil23calc_pair_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 397, type: !74, isLocal: false, isDefinition: false, scopeLine: 397, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!237 = !DISubprogram(name: "calc_pair_energy_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil30calc_pair_energy_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 398, type: !74, isLocal: false, isDefinition: false, scopeLine: 398, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!238 = !DISubprogram(name: "calc_pair_merge_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil29calc_pair_merge_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 399, type: !74, isLocal: false, isDefinition: false, scopeLine: 399, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!239 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil36calc_pair_energy_merge_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 400, type: !74, isLocal: false, isDefinition: false, scopeLine: 400, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!240 = !DISubprogram(name: "calc_pair_slow_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil28calc_pair_slow_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 401, type: !74, isLocal: false, isDefinition: false, scopeLine: 401, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!241 = !DISubprogram(name: "calc_pair_energy_slow_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil35calc_pair_energy_slow_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 402, type: !74, isLocal: false, isDefinition: false, scopeLine: 402, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!242 = !DISubprogram(name: "calc_self_les", linkageName: "_ZN20ComputeNonbondedUtil13calc_self_lesEP9nonbonded", scope: !70, file: !4, line: 403, type: !74, isLocal: false, isDefinition: false, scopeLine: 403, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!243 = !DISubprogram(name: "calc_self_energy_les", linkageName: "_ZN20ComputeNonbondedUtil20calc_self_energy_lesEP9nonbonded", scope: !70, file: !4, line: 404, type: !74, isLocal: false, isDefinition: false, scopeLine: 404, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!244 = !DISubprogram(name: "calc_self_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil23calc_self_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 405, type: !74, isLocal: false, isDefinition: false, scopeLine: 405, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!245 = !DISubprogram(name: "calc_self_energy_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil30calc_self_energy_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 406, type: !74, isLocal: false, isDefinition: false, scopeLine: 406, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!246 = !DISubprogram(name: "calc_self_merge_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil29calc_self_merge_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 407, type: !74, isLocal: false, isDefinition: false, scopeLine: 407, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!247 = !DISubprogram(name: "calc_self_energy_merge_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil36calc_self_energy_merge_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 408, type: !74, isLocal: false, isDefinition: false, scopeLine: 408, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!248 = !DISubprogram(name: "calc_self_slow_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil28calc_self_slow_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 409, type: !74, isLocal: false, isDefinition: false, scopeLine: 409, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!249 = !DISubprogram(name: "calc_self_energy_slow_fullelect_les", linkageName: "_ZN20ComputeNonbondedUtil35calc_self_energy_slow_fullelect_lesEP9nonbonded", scope: !70, file: !4, line: 410, type: !74, isLocal: false, isDefinition: false, scopeLine: 410, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!250 = !DISubprogram(name: "calc_pair_energy_int", linkageName: "_ZN20ComputeNonbondedUtil20calc_pair_energy_intEP9nonbonded", scope: !70, file: !4, line: 413, type: !74, isLocal: false, isDefinition: false, scopeLine: 413, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!251 = !DISubprogram(name: "calc_pair_energy_fullelect_int", linkageName: "_ZN20ComputeNonbondedUtil30calc_pair_energy_fullelect_intEP9nonbonded", scope: !70, file: !4, line: 414, type: !74, isLocal: false, isDefinition: false, scopeLine: 414, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!252 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_int", linkageName: "_ZN20ComputeNonbondedUtil36calc_pair_energy_merge_fullelect_intEP9nonbonded", scope: !70, file: !4, line: 415, type: !74, isLocal: false, isDefinition: false, scopeLine: 415, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!253 = !DISubprogram(name: "calc_self_energy_int", linkageName: "_ZN20ComputeNonbondedUtil20calc_self_energy_intEP9nonbonded", scope: !70, file: !4, line: 416, type: !74, isLocal: false, isDefinition: false, scopeLine: 416, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!254 = !DISubprogram(name: "calc_self_energy_fullelect_int", linkageName: "_ZN20ComputeNonbondedUtil30calc_self_energy_fullelect_intEP9nonbonded", scope: !70, file: !4, line: 417, type: !74, isLocal: false, isDefinition: false, scopeLine: 417, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!255 = !DISubprogram(name: "calc_self_energy_merge_fullelect_int", linkageName: "_ZN20ComputeNonbondedUtil36calc_self_energy_merge_fullelect_intEP9nonbonded", scope: !70, file: !4, line: 418, type: !74, isLocal: false, isDefinition: false, scopeLine: 418, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!256 = !DISubprogram(name: "calc_pair_pprof", linkageName: "_ZN20ComputeNonbondedUtil15calc_pair_pprofEP9nonbonded", scope: !70, file: !4, line: 421, type: !74, isLocal: false, isDefinition: false, scopeLine: 421, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!257 = !DISubprogram(name: "calc_pair_energy_pprof", linkageName: "_ZN20ComputeNonbondedUtil22calc_pair_energy_pprofEP9nonbonded", scope: !70, file: !4, line: 422, type: !74, isLocal: false, isDefinition: false, scopeLine: 422, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!258 = !DISubprogram(name: "calc_pair_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil25calc_pair_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 423, type: !74, isLocal: false, isDefinition: false, scopeLine: 423, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!259 = !DISubprogram(name: "calc_pair_energy_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil32calc_pair_energy_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 424, type: !74, isLocal: false, isDefinition: false, scopeLine: 424, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!260 = !DISubprogram(name: "calc_pair_merge_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil31calc_pair_merge_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 425, type: !74, isLocal: false, isDefinition: false, scopeLine: 425, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!261 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil38calc_pair_energy_merge_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 426, type: !74, isLocal: false, isDefinition: false, scopeLine: 426, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!262 = !DISubprogram(name: "calc_pair_slow_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil30calc_pair_slow_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 427, type: !74, isLocal: false, isDefinition: false, scopeLine: 427, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!263 = !DISubprogram(name: "calc_pair_energy_slow_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil37calc_pair_energy_slow_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 428, type: !74, isLocal: false, isDefinition: false, scopeLine: 428, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!264 = !DISubprogram(name: "calc_self_pprof", linkageName: "_ZN20ComputeNonbondedUtil15calc_self_pprofEP9nonbonded", scope: !70, file: !4, line: 429, type: !74, isLocal: false, isDefinition: false, scopeLine: 429, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!265 = !DISubprogram(name: "calc_self_energy_pprof", linkageName: "_ZN20ComputeNonbondedUtil22calc_self_energy_pprofEP9nonbonded", scope: !70, file: !4, line: 430, type: !74, isLocal: false, isDefinition: false, scopeLine: 430, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!266 = !DISubprogram(name: "calc_self_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil25calc_self_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 431, type: !74, isLocal: false, isDefinition: false, scopeLine: 431, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!267 = !DISubprogram(name: "calc_self_energy_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil32calc_self_energy_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 432, type: !74, isLocal: false, isDefinition: false, scopeLine: 432, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!268 = !DISubprogram(name: "calc_self_merge_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil31calc_self_merge_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 433, type: !74, isLocal: false, isDefinition: false, scopeLine: 433, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!269 = !DISubprogram(name: "calc_self_energy_merge_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil38calc_self_energy_merge_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 434, type: !74, isLocal: false, isDefinition: false, scopeLine: 434, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!270 = !DISubprogram(name: "calc_self_slow_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil30calc_self_slow_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 435, type: !74, isLocal: false, isDefinition: false, scopeLine: 435, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!271 = !DISubprogram(name: "calc_self_energy_slow_fullelect_pprof", linkageName: "_ZN20ComputeNonbondedUtil37calc_self_energy_slow_fullelect_pprofEP9nonbonded", scope: !70, file: !4, line: 436, type: !74, isLocal: false, isDefinition: false, scopeLine: 436, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!272 = !DISubprogram(name: "calc_pair_tabener", linkageName: "_ZN20ComputeNonbondedUtil17calc_pair_tabenerEP9nonbonded", scope: !70, file: !4, line: 439, type: !74, isLocal: false, isDefinition: false, scopeLine: 439, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!273 = !DISubprogram(name: "calc_pair_energy_tabener", linkageName: "_ZN20ComputeNonbondedUtil24calc_pair_energy_tabenerEP9nonbonded", scope: !70, file: !4, line: 440, type: !74, isLocal: false, isDefinition: false, scopeLine: 440, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!274 = !DISubprogram(name: "calc_pair_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil27calc_pair_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 441, type: !74, isLocal: false, isDefinition: false, scopeLine: 441, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!275 = !DISubprogram(name: "calc_pair_energy_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil34calc_pair_energy_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 442, type: !74, isLocal: false, isDefinition: false, scopeLine: 442, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!276 = !DISubprogram(name: "calc_pair_merge_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil33calc_pair_merge_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 443, type: !74, isLocal: false, isDefinition: false, scopeLine: 443, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!277 = !DISubprogram(name: "calc_pair_energy_merge_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil40calc_pair_energy_merge_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 444, type: !74, isLocal: false, isDefinition: false, scopeLine: 444, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!278 = !DISubprogram(name: "calc_pair_slow_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil32calc_pair_slow_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 445, type: !74, isLocal: false, isDefinition: false, scopeLine: 445, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!279 = !DISubprogram(name: "calc_pair_energy_slow_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil39calc_pair_energy_slow_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 446, type: !74, isLocal: false, isDefinition: false, scopeLine: 446, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!280 = !DISubprogram(name: "calc_self_tabener", linkageName: "_ZN20ComputeNonbondedUtil17calc_self_tabenerEP9nonbonded", scope: !70, file: !4, line: 447, type: !74, isLocal: false, isDefinition: false, scopeLine: 447, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!281 = !DISubprogram(name: "calc_self_energy_tabener", linkageName: "_ZN20ComputeNonbondedUtil24calc_self_energy_tabenerEP9nonbonded", scope: !70, file: !4, line: 448, type: !74, isLocal: false, isDefinition: false, scopeLine: 448, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!282 = !DISubprogram(name: "calc_self_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil27calc_self_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 449, type: !74, isLocal: false, isDefinition: false, scopeLine: 449, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!283 = !DISubprogram(name: "calc_self_energy_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil34calc_self_energy_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 450, type: !74, isLocal: false, isDefinition: false, scopeLine: 450, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!284 = !DISubprogram(name: "calc_self_merge_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil33calc_self_merge_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 451, type: !74, isLocal: false, isDefinition: false, scopeLine: 451, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!285 = !DISubprogram(name: "calc_self_energy_merge_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil40calc_self_energy_merge_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 452, type: !74, isLocal: false, isDefinition: false, scopeLine: 452, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!286 = !DISubprogram(name: "calc_self_slow_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil32calc_self_slow_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 453, type: !74, isLocal: false, isDefinition: false, scopeLine: 453, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!287 = !DISubprogram(name: "calc_self_energy_slow_fullelect_tabener", linkageName: "_ZN20ComputeNonbondedUtil39calc_self_energy_slow_fullelect_tabenerEP9nonbonded", scope: !70, file: !4, line: 454, type: !74, isLocal: false, isDefinition: false, scopeLine: 454, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!288 = !DISubprogram(name: "calcGBIS", linkageName: "_ZN20ComputeNonbondedUtil8calcGBISEP9nonbondedP15GBISParamStruct", scope: !70, file: !4, line: 456, type: !289, isLocal: false, isDefinition: false, scopeLine: 456, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!289 = !DISubroutineType(types: !290)
+!290 = !{null, !179, !76, !291}
+!291 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !292, size: 64)
+!292 = !DICompositeType(tag: DW_TAG_structure_type, name: "GBISParamStruct", file: !4, line: 138, flags: DIFlagFwdDecl, identifier: "_ZTS15GBISParamStruct")
+!293 = !DIDerivedType(tag: DW_TAG_member, name: "patchId", scope: !66, file: !67, line: 20, baseType: !12, size: 32, flags: DIFlagPublic)
+!294 = !DIDerivedType(tag: DW_TAG_member, name: "pairlists", scope: !66, file: !67, line: 22, baseType: !5, size: 128, offset: 64, flags: DIFlagPublic)
+!295 = !DIDerivedType(tag: DW_TAG_member, name: "pairlistsValid", scope: !66, file: !67, line: 23, baseType: !12, size: 32, offset: 192, flags: DIFlagPublic)
+!296 = !DIDerivedType(tag: DW_TAG_member, name: "pairlistTolerance", scope: !66, file: !67, line: 24, baseType: !98, size: 64, offset: 256, flags: DIFlagPublic)
+!297 = !DISubprogram(name: "SelfCompute", scope: !66, file: !67, line: 17, type: !298, isLocal: false, isDefinition: false, scopeLine: 17, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!298 = !DISubroutineType(types: !299)
+!299 = !{null, !300}
+!300 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !66, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!301 = !DISubprogram(name: "~SelfCompute", scope: !66, file: !67, line: 18, type: !298, isLocal: false, isDefinition: false, scopeLine: 18, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!302 = !DISubprogram(name: "doWork", linkageName: "_ZN11SelfCompute6doWorkEP9PatchList", scope: !66, file: !67, line: 26, type: !303, isLocal: false, isDefinition: false, scopeLine: 26, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!303 = !DISubroutineType(types: !304)
+!304 = !{null, !300, !305}
+!305 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !306, size: 64)
+!306 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "PatchList", file: !307, line: 16, size: 384, elements: !308, identifier: "_ZTS9PatchList")
+!307 = !DIFile(filename: "./PatchList.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!308 = !{!309, !310, !311, !312, !313, !314, !318, !321, !323, !327, !330, !390, !391, !392}
+!309 = !DIDerivedType(tag: DW_TAG_member, name: "doEnergy", scope: !306, file: !307, line: 19, baseType: !12, size: 32, flags: DIFlagPublic)
+!310 = !DIDerivedType(tag: DW_TAG_member, name: "doFull", scope: !306, file: !307, line: 20, baseType: !12, size: 32, offset: 32, flags: DIFlagPublic)
+!311 = !DIDerivedType(tag: DW_TAG_member, name: "doMerge", scope: !306, file: !307, line: 21, baseType: !12, size: 32, offset: 64, flags: DIFlagPublic)
+!312 = !DIDerivedType(tag: DW_TAG_member, name: "savePairlists", scope: !306, file: !307, line: 22, baseType: !12, size: 32, offset: 96, flags: DIFlagPublic)
+!313 = !DIDerivedType(tag: DW_TAG_member, name: "numPatches", scope: !306, file: !307, line: 24, baseType: !12, size: 32, offset: 128, flags: DIFlagPublic)
+!314 = !DIDerivedType(tag: DW_TAG_member, name: "patches", scope: !306, file: !307, line: 26, baseType: !315, size: 64, offset: 192, flags: DIFlagPublic)
+!315 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !316, size: 64)
+!316 = !DICompositeType(tag: DW_TAG_class_type, name: "Patch", file: !317, line: 16, flags: DIFlagFwdDecl, identifier: "_ZTS5Patch")
+!317 = !DIFile(filename: "./Patch.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!318 = !DIDerivedType(tag: DW_TAG_member, name: "lattice", scope: !306, file: !307, line: 33, baseType: !319, size: 64, offset: 256, flags: DIFlagPublic)
+!319 = !DIDerivedType(tag: DW_TAG_reference_type, baseType: !320, size: 64)
+!320 = !DICompositeType(tag: DW_TAG_class_type, name: "Lattice", file: !317, line: 14, flags: DIFlagFwdDecl, identifier: "_ZTS7Lattice")
+!321 = !DIDerivedType(tag: DW_TAG_member, name: "reductionData", scope: !306, file: !307, line: 39, baseType: !322, size: 64, offset: 320, flags: DIFlagPublic)
+!322 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !99, size: 64)
+!323 = !DISubprogram(name: "PatchList", scope: !306, file: !307, line: 28, type: !324, isLocal: false, isDefinition: false, scopeLine: 28, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!324 = !DISubroutineType(types: !325)
+!325 = !{null, !326, !319}
+!326 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !306, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!327 = !DISubprogram(name: "~PatchList", scope: !306, file: !307, line: 29, type: !328, isLocal: false, isDefinition: false, scopeLine: 29, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!328 = !DISubroutineType(types: !329)
+!329 = !{null, !326}
+!330 = !DISubprogram(name: "readfile", linkageName: "_ZN9PatchList8readfileEP8_IO_FILEP8Molecule", scope: !306, file: !307, line: 31, type: !331, isLocal: false, isDefinition: false, scopeLine: 31, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!331 = !DISubroutineType(types: !332)
+!332 = !{!12, !326, !333, !186}
+!333 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !334, size: 64)
+!334 = !DIDerivedType(tag: DW_TAG_typedef, name: "FILE", file: !335, line: 48, baseType: !336)
+!335 = !DIFile(filename: "/usr/include/stdio.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!336 = distinct !DICompositeType(tag: DW_TAG_structure_type, name: "_IO_FILE", file: !337, line: 246, size: 1728, elements: !338, identifier: "_ZTS8_IO_FILE")
+!337 = !DIFile(filename: "/usr/include/libio.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!338 = !{!339, !340, !343, !344, !345, !346, !347, !348, !349, !350, !351, !352, !353, !356, !358, !359, !360, !364, !365, !367, !371, !374, !376, !378, !379, !380, !381, !385, !386}
+!339 = !DIDerivedType(tag: DW_TAG_member, name: "_flags", scope: !336, file: !337, line: 247, baseType: !12, size: 32)
+!340 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_read_ptr", scope: !336, file: !337, line: 252, baseType: !341, size: 64, offset: 64)
+!341 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !342, size: 64)
+!342 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_signed_char)
+!343 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_read_end", scope: !336, file: !337, line: 253, baseType: !341, size: 64, offset: 128)
+!344 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_read_base", scope: !336, file: !337, line: 254, baseType: !341, size: 64, offset: 192)
+!345 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_write_base", scope: !336, file: !337, line: 255, baseType: !341, size: 64, offset: 256)
+!346 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_write_ptr", scope: !336, file: !337, line: 256, baseType: !341, size: 64, offset: 320)
+!347 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_write_end", scope: !336, file: !337, line: 257, baseType: !341, size: 64, offset: 384)
+!348 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_buf_base", scope: !336, file: !337, line: 258, baseType: !341, size: 64, offset: 448)
+!349 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_buf_end", scope: !336, file: !337, line: 259, baseType: !341, size: 64, offset: 512)
+!350 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_save_base", scope: !336, file: !337, line: 261, baseType: !341, size: 64, offset: 576)
+!351 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_backup_base", scope: !336, file: !337, line: 262, baseType: !341, size: 64, offset: 640)
+!352 = !DIDerivedType(tag: DW_TAG_member, name: "_IO_save_end", scope: !336, file: !337, line: 263, baseType: !341, size: 64, offset: 704)
+!353 = !DIDerivedType(tag: DW_TAG_member, name: "_markers", scope: !336, file: !337, line: 265, baseType: !354, size: 64, offset: 768)
+!354 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !355, size: 64)
+!355 = !DICompositeType(tag: DW_TAG_structure_type, name: "_IO_marker", file: !337, line: 161, flags: DIFlagFwdDecl, identifier: "_ZTS10_IO_marker")
+!356 = !DIDerivedType(tag: DW_TAG_member, name: "_chain", scope: !336, file: !337, line: 267, baseType: !357, size: 64, offset: 832)
+!357 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !336, size: 64)
+!358 = !DIDerivedType(tag: DW_TAG_member, name: "_fileno", scope: !336, file: !337, line: 269, baseType: !12, size: 32, offset: 896)
+!359 = !DIDerivedType(tag: DW_TAG_member, name: "_flags2", scope: !336, file: !337, line: 273, baseType: !12, size: 32, offset: 928)
+!360 = !DIDerivedType(tag: DW_TAG_member, name: "_old_offset", scope: !336, file: !337, line: 275, baseType: !361, size: 64, offset: 960)
+!361 = !DIDerivedType(tag: DW_TAG_typedef, name: "__off_t", file: !362, line: 140, baseType: !363)
+!362 = !DIFile(filename: "/usr/include/bits/types.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!363 = !DIBasicType(name: "long int", size: 64, encoding: DW_ATE_signed)
+!364 = !DIDerivedType(tag: DW_TAG_member, name: "_cur_column", scope: !336, file: !337, line: 279, baseType: !10, size: 16, offset: 1024)
+!365 = !DIDerivedType(tag: DW_TAG_member, name: "_vtable_offset", scope: !336, file: !337, line: 280, baseType: !366, size: 8, offset: 1040)
+!366 = !DIBasicType(name: "signed char", size: 8, encoding: DW_ATE_signed_char)
+!367 = !DIDerivedType(tag: DW_TAG_member, name: "_shortbuf", scope: !336, file: !337, line: 281, baseType: !368, size: 8, offset: 1048)
+!368 = !DICompositeType(tag: DW_TAG_array_type, baseType: !342, size: 8, elements: !369)
+!369 = !{!370}
+!370 = !DISubrange(count: 1)
+!371 = !DIDerivedType(tag: DW_TAG_member, name: "_lock", scope: !336, file: !337, line: 285, baseType: !372, size: 64, offset: 1088)
+!372 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !373, size: 64)
+!373 = !DIDerivedType(tag: DW_TAG_typedef, name: "_IO_lock_t", file: !337, line: 155, baseType: null)
+!374 = !DIDerivedType(tag: DW_TAG_member, name: "_offset", scope: !336, file: !337, line: 294, baseType: !375, size: 64, offset: 1152)
+!375 = !DIDerivedType(tag: DW_TAG_typedef, name: "__off64_t", file: !362, line: 141, baseType: !363)
+!376 = !DIDerivedType(tag: DW_TAG_member, name: "__pad1", scope: !336, file: !337, line: 303, baseType: !377, size: 64, offset: 1216)
+!377 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: null, size: 64)
+!378 = !DIDerivedType(tag: DW_TAG_member, name: "__pad2", scope: !336, file: !337, line: 304, baseType: !377, size: 64, offset: 1280)
+!379 = !DIDerivedType(tag: DW_TAG_member, name: "__pad3", scope: !336, file: !337, line: 305, baseType: !377, size: 64, offset: 1344)
+!380 = !DIDerivedType(tag: DW_TAG_member, name: "__pad4", scope: !336, file: !337, line: 306, baseType: !377, size: 64, offset: 1408)
+!381 = !DIDerivedType(tag: DW_TAG_member, name: "__pad5", scope: !336, file: !337, line: 307, baseType: !382, size: 64, offset: 1472)
+!382 = !DIDerivedType(tag: DW_TAG_typedef, name: "size_t", file: !383, line: 62, baseType: !384)
+!383 = !DIFile(filename: "/home/libs/flang/bin/../lib64/clang/4.0.1/include/stddef.h", directory: "/home/benchmarks/cpu2017-custom/namd_r/build")
+!384 = !DIBasicType(name: "long unsigned int", size: 64, encoding: DW_ATE_unsigned)
+!385 = !DIDerivedType(tag: DW_TAG_member, name: "_mode", scope: !336, file: !337, line: 309, baseType: !12, size: 32, offset: 1536)
+!386 = !DIDerivedType(tag: DW_TAG_member, name: "_unused2", scope: !336, file: !337, line: 311, baseType: !387, size: 160, offset: 1568)
+!387 = !DICompositeType(tag: DW_TAG_array_type, baseType: !342, size: 160, elements: !388)
+!388 = !{!389}
+!389 = !DISubrange(count: 20)
+!390 = !DISubprogram(name: "zeroresults", linkageName: "_ZN9PatchList11zeroresultsEv", scope: !306, file: !307, line: 35, type: !328, isLocal: false, isDefinition: false, scopeLine: 35, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!391 = !DISubprogram(name: "moveatoms", linkageName: "_ZN9PatchList9moveatomsEv", scope: !306, file: !307, line: 37, type: !328, isLocal: false, isDefinition: false, scopeLine: 37, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!392 = !DISubprogram(name: "setresults", linkageName: "_ZN9PatchList10setresultsEP9ResultSet", scope: !306, file: !307, line: 41, type: !393, isLocal: false, isDefinition: false, scopeLine: 41, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!393 = !DISubroutineType(types: !394)
+!394 = !{null, !326, !395}
+!395 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !396, size: 64)
+!396 = !DICompositeType(tag: DW_TAG_class_type, name: "ResultSet", file: !307, line: 14, flags: DIFlagFwdDecl, identifier: "_ZTS9ResultSet")
+!397 = !DIDerivedType(tag: DW_TAG_member, name: "pairComputes", scope: !59, file: !60, line: 23, baseType: !398, size: 64, offset: 128, flags: DIFlagPublic)
+!398 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !399, size: 64)
+!399 = distinct !DICompositeType(tag: DW_TAG_class_type, name: "PairCompute", file: !67, line: 30, size: 384, elements: !400, identifier: "_ZTS11PairCompute")
+!400 = !{!401, !402, !403, !404, !405, !406, !407, !408, !409, !413, !414}
+!401 = !DIDerivedType(tag: DW_TAG_inheritance, scope: !399, baseType: !70)
+!402 = !DIDerivedType(tag: DW_TAG_member, name: "patchId1", scope: !399, file: !67, line: 36, baseType: !12, size: 32, flags: DIFlagPublic)
+!403 = !DIDerivedType(tag: DW_TAG_member, name: "image1", scope: !399, file: !67, line: 37, baseType: !12, size: 32, offset: 32, flags: DIFlagPublic)
+!404 = !DIDerivedType(tag: DW_TAG_member, name: "patchId2", scope: !399, file: !67, line: 38, baseType: !12, size: 32, offset: 64, flags: DIFlagPublic)
+!405 = !DIDerivedType(tag: DW_TAG_member, name: "image2", scope: !399, file: !67, line: 39, baseType: !12, size: 32, offset: 96, flags: DIFlagPublic)
+!406 = !DIDerivedType(tag: DW_TAG_member, name: "pairlists", scope: !399, file: !67, line: 41, baseType: !5, size: 128, offset: 128, flags: DIFlagPublic)
+!407 = !DIDerivedType(tag: DW_TAG_member, name: "pairlistsValid", scope: !399, file: !67, line: 42, baseType: !12, size: 32, offset: 256, flags: DIFlagPublic)
+!408 = !DIDerivedType(tag: DW_TAG_member, name: "pairlistTolerance", scope: !399, file: !67, line: 43, baseType: !98, size: 64, offset: 320, flags: DIFlagPublic)
+!409 = !DISubprogram(name: "PairCompute", scope: !399, file: !67, line: 33, type: !410, isLocal: false, isDefinition: false, scopeLine: 33, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!410 = !DISubroutineType(types: !411)
+!411 = !{null, !412}
+!412 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !399, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!413 = !DISubprogram(name: "~PairCompute", scope: !399, file: !67, line: 34, type: !410, isLocal: false, isDefinition: false, scopeLine: 34, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!414 = !DISubprogram(name: "doWork", linkageName: "_ZN11PairCompute6doWorkEP9PatchList", scope: !399, file: !67, line: 45, type: !415, isLocal: false, isDefinition: false, scopeLine: 45, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!415 = !DISubroutineType(types: !416)
+!416 = !{null, !412, !305}
+!417 = !DISubprogram(name: "ComputeList", scope: !59, file: !60, line: 25, type: !418, isLocal: false, isDefinition: false, scopeLine: 25, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!418 = !DISubroutineType(types: !419)
+!419 = !{null, !420}
+!420 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !59, size: 64, flags: DIFlagArtificial | DIFlagObjectPointer)
+!421 = !DISubprogram(name: "~ComputeList", scope: !59, file: !60, line: 26, type: !418, isLocal: false, isDefinition: false, scopeLine: 26, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!422 = !DISubprogram(name: "readfile", linkageName: "_ZN11ComputeList8readfileEP8_IO_FILEP9PatchList", scope: !59, file: !60, line: 28, type: !423, isLocal: false, isDefinition: false, scopeLine: 28, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!423 = !DISubroutineType(types: !424)
+!424 = !{!12, !420, !333, !305}
+!425 = !DISubprogram(name: "runComputes", linkageName: "_ZN11ComputeList11runComputesEP9PatchList", scope: !59, file: !60, line: 30, type: !426, isLocal: false, isDefinition: false, scopeLine: 30, flags: DIFlagPublic | DIFlagPrototyped, isOptimized: true)
+!426 = !DISubroutineType(types: !427)
+!427 = !{null, !420, !305}
+!428 = !{!429}
+!429 = !DILocalVariable(name: "this", arg: 1, scope: !58, type: !430, flags: DIFlagArtificial | DIFlagObjectPointer)
+!430 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !59, size: 64)
+!431 = !DIExpression()
+!432 = !DILocation(line: 0, scope: !58)
+!433 = !DILocation(line: 16, column: 1, scope: !58)
+!434 = !DILocation(line: 13, column: 16, scope: !435)
+!435 = distinct !DILexicalBlock(scope: !58, file: !1, line: 11, column: 28)
+!436 = distinct !DISubprogram(name: "~ComputeList", linkageName: "_ZN11ComputeListD2Ev", scope: !59, file: !1, line: 18, type: !418, isLocal: false, isDefinition: true, scopeLine: 18, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !421, variables: !437)
+!437 = !{!438}
+!438 = !DILocalVariable(name: "this", arg: 1, scope: !436, type: !430, flags: DIFlagArtificial | DIFlagObjectPointer)
+!439 = !DILocation(line: 0, scope: !436)
+!440 = !DILocation(line: 19, column: 13, scope: !441)
+!441 = distinct !DILexicalBlock(scope: !436, file: !1, line: 18, column: 29)
+!442 = !{!443, !447, i64 8}
+!443 = !{!"_ZTS11ComputeList", !444, i64 0, !444, i64 4, !447, i64 8, !447, i64 16}
+!444 = !{!"int", !445, i64 0}
+!445 = !{!"omnipotent char", !446, i64 0}
+!446 = !{!"Simple C++ TBAA"}
+!447 = !{!"any pointer", !445, i64 0}
+!448 = !DILocation(line: 19, column: 3, scope: !441)
+!449 = !DILocation(line: 19, column: 3, scope: !450)
+!450 = !DILexicalBlockFile(scope: !441, file: !1, discriminator: 1)
+!451 = !DILocation(line: 19, column: 3, scope: !452)
+!452 = !DILexicalBlockFile(scope: !441, file: !1, discriminator: 2)
+!453 = !DILocalVariable(name: "this", arg: 1, scope: !454, type: !65, flags: DIFlagArtificial | DIFlagObjectPointer)
+!454 = distinct !DISubprogram(name: "~SelfCompute", linkageName: "_ZN11SelfComputeD2Ev", scope: !66, file: !67, line: 18, type: !298, isLocal: false, isDefinition: true, scopeLine: 18, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !301, variables: !455)
+!455 = !{!453}
+!456 = !DILocation(line: 0, scope: !454, inlinedAt: !457)
+!457 = distinct !DILocation(line: 19, column: 3, scope: !452)
+!458 = !DILocation(line: 45, column: 28, scope: !459, inlinedAt: !464)
+!459 = distinct !DILexicalBlock(scope: !460, file: !4, line: 45, column: 16)
+!460 = distinct !DISubprogram(name: "~Pairlists", linkageName: "_ZN9PairlistsD2Ev", scope: !5, file: !4, line: 45, type: !25, isLocal: false, isDefinition: true, scopeLine: 45, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !27, variables: !461)
+!461 = !{!462}
+!462 = !DILocalVariable(name: "this", arg: 1, scope: !460, type: !463, flags: DIFlagArtificial | DIFlagObjectPointer)
+!463 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !5, size: 64)
+!464 = distinct !DILocation(line: 18, column: 19, scope: !465, inlinedAt: !457)
+!465 = distinct !DILexicalBlock(scope: !454, file: !67, line: 18, column: 18)
+!466 = !{!467, !447, i64 0}
+!467 = !{!"_ZTS9Pairlists", !447, i64 0, !444, i64 8, !444, i64 12}
+!468 = !DILocation(line: 45, column: 18, scope: !459, inlinedAt: !464)
+!469 = !DILocation(line: 45, column: 18, scope: !470, inlinedAt: !464)
+!470 = !DILexicalBlockFile(scope: !459, file: !4, discriminator: 1)
+!471 = !DILocation(line: 19, column: 3, scope: !472)
+!472 = !DILexicalBlockFile(scope: !441, file: !1, discriminator: 3)
+!473 = !DILocation(line: 19, column: 3, scope: !474)
+!474 = !DILexicalBlockFile(scope: !441, file: !1, discriminator: 4)
+!475 = !DILocation(line: 20, column: 13, scope: !441)
+!476 = !{!443, !447, i64 16}
+!477 = !DILocation(line: 20, column: 3, scope: !441)
+!478 = !DILocation(line: 20, column: 3, scope: !450)
+!479 = !DILocation(line: 20, column: 3, scope: !452)
+!480 = !DILocalVariable(name: "this", arg: 1, scope: !481, type: !398, flags: DIFlagArtificial | DIFlagObjectPointer)
+!481 = distinct !DISubprogram(name: "~PairCompute", linkageName: "_ZN11PairComputeD2Ev", scope: !399, file: !67, line: 34, type: !410, isLocal: false, isDefinition: true, scopeLine: 34, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !413, variables: !482)
+!482 = !{!480}
+!483 = !DILocation(line: 0, scope: !481, inlinedAt: !484)
+!484 = distinct !DILocation(line: 20, column: 3, scope: !452)
+!485 = !DILocation(line: 45, column: 28, scope: !459, inlinedAt: !486)
+!486 = distinct !DILocation(line: 34, column: 19, scope: !487, inlinedAt: !484)
+!487 = distinct !DILexicalBlock(scope: !481, file: !67, line: 34, column: 18)
+!488 = !DILocation(line: 45, column: 18, scope: !459, inlinedAt: !486)
+!489 = !DILocation(line: 45, column: 18, scope: !470, inlinedAt: !486)
+!490 = !DILocation(line: 20, column: 3, scope: !472)
+!491 = !DILocation(line: 20, column: 3, scope: !474)
+!492 = !DILocation(line: 21, column: 1, scope: !436)
+!493 = distinct !DISubprogram(name: "readfile", linkageName: "_ZN11ComputeList8readfileEP8_IO_FILEP9PatchList", scope: !59, file: !1, line: 23, type: !423, isLocal: false, isDefinition: true, scopeLine: 23, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !422, variables: !494)
+!494 = !{!495, !496, !497, !498, !502, !503, !507, !508, !509}
+!495 = !DILocalVariable(name: "this", arg: 1, scope: !493, type: !430, flags: DIFlagArtificial | DIFlagObjectPointer)
+!496 = !DILocalVariable(name: "file", arg: 2, scope: !493, file: !1, line: 23, type: !333)
+!497 = !DILocalVariable(name: "patchList", arg: 3, scope: !493, file: !1, line: 23, type: !305)
+!498 = !DILocalVariable(name: "buf", scope: !493, file: !1, line: 25, type: !499)
+!499 = !DICompositeType(tag: DW_TAG_array_type, baseType: !342, size: 8192, elements: !500)
+!500 = !{!501}
+!501 = !DISubrange(count: 1024)
+!502 = !DILocalVariable(name: "i", scope: !493, file: !1, line: 39, type: !12)
+!503 = !DILocalVariable(name: "p1", scope: !504, file: !1, line: 41, type: !12)
+!504 = distinct !DILexicalBlock(scope: !505, file: !1, line: 40, column: 39)
+!505 = distinct !DILexicalBlock(scope: !506, file: !1, line: 40, column: 3)
+!506 = distinct !DILexicalBlock(scope: !493, file: !1, line: 40, column: 3)
+!507 = !DILocalVariable(name: "i1", scope: !504, file: !1, line: 41, type: !12)
+!508 = !DILocalVariable(name: "p2", scope: !504, file: !1, line: 41, type: !12)
+!509 = !DILocalVariable(name: "i2", scope: !504, file: !1, line: 41, type: !12)
+!510 = !DILocation(line: 0, scope: !493)
+!511 = !DILocation(line: 23, column: 33, scope: !493)
+!512 = !DILocation(line: 23, column: 50, scope: !493)
+!513 = !DILocation(line: 25, column: 3, scope: !493)
+!514 = !DILocation(line: 25, column: 8, scope: !493)
+!515 = !DILocation(line: 27, column: 10, scope: !516)
+!516 = distinct !DILexicalBlock(scope: !493, file: !1, line: 27, column: 8)
+!517 = !DILocation(line: 27, column: 31, scope: !516)
+!518 = !DILocation(line: 27, column: 34, scope: !519)
+!519 = !DILexicalBlockFile(scope: !516, file: !1, discriminator: 1)
+!520 = !DILocation(line: 27, column: 8, scope: !521)
+!521 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 1)
+!522 = !DILocation(line: 28, column: 5, scope: !523)
+!523 = distinct !DILexicalBlock(scope: !516, file: !1, line: 27, column: 70)
+!524 = !DILocation(line: 29, column: 5, scope: !523)
+!525 = !DILocation(line: 32, column: 28, scope: !526)
+!526 = distinct !DILexicalBlock(scope: !493, file: !1, line: 32, column: 8)
+!527 = !DILocation(line: 32, column: 8, scope: !526)
+!528 = !DILocation(line: 32, column: 45, scope: !526)
+!529 = !DILocation(line: 32, column: 8, scope: !493)
+!530 = !DILocation(line: 33, column: 5, scope: !531)
+!531 = distinct !DILexicalBlock(scope: !526, file: !1, line: 32, column: 52)
+!532 = !DILocation(line: 34, column: 5, scope: !531)
+!533 = !DILocation(line: 37, column: 34, scope: !493)
+!534 = !{!443, !444, i64 4}
+!535 = !DILocation(line: 37, column: 18, scope: !493)
+!536 = !DILocation(line: 37, column: 3, scope: !537)
+!537 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 4)
+!538 = !DILocation(line: 37, column: 16, scope: !537)
+!539 = !DILocation(line: 39, column: 7, scope: !493)
+!540 = !DILocation(line: 40, column: 3, scope: !541)
+!541 = !DILexicalBlockFile(scope: !506, file: !1, discriminator: 1)
+!542 = !DILocation(line: 37, column: 18, scope: !521)
+!543 = !DILocation(line: 37, column: 18, scope: !544)
+!544 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 2)
+!545 = !DILocalVariable(name: "this", arg: 1, scope: !546, type: !398, flags: DIFlagArtificial | DIFlagObjectPointer)
+!546 = distinct !DISubprogram(name: "PairCompute", linkageName: "_ZN11PairComputeC2Ev", scope: !399, file: !67, line: 33, type: !410, isLocal: false, isDefinition: true, scopeLine: 33, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !409, variables: !547)
+!547 = !{!545}
+!548 = !DILocation(line: 0, scope: !546, inlinedAt: !549)
+!549 = distinct !DILocation(line: 37, column: 18, scope: !544)
+!550 = !DILocalVariable(name: "this", arg: 1, scope: !551, type: !463, flags: DIFlagArtificial | DIFlagObjectPointer)
+!551 = distinct !DISubprogram(name: "Pairlists", linkageName: "_ZN9PairlistsC2Ev", scope: !5, file: !4, line: 44, type: !25, isLocal: false, isDefinition: true, scopeLine: 44, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !24, variables: !552)
+!552 = !{!550}
+!553 = !DILocation(line: 0, scope: !551, inlinedAt: !554)
+!554 = distinct !DILocation(line: 33, column: 3, scope: !546, inlinedAt: !549)
+!555 = !DILocation(line: 44, column: 17, scope: !551, inlinedAt: !554)
+!556 = !{!467, !444, i64 12}
+!557 = !DILocation(line: 44, column: 41, scope: !558, inlinedAt: !554)
+!558 = distinct !DILexicalBlock(scope: !551, file: !4, line: 44, column: 32)
+!559 = !DILocation(line: 33, column: 3, scope: !546, inlinedAt: !549)
+!560 = !DILocation(line: 44, column: 39, scope: !558, inlinedAt: !554)
+!561 = !DILocation(line: 33, column: 19, scope: !562, inlinedAt: !549)
+!562 = !DILexicalBlockFile(scope: !563, file: !67, discriminator: 1)
+!563 = distinct !DILexicalBlock(scope: !546, file: !67, line: 33, column: 17)
+!564 = !DILocation(line: 33, column: 33, scope: !562, inlinedAt: !549)
+!565 = !{!566, !444, i64 32}
+!566 = !{!"_ZTS11PairCompute", !444, i64 0, !444, i64 4, !444, i64 8, !444, i64 12, !467, i64 16, !444, i64 32, !567, i64 40}
+!567 = !{!"double", !445, i64 0}
+!568 = !DILocation(line: 37, column: 18, scope: !569)
+!569 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 3)
+!570 = !DILocation(line: 40, column: 15, scope: !571)
+!571 = !DILexicalBlockFile(scope: !505, file: !1, discriminator: 1)
+!572 = !DILocation(line: 41, column: 5, scope: !504)
+!573 = !DILocation(line: 41, column: 18, scope: !504)
+!574 = !DILocation(line: 42, column: 16, scope: !504)
+!575 = !{!444, !444, i64 0}
+!576 = !DILocation(line: 41, column: 15, scope: !504)
+!577 = !DILocation(line: 42, column: 13, scope: !504)
+!578 = !DILocation(line: 41, column: 12, scope: !504)
+!579 = !DILocation(line: 42, column: 10, scope: !504)
+!580 = !DILocation(line: 41, column: 9, scope: !504)
+!581 = !DILocation(line: 42, column: 7, scope: !504)
+!582 = !DIExpression(DW_OP_deref)
+!583 = !DILocation(line: 43, column: 10, scope: !584)
+!584 = distinct !DILexicalBlock(scope: !504, file: !1, line: 43, column: 10)
+!585 = !DILocation(line: 43, column: 55, scope: !584)
+!586 = !DILocation(line: 43, column: 10, scope: !504)
+!587 = !DILocation(line: 44, column: 7, scope: !588)
+!588 = distinct !DILexicalBlock(scope: !584, file: !1, line: 43, column: 62)
+!589 = !DILocation(line: 51, column: 3, scope: !505)
+!590 = !DILocation(line: 65, column: 1, scope: !493)
+!591 = !DILocation(line: 37, column: 18, scope: !592)
+!592 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 5)
+!593 = !DILocation(line: 37, column: 18, scope: !594)
+!594 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 6)
+!595 = !DILocation(line: 0, scope: !481, inlinedAt: !596)
+!596 = distinct !DILocation(line: 37, column: 18, scope: !594)
+!597 = !DILocation(line: 45, column: 28, scope: !459, inlinedAt: !598)
+!598 = distinct !DILocation(line: 34, column: 19, scope: !487, inlinedAt: !596)
+!599 = !DILocation(line: 45, column: 18, scope: !459, inlinedAt: !598)
+!600 = !DILocation(line: 45, column: 18, scope: !470, inlinedAt: !598)
+!601 = !DILocation(line: 37, column: 18, scope: !602)
+!602 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 7)
+!603 = !DILocation(line: 37, column: 18, scope: !604)
+!604 = !DILexicalBlockFile(scope: !493, file: !1, discriminator: 8)
+!605 = !DILocation(line: 47, column: 32, scope: !504)
+!606 = !DILocation(line: 47, column: 5, scope: !504)
+!607 = !DILocation(line: 47, column: 21, scope: !504)
+!608 = !DILocation(line: 47, column: 30, scope: !504)
+!609 = !{!566, !444, i64 0}
+!610 = !DILocation(line: 48, column: 30, scope: !504)
+!611 = !DILocation(line: 48, column: 21, scope: !504)
+!612 = !DILocation(line: 48, column: 28, scope: !504)
+!613 = !{!566, !444, i64 4}
+!614 = !DILocation(line: 49, column: 32, scope: !504)
+!615 = !DILocation(line: 49, column: 21, scope: !504)
+!616 = !DILocation(line: 49, column: 30, scope: !504)
+!617 = !{!566, !444, i64 8}
+!618 = !DILocation(line: 50, column: 30, scope: !504)
+!619 = !DILocation(line: 50, column: 21, scope: !504)
+!620 = !DILocation(line: 50, column: 28, scope: !504)
+!621 = !{!566, !444, i64 12}
+!622 = !DILocation(line: 40, column: 33, scope: !623)
+!623 = !DILexicalBlockFile(scope: !505, file: !1, discriminator: 2)
+!624 = !DILocation(line: 40, column: 16, scope: !571)
+!625 = distinct !{!625, !626, !627}
+!626 = !DILocation(line: 40, column: 3, scope: !506)
+!627 = !DILocation(line: 51, column: 3, scope: !506)
+!628 = !DILocation(line: 53, column: 10, scope: !629)
+!629 = distinct !DILexicalBlock(scope: !493, file: !1, line: 53, column: 8)
+!630 = !DILocation(line: 53, column: 31, scope: !629)
+!631 = !DILocation(line: 53, column: 34, scope: !632)
+!632 = !DILexicalBlockFile(scope: !629, file: !1, discriminator: 1)
+!633 = !DILocation(line: 53, column: 8, scope: !521)
+!634 = !DILocation(line: 54, column: 5, scope: !635)
+!635 = distinct !DILexicalBlock(scope: !629, file: !1, line: 53, column: 68)
+!636 = !DILocation(line: 55, column: 5, scope: !635)
+!637 = !DILocation(line: 58, column: 32, scope: !493)
+!638 = !{!639, !444, i64 16}
+!639 = !{!"_ZTS9PatchList", !444, i64 0, !444, i64 4, !444, i64 8, !444, i64 12, !444, i64 16, !447, i64 24, !445, i64 32, !447, i64 40}
+!640 = !DILocation(line: 58, column: 3, scope: !493)
+!641 = !DILocation(line: 58, column: 19, scope: !493)
+!642 = !{!443, !444, i64 0}
+!643 = !DILocation(line: 59, column: 18, scope: !493)
+!644 = !DILocation(line: 59, column: 3, scope: !537)
+!645 = !DILocation(line: 59, column: 16, scope: !537)
+!646 = !DILocation(line: 60, column: 3, scope: !647)
+!647 = !DILexicalBlockFile(scope: !648, file: !1, discriminator: 1)
+!648 = distinct !DILexicalBlock(scope: !493, file: !1, line: 60, column: 3)
+!649 = !DILocation(line: 59, column: 18, scope: !521)
+!650 = !DILocation(line: 59, column: 18, scope: !544)
+!651 = !DILocalVariable(name: "this", arg: 1, scope: !652, type: !65, flags: DIFlagArtificial | DIFlagObjectPointer)
+!652 = distinct !DISubprogram(name: "SelfCompute", linkageName: "_ZN11SelfComputeC2Ev", scope: !66, file: !67, line: 17, type: !298, isLocal: false, isDefinition: true, scopeLine: 17, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !297, variables: !653)
+!653 = !{!651}
+!654 = !DILocation(line: 0, scope: !652, inlinedAt: !655)
+!655 = distinct !DILocation(line: 59, column: 18, scope: !544)
+!656 = !DILocation(line: 0, scope: !551, inlinedAt: !657)
+!657 = distinct !DILocation(line: 17, column: 3, scope: !652, inlinedAt: !655)
+!658 = !DILocation(line: 44, column: 17, scope: !551, inlinedAt: !657)
+!659 = !DILocation(line: 44, column: 41, scope: !558, inlinedAt: !657)
+!660 = !DILocation(line: 17, column: 3, scope: !652, inlinedAt: !655)
+!661 = !DILocation(line: 44, column: 39, scope: !558, inlinedAt: !657)
+!662 = !DILocation(line: 17, column: 19, scope: !663, inlinedAt: !655)
+!663 = !DILexicalBlockFile(scope: !664, file: !67, discriminator: 1)
+!664 = distinct !DILexicalBlock(scope: !652, file: !67, line: 17, column: 17)
+!665 = !DILocation(line: 17, column: 33, scope: !663, inlinedAt: !655)
+!666 = !{!667, !444, i64 24}
+!667 = !{!"_ZTS11SelfCompute", !444, i64 0, !467, i64 8, !444, i64 24, !567, i64 32}
+!668 = !DILocation(line: 59, column: 18, scope: !569)
+!669 = !DILocation(line: 60, column: 15, scope: !670)
+!670 = !DILexicalBlockFile(scope: !671, file: !1, discriminator: 1)
+!671 = distinct !DILexicalBlock(scope: !648, file: !1, line: 60, column: 3)
+!672 = !DILocation(line: 61, column: 21, scope: !673)
+!673 = distinct !DILexicalBlock(scope: !671, file: !1, line: 60, column: 39)
+!674 = !DILocation(line: 61, column: 29, scope: !673)
+!675 = !{!667, !444, i64 0}
+!676 = !DILocation(line: 60, column: 33, scope: !677)
+!677 = !DILexicalBlockFile(scope: !671, file: !1, discriminator: 2)
+!678 = distinct !{!678, !679}
+!679 = !{!"llvm.loop.unroll.disable"}
+!680 = distinct !{!680, !681, !682}
+!681 = !DILocation(line: 60, column: 3, scope: !648)
+!682 = !DILocation(line: 62, column: 3, scope: !648)
+!683 = !DILocation(line: 65, column: 1, scope: !521)
+!684 = !DILocation(line: 59, column: 18, scope: !592)
+!685 = !DILocation(line: 59, column: 18, scope: !594)
+!686 = !DILocation(line: 0, scope: !454, inlinedAt: !687)
+!687 = distinct !DILocation(line: 59, column: 18, scope: !594)
+!688 = !DILocation(line: 45, column: 28, scope: !459, inlinedAt: !689)
+!689 = distinct !DILocation(line: 18, column: 19, scope: !465, inlinedAt: !687)
+!690 = !DILocation(line: 45, column: 18, scope: !459, inlinedAt: !689)
+!691 = !DILocation(line: 45, column: 18, scope: !470, inlinedAt: !689)
+!692 = !DILocation(line: 59, column: 18, scope: !602)
+!693 = !DILocation(line: 59, column: 18, scope: !604)
+!694 = !DILocation(line: 65, column: 1, scope: !544)
+!695 = !DILocation(line: 65, column: 1, scope: !537)
+!696 = !DILocation(line: 65, column: 1, scope: !594)
+!697 = distinct !DISubprogram(name: "runComputes", linkageName: "_ZN11ComputeList11runComputesEP9PatchList", scope: !59, file: !1, line: 67, type: !426, isLocal: false, isDefinition: true, scopeLine: 67, flags: DIFlagPrototyped, isOptimized: true, unit: !0, declaration: !425, variables: !698)
+!698 = !{!699, !700, !701}
+!699 = !DILocalVariable(name: "this", arg: 1, scope: !697, type: !430, flags: DIFlagArtificial | DIFlagObjectPointer)
+!700 = !DILocalVariable(name: "patchList", arg: 2, scope: !697, file: !1, line: 67, type: !305)
+!701 = !DILocalVariable(name: "i", scope: !697, file: !1, line: 69, type: !12)
+!702 = !DILocation(line: 0, scope: !697)
+!703 = !DILocation(line: 67, column: 42, scope: !697)
+!704 = !DILocation(line: 69, column: 7, scope: !697)
+!705 = !DILocation(line: 71, column: 16, scope: !706)
+!706 = !DILexicalBlockFile(scope: !707, file: !1, discriminator: 1)
+!707 = distinct !DILexicalBlock(scope: !708, file: !1, line: 71, column: 3)
+!708 = distinct !DILexicalBlock(scope: !697, file: !1, line: 71, column: 3)
+!709 = !DILocation(line: 71, column: 15, scope: !706)
+!710 = !DILocation(line: 71, column: 3, scope: !711)
+!711 = !DILexicalBlockFile(scope: !708, file: !1, discriminator: 1)
+!712 = !DILocation(line: 75, column: 16, scope: !713)
+!713 = !DILexicalBlockFile(scope: !714, file: !1, discriminator: 1)
+!714 = distinct !DILexicalBlock(scope: !715, file: !1, line: 75, column: 3)
+!715 = distinct !DILexicalBlock(scope: !697, file: !1, line: 75, column: 3)
+!716 = !DILocation(line: 75, column: 15, scope: !713)
+!717 = !DILocation(line: 75, column: 3, scope: !718)
+!718 = !DILexicalBlockFile(scope: !715, file: !1, discriminator: 1)
+!719 = !DILocation(line: 72, column: 5, scope: !720)
+!720 = distinct !DILexicalBlock(scope: !707, file: !1, line: 71, column: 39)
+!721 = !DILocation(line: 72, column: 21, scope: !720)
+!722 = !DILocation(line: 71, column: 33, scope: !723)
+!723 = !DILexicalBlockFile(scope: !707, file: !1, discriminator: 2)
+!724 = distinct !{!724, !725, !726}
+!725 = !DILocation(line: 71, column: 3, scope: !708)
+!726 = !DILocation(line: 73, column: 3, scope: !708)
+!727 = !DILocation(line: 76, column: 5, scope: !728)
+!728 = distinct !DILexicalBlock(scope: !714, file: !1, line: 75, column: 39)
+!729 = !DILocation(line: 76, column: 21, scope: !728)
+!730 = !DILocation(line: 75, column: 33, scope: !731)
+!731 = !DILexicalBlockFile(scope: !714, file: !1, discriminator: 2)
+!732 = distinct !{!732, !733, !734}
+!733 = !DILocation(line: 75, column: 3, scope: !715)
+!734 = !DILocation(line: 77, column: 3, scope: !715)
+!735 = !DILocation(line: 79, column: 1, scope: !697)

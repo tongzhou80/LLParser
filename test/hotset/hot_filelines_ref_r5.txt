@@ -1,0 +1,45 @@
+0 0xffffffff
+src/spec.c:92
+src/spec.c:306
+??:0
+??:?
+
+2 0xffffffff
+src/bzlib.c:1006
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+3 0xffffffff
+src/bzlib.c:226
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+4 0xffffffff
+src/bzlib.c:235
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+5 0xffffffff
+src/bzlib.c:236
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+
+6 0xffffffff
+src/bzlib.c:238
+src/bzlib.c:1021 (discriminator 2)
+src/bzip2.c:456
+src/spec.c:336
+??:0
+??:?
+

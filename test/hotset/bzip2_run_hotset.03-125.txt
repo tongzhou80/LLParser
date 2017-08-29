@@ -1,0 +1,69 @@
+3        43480            84973373        
+./bzip2(BZ2_bzCompressInit+0x6e)
+./bzip2(BZ2_bzWriteOpen+0xf5)
+./bzip2(compressStream+0x2e)
+./bzip2(main+0x11b)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+5        2101248          474652658       
+./bzip2(BZ2_bzCompressInit+0xc8)
+./bzip2(BZ2_bzWriteOpen+0xf5)
+./bzip2(compressStream+0x2e)
+./bzip2(main+0x11b)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+2        5104             834755          
+./bzip2(BZ2_bzWriteOpen+0x6a)
+./bzip2(compressStream+0x2e)
+./bzip2(main+0x11b)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+9        2800000          268957747       
+./bzip2(BZ2_decompress+0x2bd)
+./bzip2(BZ2_bzDecompress+0x12a)
+./bzip2(BZ2_bzRead+0xf8)
+./bzip2(uncompressStream+0x77)
+./bzip2(main+0x15c)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+4        2800000          251630791       
+./bzip2(BZ2_bzCompressInit+0xb0)
+./bzip2(BZ2_bzWriteOpen+0xf5)
+./bzip2(compressStream+0x2e)
+./bzip2(main+0x11b)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+6        262148           20699335        
+./bzip2(BZ2_bzCompressInit+0xdd)
+./bzip2(BZ2_bzWriteOpen+0xf5)
+./bzip2(compressStream+0x2e)
+./bzip2(main+0x11b)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+8        60048            4537847         
+./bzip2(BZ2_bzDecompressInit+0x54)
+./bzip2(BZ2_bzReadOpen+0x141)
+./bzip2(uncompressStream+0x41)
+./bzip2(main+0x15c)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+7        5104             132722          
+./bzip2(BZ2_bzReadOpen+0x79)
+./bzip2(uncompressStream+0x41)
+./bzip2(main+0x15c)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+
+0        347201536        35810694        
+./bzip2(spec_init+0x3d)
+./bzip2(main+0x65)
+/usr/lib64/libc.so.6(__libc_start_main+0xf5)
+./bzip2()
+

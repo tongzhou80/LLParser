@@ -1,0 +1,82 @@
+; ModuleID = '/tmp/test-761f0c.ll'
+source_filename = "/tmp/test-761f0c.ll"
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+
+
+@.C312_MAIN_ = internal constant i32 27
+@.C311_MAIN_ = internal constant i32 4
+@.C304_MAIN_ = internal constant i32 200
+@.C285_MAIN_ = internal constant i32 1
+@.C284_MAIN_ = internal constant i64 0
+@.C283_MAIN_ = internal constant i32 0
+
+
+;
+define void @MAIN_() !dbg !5 {
+L.entry:
+  %.Z0630_305 = alloca float*, align 8
+  %z_b_0_298 = alloca i32, align 4
+  %z_b_1_299 = alloca i32, align 4
+  %z_e_17_302 = alloca i32, align 4
+  %z_b_2_300 = alloca i32, align 4
+  %z_b_3_301 = alloca i32, align 4
+  %.g0000_321 = alloca i64, align 8
+  %0 = bitcast i32* @.C283_MAIN_ to i8*, !dbg !8
+  %1 = bitcast void (...)* @fort_init to void (i8*, ...)*, !dbg !8
+  call void (i8*, ...) %1(i8* %0), !dbg !8
+  %2 = bitcast float** %.Z0630_305 to i8**, !dbg !8
+  store i8* null, i8** %2, align 8, !dbg !8
+  br label %L.LB1_315
+
+L.LB1_315:                                        ; preds = %L.entry
+  store i32 1, i32* %z_b_0_298, align 4, !dbg !10
+  store i32 200, i32* %z_b_1_299, align 4, !dbg !10
+  %3 = load i32, i32* %z_b_1_299, align 4, !dbg !10
+  store i32 %3, i32* %z_e_17_302, align 4, !dbg !10
+  %4 = load i32, i32* %z_b_1_299, align 4, !dbg !10
+  %5 = load i32, i32* %z_b_0_298, align 4, !dbg !10
+  %6 = sub nsw i32 %5, 1, !dbg !10
+  %7 = sub nsw i32 %4, %6, !dbg !10
+  store i32 %7, i32* %z_b_2_300, align 4, !dbg !10
+  %8 = load i32, i32* %z_b_0_298, align 4, !dbg !10
+  store i32 %8, i32* %z_b_3_301, align 4, !dbg !10
+  %9 = load i32, i32* %z_b_2_300, align 4, !dbg !10
+  %10 = sext i32 %9 to i64, !dbg !10
+  store i64 %10, i64* %.g0000_321, align 8, !dbg !10
+  %11 = bitcast i64* %.g0000_321 to i8*, !dbg !10
+  %12 = bitcast i32* @.C312_MAIN_ to i8*, !dbg !10
+  %13 = bitcast i32* @.C311_MAIN_ to i8*, !dbg !10
+  %14 = bitcast float** %.Z0630_305 to i8*, !dbg !10
+  %15 = bitcast i32* @.C285_MAIN_ to i8*, !dbg !10
+  %16 = bitcast i64* @.C284_MAIN_ to i8*, !dbg !10
+  %17 = bitcast void (...)* @f90_ben_alloc04_chk to void (i32, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i64, ...)*, !dbg !10
+  call void (i32, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i8*, i64, ...) %17(i32 1, i8* %11, i8* %12, i8* %13, i8* null, i8* %14, i8* null, i8* %15, i8* %16, i8* null, i64 0), !dbg !10
+  ret void, !dbg !11
+}
+
+;
+declare void @f90_alloc04_chk(...)
+
+;
+declare void @f90_ben_alloc04_chk(...)
+
+;
+declare void @fort_init(...)
+
+
+!llvm.dbg.cu = !{!2}
+!llvm.module.flags = !{!0, !1}
+!0 = !{i32 2, !"Dwarf Version", i32 4}
+!1 = !{i32 1, !"Debug Info Version", i32 3}
+!2 = distinct !DICompileUnit(language: DW_LANG_Fortran90, file: !3, producer: " F90 Flang - 1.5 2017-05-01", isOptimized: false, runtimeVersion: 0, emissionKind: FullDebug, enums: !4, retainedTypes: !4, globals: !4, imports: !4)
+!3 = !DIFile(filename: "test.f90", directory: "/home/macslayer")
+!4 = !{}
+!5 = distinct !DISubprogram(name: "test", scope: !2, file: !3, line: 1, type: !6, isLocal: false, isDefinition: true, scopeLine: 1, isOptimized: false, unit: !2, variables: !4)
+!6 = !DISubroutineType(types: !7)
+!7 = !{null}
+!8 = !DILocation(line: 1, column: 1, scope: !9)
+!9 = !DILexicalBlock(scope: !5, file: !3, line: 1, column: 1)
+!10 = !DILocation(line: 5, column: 1, scope: !9)
+!11 = !DILocation(line: 7, column: 1, scope: !9)
