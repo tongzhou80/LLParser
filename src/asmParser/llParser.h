@@ -38,6 +38,7 @@ class LLParser: public FileParser {
     bool _debug_info;
     Module* _module;
     InstParser* _inst_parser;
+    bool _done;
 public:
     int MAX_LINE_LEN;
     int MAX_VALUE_LEN;
@@ -49,6 +50,10 @@ public:
 
     Module* module()                                                        { return _module; }
     InstParser* inst_parser()                                               { return _inst_parser; }
+
+    void set_done(bool v=1);
+    bool is_done();
+
     void inc_inline_pos(int steps=1)                                        { inc_intext_pos(steps); }
     void set_line(string l)                                                 { set_text(l); }
 

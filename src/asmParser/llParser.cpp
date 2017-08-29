@@ -8,6 +8,7 @@
 #include <cstring>
 #include <peripheral/sysArgs.h>
 #include <utilities/mutex.h>
+#include <peripheral/timer.h>
 //#include <peripheral/sysArgs.h>
 #include "llParser.h"
 #include "instParser.h"
@@ -58,6 +59,18 @@ void LLParser::initialize() {
     _inst_parser = new InstParser();
 }
 
+void LLParser::set_done(bool v) {
+    Locks::llparser_done_lock->lock();
+    _done = v;
+    Locks::llparser_done_lock->unlock();
+}
+
+bool LLParser::is_done() {
+    Locks::llparser_done_lock->lock();
+    bool ret = _done;
+    Locks::llparser_done_lock->unlock();
+    return ret;
+}
 
 void LLParser::parse_header(Module* module) {
     assert(_ifs.is_open() && "file not open, can't prase");
@@ -730,9 +743,21 @@ DISubprogram* LLParser::parse_disubprogram() {
 
 Module* LLParser::parse(string file) {
     reset_parser();
+    set_done(false);
     _file_name = file;
     return parse();
 }
+
+void* instparser_start() {
+    InstParser* ip = new InstParser();
+    while (!SysDict::is_llparser_done()) {
+        if (!SysDict::inst_stack_is_empty()) {
+            Instruction* job = SysDict::worker_fetch_instruction();
+            ip->parse(job);
+        }
+    }
+}
+
 
 /* 1. the parser always read in one line ahead, namely _line
  *    the next parsing phase will start from _line
@@ -750,6 +775,21 @@ Module* LLParser::parse() {
     SysDict::add_module(this);
 
 
+    pthread_t* tids = NULL;
+    int thread_num = 3;
+    if (ParallelInstruction) {
+        tids = new pthread_t[thread_num];
+    }
+
+    for (int i = 0; i < thread_num; ++i) {
+        if (ParallelInstruction) {
+            pthread_create(&tids[i], NULL, (void* (*)(void*))instparser_start, NULL);
+        }
+    }
+
+
+
+
     getline_nonempty();
     parse_header(module());
     parse_module_level_asms();
@@ -763,6 +803,14 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     SysDict::module()->resolve_debug_info();
+
+    set_done();
+    if (ParallelInstruction) {
+        for (int i = 0; i < thread_num; i++)
+            pthread_join(tids[i], NULL);
+    }
+
+
     SysDict::module()->check_after_parse();
 
     Locks::pass_manager_lock->lock();

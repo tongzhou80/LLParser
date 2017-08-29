@@ -28,7 +28,9 @@
          "")                                              \
   develop(bool, UseLabelComments, 1,                      \
          "")                                              \
-  develop(bool, ParallelModule, 1,                        \
+  develop(bool, ParallelModule, 0,                        \
+         "")                                              \
+  develop(bool, ParallelInstruction, 0,                   \
          "")                                              \
   develop(bool, PrintParsedLine, 0,                       \
          "")                                              \

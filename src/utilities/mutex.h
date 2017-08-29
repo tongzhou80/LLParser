@@ -47,6 +47,8 @@ public:
     static Mutex* module_list_lock;
     static Mutex* thread_table_lock;
     static Mutex* pass_manager_lock;
+    static Mutex* inst_stack_lock;
+    static Mutex* llparser_done_lock;
 };
 
 #endif //LLPARSER_MUTEX_H

@@ -10,9 +10,11 @@
 #include "instParser.h"
 #include "llParser.h"
 
+bool SysDict::_llparser_done = false;
 std::vector<Module*> SysDict::modules;
 std::map<pthread_t , LLParser*> SysDict::thread_table;  // only used when ParallelModule is on
 LLParser* SysDict::parser = NULL;
+std::vector<Instruction*> SysDict::_inst_stack;
 //InstParser* SysDict::instParser = NULL;
 
 void SysDict::init() {
@@ -38,6 +40,40 @@ void SysDict::destroy() {
     }
     
     Locks::destroy();
+}
+
+void SysDict::set_llparser_done() {
+    Locks::llparser_done_lock->lock();
+    _llparser_done = true;
+    Locks::llparser_done_lock->unlock();
+}
+
+bool SysDict::is_llparser_done() {
+    Locks::llparser_done_lock->lock();
+    bool ret = _llparser_done;
+    Locks::llparser_done_lock->unlock();
+    return ret;
+}
+
+void SysDict::worker_push_inst(Instruction *inst) {
+    Locks::inst_stack_lock->lock();
+    _inst_stack.push_back(inst);
+    Locks::inst_stack_lock->unlock();
+}
+
+Instruction* SysDict::worker_fetch_instruction() {
+    Locks::inst_stack_lock->lock();
+    Instruction* ret = _inst_stack.at(_inst_stack.size());
+    _inst_stack.pop_back();
+    Locks::inst_stack_lock->unlock();
+    return ret;
+}
+
+bool SysDict::inst_stack_is_empty() {
+    Locks::inst_stack_lock->lock();
+    bool ret = _inst_stack.empty();
+    Locks::inst_stack_lock->unlock();
+    return ret;
 }
 
 Module* SysDict::module() {

@@ -110,16 +110,27 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
         inst->set_owner(bb->parent()->name());
     }
 
-    if (sync) {
-        if (inst->type() != Instruction::UnknownInstType) {
-            SysDict::llparser()->inst_parser()->parse(inst);
-            //parse_routine(inst);
+
+    if (inst->type() != Instruction::UnknownInstType) {
+        if (ParallelInstruction) {
+
         }
+        else {
+            SysDict::llparser()->inst_parser()->parse(inst);
+        }
+
     }
-    else {
-        guarantee(0, "unimplemented");
-        /* todo: push to a stack and each inst parser thread should call its own InstParser instance to parse it */
-    }
+
+//    if (sync) {
+//        if (inst->type() != Instruction::UnknownInstType) {
+//            SysDict::llparser()->inst_parser()->parse(inst);
+//            //parse_routine(inst);
+//        }
+//    }
+//    else {
+//        guarantee(0, "unimplemented");
+//        /* todo: push to a stack and each inst parser thread should call its own InstParser instance to parse it */
+//    }
 
     if (InstFlags::in_terminator_insts(op)) {
         inst->set_opstr(op);
