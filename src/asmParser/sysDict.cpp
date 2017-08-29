@@ -12,24 +12,24 @@
 
 std::vector<Module*> SysDict::modules;
 std::map<pthread_t , LLParser*> SysDict::thread_table;  // only used when ParallelModule is on
-LLParser* SysDict::llParser = NULL;
+LLParser* SysDict::parser = NULL;
 InstParser* SysDict::instParser = NULL;
 
 void SysDict::init() {
-    llParser = new LLParser();
-    instParser = new InstParser();
+    parser = new LLParser();
+    //instParser = new InstParser();
 
     InstFlags::init();
     Locks::init();
 }
 
 void SysDict::destroy() {
-    if (llParser) {
-        delete llParser;
+    if (parser) {
+        delete parser;
     }
-    if (instParser) {
-        delete instParser;
-    }
+//    if (instParser) {
+//        delete instParser;
+//    }
 
     if (ParallelModule) {
         for (auto it: thread_table) {
@@ -42,12 +42,11 @@ void SysDict::destroy() {
 
 Module* SysDict::module() {
     guarantee(modules.size() > 0, " ");
-    get_thread_llparser()->module();
+    llparser()->module();
 }
 
 const string& SysDict::filename() {
-    LLParser* lp = (ParallelModule) ? get_thread_llparser(): SysDict::llParser;
-    return lp->filename();
+    return llparser()->filename();
 }
 
 /**
@@ -69,7 +68,7 @@ void SysDict::add_module(LLParser* parser) {
 
 }
 
-LLParser* SysDict::get_thread_llparser() {
+LLParser* SysDict::llparser() {
     if (ParallelModule) {
         pthread_t id = pthread_self();
         LLParser* lp;
@@ -81,7 +80,7 @@ LLParser* SysDict::get_thread_llparser() {
         return lp;
     }
     else {
-        return SysDict::llParser;
+        return SysDict::parser;
     }
 }
 //

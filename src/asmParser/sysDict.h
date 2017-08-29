@@ -16,7 +16,7 @@ class SysDict {
 public:
     static void init();
     static void destroy();
-    static LLParser* get_thread_llparser();
+    static LLParser* llparser();
     //static Module* get_module(string name);
     static void add_module(LLParser* );
     /* thread specific */
@@ -25,7 +25,7 @@ public:
 
     static std::map<pthread_t , LLParser*> thread_table;
     static std::vector<Module*> modules;
-    static LLParser* llParser;
+    static LLParser* parser;
     static InstParser* instParser;
 };
 

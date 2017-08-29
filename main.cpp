@@ -15,7 +15,7 @@ void* llparser_start(string* filename) {
         llparser = new LLParser();
     }
     else {
-        llparser = SysDict::llParser;
+        llparser = SysDict::parser;
     }
     llparser->parse(*filename);
     t.stop();

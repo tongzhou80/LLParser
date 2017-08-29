@@ -112,12 +112,7 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
 
     if (sync) {
         if (inst->type() != Instruction::UnknownInstType) {
-            if (ParallelModule) {
-                SysDict::get_thread_llparser()->inst_parser()->parse(inst);
-            } else {
-                SysDict::instParser->parse(inst);
-            }
-
+            SysDict::llparser()->inst_parser()->parse(inst);
             //parse_routine(inst);
         }
     }
@@ -134,7 +129,7 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
 }
 
 Function* IRBuilder::create_function_declaration(string &text) {
-    Function* f = SysDict::get_thread_llparser()->create_function(text);
+    Function* f = SysDict::llparser()->create_function(text);
     f->set_is_external();
     return f;
 }

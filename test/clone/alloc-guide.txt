@@ -1,4 +1,4 @@
 id        tier      location            
-1         0         clone1.c:38(D)      
+1         0         
 2         0         clone3.c:30(D)      
-3         0         
+3         0         clone1.c:38(D)      
