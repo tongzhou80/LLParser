@@ -113,7 +113,7 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
 
     if (inst->type() != Instruction::UnknownInstType) {
         if (ParallelInstruction) {
-
+            SysDict::worker_push_inst(inst);
         }
         else {
             SysDict::llparser()->inst_parser()->parse(inst);

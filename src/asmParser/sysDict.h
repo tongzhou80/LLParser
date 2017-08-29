@@ -13,9 +13,10 @@ class LLParser;
 class InstParser;
 
 class SysDict {
-    static std::vector<Instruction*> _inst_stack;
+
     static bool _llparser_done;
 public:
+    static std::vector<Instruction*> _inst_stack;
     static void init();
     static void destroy();
 

@@ -751,10 +751,10 @@ Module* LLParser::parse(string file) {
 void* instparser_start() {
     InstParser* ip = new InstParser();
     while (!SysDict::is_llparser_done()) {
-        if (!SysDict::inst_stack_is_empty()) {
-            Instruction* job = SysDict::worker_fetch_instruction();
+        Instruction* job = SysDict::worker_fetch_instruction();
+        //zpl("job: %p", job)
+        if (job)
             ip->parse(job);
-        }
     }
 }
 
@@ -776,7 +776,7 @@ Module* LLParser::parse() {
 
 
     pthread_t* tids = NULL;
-    int thread_num = 3;
+    int thread_num = 1;
     if (ParallelInstruction) {
         tids = new pthread_t[thread_num];
     }
