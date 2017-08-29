@@ -13,7 +13,7 @@
 std::vector<Module*> SysDict::modules;
 std::map<pthread_t , LLParser*> SysDict::thread_table;  // only used when ParallelModule is on
 LLParser* SysDict::parser = NULL;
-InstParser* SysDict::instParser = NULL;
+//InstParser* SysDict::instParser = NULL;
 
 void SysDict::init() {
     parser = new LLParser();
