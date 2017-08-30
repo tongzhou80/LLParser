@@ -81,6 +81,8 @@ Function* Function::clone(string new_name) {
     }
     f->rename(new_name);
 
+    zpl("cloned %s to %s", name_as_c_str(), f->name_as_c_str())
+
     /* strip DISubprogram info */
     int dipos = raw_text().find("!dbg");
     if (dipos != string::npos) {
@@ -91,7 +93,7 @@ Function* Function::clone(string new_name) {
 }
 
 
-/**@brief change the name of the function
+/**@brief change the name of a new created function
  *
  * @param name
  */

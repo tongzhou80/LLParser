@@ -332,7 +332,7 @@ public:
                 cloned_caller = caller;
             }
             else {
-                cloned_caller = caller->clone(caller->name()+'.'+std::to_string(_path_counter));
+                cloned_caller = caller->clone();
                 SysDict::module()->append_new_function(cloned_caller);
             }
             CallInst* cloned_ci = dynamic_cast<CallInst*>(cloned_caller->get_instruction(b_index, i_index));
@@ -346,23 +346,25 @@ public:
                 //cloned_ci->parent()->replace(cloned_ci, neu);  // will not delete I; I will become an orphan
             }
             else {
-                cloned_ci->replace_callee(callee->name()+'.'+std::to_string(_path_counter));
+                cloned_ci->replace_callee(new_callee);
             }
+            new_callee = cloned_caller->name();
         }
 
         string top_caller = stack[stack.size()-1]->owner();
         if (top_caller != "main") {
-
+            update_top_caller(new_callee, stack);
         }
     }
 
-    void update_top_caller(std::vector<Instruction*>& stack) {
+    void update_top_caller(string new_name, std::vector<Instruction*>& stack) {
         Function* caller = stack[stack.size()-1]->function();
         auto users = caller->user_list();
         for (auto I: users) {
             if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
-                if (std::find(stack.begin(), stack.end(), ci) != stack.end()) {
-
+                if (std::find(stack.begin(), stack.end(), ci) == stack.end()) {
+                    zpl("replaced callee %s to %s in %s", ci->called_function()->name_as_c_str(), new_name.c_str(), ci->owner().c_str())
+                    ci->replace_callee(new_name);
                 }
             }
         }
