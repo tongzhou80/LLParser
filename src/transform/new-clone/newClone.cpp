@@ -246,6 +246,9 @@ public:
     void load_hot_aps_file(string filename) {
         std::ifstream ifs;
         ifs.open(filename);
+        if (!ifs.is_open()) {
+            fprintf(stderr, "open file %s failed.\n", filename.c_str());
+        }
         string line;
         std::vector<XPS_CallSite*> callstack;
         bool is_header = true;
@@ -266,7 +269,7 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        clone_call_path(_stack);
+                        //clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;
