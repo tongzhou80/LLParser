@@ -748,16 +748,6 @@ Module* LLParser::parse(string file) {
     return parse();
 }
 
-void* instparser_start() {
-    InstParser* ip = new InstParser();
-    while (!SysDict::is_llparser_done()) {
-        Instruction* job = SysDict::worker_fetch_instruction();
-        //zpl("job: %p", job)
-        if (job)
-            ip->parse(job);
-    }
-}
-
 
 /* 1. the parser always read in one line ahead, namely _line
  *    the next parsing phase will start from _line

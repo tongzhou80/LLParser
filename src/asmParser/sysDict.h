@@ -13,17 +13,14 @@ class LLParser;
 class InstParser;
 
 class SysDict {
-
-    static bool _llparser_done;
-public:
     static std::vector<Instruction*> _inst_stack;
+public:
+
     static void init();
     static void destroy();
 
     //static Module* get_module(string name);
 
-    static void set_llparser_done();
-    static bool is_llparser_done();
 
     static void worker_push_inst(Instruction*);
     static Instruction* worker_fetch_instruction();

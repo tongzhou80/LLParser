@@ -73,7 +73,7 @@ arraydestroy.body:                                ; preds = %arraydestroy.body.p
 
 delete.notnull.i.i:                               ; preds = %arraydestroy.body
   %6 = bitcast i16* %5 to i8*, !dbg !469
-  tail call void @ben_free(i32 3, i8* %6) #10, !dbg !469
+  tail call void @ben_free(i32 5, i8* %6) #10, !dbg !469
   br label %invoke.cont, !dbg !469
 
 invoke.cont:                                      ; preds = %delete.notnull.i.i, %arraydestroy.body
@@ -84,7 +84,7 @@ arraydestroy.done9.loopexit:                      ; preds = %invoke.cont
   br label %arraydestroy.done9, !dbg !473
 
 arraydestroy.done9:                               ; preds = %arraydestroy.done9.loopexit, %delete.notnull
-  tail call void @ben_free(i32 4, i8* %2) #10, !dbg !473
+  tail call void @ben_free(i32 6, i8* %2) #10, !dbg !473
   br label %delete.end10, !dbg !473
 
 delete.end10:                                     ; preds = %arraydestroy.done9, %entry
@@ -116,7 +116,7 @@ arraydestroy.body15:                              ; preds = %arraydestroy.body15
 
 delete.notnull.i.i33:                             ; preds = %arraydestroy.body15
   %13 = bitcast i16* %12 to i8*, !dbg !489
-  tail call void @ben_free(i32 5, i8* %13) #10, !dbg !489
+  tail call void @ben_free(i32 7, i8* %13) #10, !dbg !489
   br label %invoke.cont19, !dbg !489
 
 invoke.cont19:                                    ; preds = %delete.notnull.i.i33, %arraydestroy.body15
@@ -127,7 +127,7 @@ arraydestroy.done28.loopexit:                     ; preds = %invoke.cont19
   br label %arraydestroy.done28, !dbg !491
 
 arraydestroy.done28:                              ; preds = %arraydestroy.done28.loopexit, %delete.notnull12
-  tail call void @ben_free(i32 6, i8* %9) #10, !dbg !491
+  tail call void @ben_free(i32 8, i8* %9) #10, !dbg !491
   br label %delete.end29, !dbg !491
 
 delete.end29:                                     ; preds = %arraydestroy.done28, %delete.end10
@@ -217,7 +217,8 @@ arrayctor.loop:                                   ; preds = %invoke.cont, %new.c
   call void @llvm.dbg.value(metadata %class.Pairlists* %pairlists.i, i64 0, metadata !550, metadata !431), !dbg !553
   %size.i.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 0, i32 4, i32 2, !dbg !555
   store i32 10, i32* %size.i.i, align 4, !dbg !555, !tbaa !556
-  %call.i4.i93 = invoke i8* @_Znam(i64 20) #12          to label %invoke.cont unwind label %lpad, !dbg !557
+  %call.i4.i93 = invoke i8* @ben_malloc(i32 2, i64 20) #12
+          to label %invoke.cont unwind label %lpad, !dbg !557
 
 invoke.cont:                                      ; preds = %arrayctor.loop
   %pairlists.i = getelementptr inbounds %class.PairCompute, %class.PairCompute* %arrayctor.cur, i64 0, i32 4, !dbg !559
@@ -297,7 +298,7 @@ arraydestroy.body:                                ; preds = %arraydestroy.body.p
 
 delete.notnull.i.i:                               ; preds = %arraydestroy.body
   %25 = bitcast i16* %24 to i8*, !dbg !600
-  call void @ben_free(i32 7, i8* %25) #10, !dbg !600
+  call void @ben_free(i32 9, i8* %25) #10, !dbg !600
   br label %invoke.cont12, !dbg !600
 
 invoke.cont12:                                    ; preds = %delete.notnull.i.i, %arraydestroy.body
@@ -308,7 +309,7 @@ arraydestroy.done13.loopexit:                     ; preds = %invoke.cont12
   br label %arraydestroy.done13, !dbg !603
 
 arraydestroy.done13:                              ; preds = %arraydestroy.done13.loopexit, %lpad
-  call void @ben_free(i32 8, i8* nonnull %call11) #10, !dbg !603
+  call void @ben_free(i32 10, i8* nonnull %call11) #10, !dbg !603
   br label %ehcleanup, !dbg !603
 
 if.end20:                                         ; preds = %for.body
@@ -370,7 +371,7 @@ if.end43:                                         ; preds = %lor.lhs.false37
   %40 = or i1 %36, %39, !dbg !643
   %41 = extractvalue { i64, i1 } %38, 0, !dbg !643
   %42 = select i1 %40, i64 -1, i64 %41, !dbg !643
-  %call45 = call i8* @ben_malloc(i32 2, i64 %42) #12, !dbg !643
+  %call45 = call i8* @ben_malloc(i32 3, i64 %42) #12, !dbg !643
   %43 = bitcast i8* %call45 to i64*, !dbg !643
   store i64 %34, i64* %43, align 16, !dbg !643
   %44 = getelementptr inbounds i8, i8* %call45, i64 8, !dbg !643
@@ -396,7 +397,8 @@ arrayctor.loop49:                                 ; preds = %invoke.cont52, %new
   call void @llvm.dbg.value(metadata %class.Pairlists* %pairlists.i94, i64 0, metadata !550, metadata !431), !dbg !656
   %size.i.i95 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 0, i32 1, i32 2, !dbg !658
   store i32 10, i32* %size.i.i95, align 4, !dbg !658, !tbaa !556
-  %call.i4.i97 = invoke i8* @_Znam(i64 20) #12          to label %invoke.cont52 unwind label %lpad51, !dbg !659
+  %call.i4.i97 = invoke i8* @ben_malloc(i32 4, i64 20) #12
+          to label %invoke.cont52 unwind label %lpad51, !dbg !659
 
 invoke.cont52:                                    ; preds = %arrayctor.loop49
   %pairlists.i94 = getelementptr inbounds %class.SelfCompute, %class.SelfCompute* %arrayctor.cur50, i64 0, i32 1, !dbg !660
@@ -508,7 +510,7 @@ arraydestroy.body54:                              ; preds = %arraydestroy.body54
 
 delete.notnull.i.i100:                            ; preds = %arraydestroy.body54
   %65 = bitcast i16* %64 to i8*, !dbg !691
-  call void @ben_free(i32 9, i8* %65) #10, !dbg !691
+  call void @ben_free(i32 11, i8* %65) #10, !dbg !691
   br label %invoke.cont57, !dbg !691
 
 invoke.cont57:                                    ; preds = %delete.notnull.i.i100, %arraydestroy.body54
@@ -519,7 +521,7 @@ arraydestroy.done59.loopexit:                     ; preds = %invoke.cont57
   br label %arraydestroy.done59, !dbg !693
 
 arraydestroy.done59:                              ; preds = %arraydestroy.done59.loopexit, %lpad51
-  call void @ben_free(i32 10, i8* nonnull %call45) #10, !dbg !693
+  call void @ben_free(i32 12, i8* nonnull %call45) #10, !dbg !693
   br label %ehcleanup, !dbg !694
 
 cleanup74.loopexit.unr-lcssa:                     ; preds = %for.body66

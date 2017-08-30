@@ -10,7 +10,6 @@
 #include "instParser.h"
 #include "llParser.h"
 
-bool SysDict::_llparser_done = false;
 std::vector<Module*> SysDict::modules;
 std::map<pthread_t, LLParser*> SysDict::thread_table;  // only used when ParallelModule is on
 LLParser* SysDict::parser = NULL;
@@ -42,19 +41,6 @@ void SysDict::destroy() {
     Locks::destroy();
 }
 
-void SysDict::set_llparser_done() {
-    Locks::llparser_done_lock->lock();
-    _llparser_done = true;
-    Locks::llparser_done_lock->unlock();
-}
-
-bool SysDict::is_llparser_done() {
-    Locks::llparser_done_lock->lock();
-    bool ret = _llparser_done;
-    Locks::llparser_done_lock->unlock();
-    return ret;
-}
-
 void SysDict::worker_push_inst(Instruction *inst) {
     Locks::inst_stack_lock->lock();
     _inst_stack.push_back(inst);
@@ -63,7 +49,6 @@ void SysDict::worker_push_inst(Instruction *inst) {
 }
 
 Instruction* SysDict::worker_fetch_instruction() {
-
     Locks::inst_stack_lock->lock();
     Instruction* ret = NULL;
     if (!_inst_stack.empty()) {

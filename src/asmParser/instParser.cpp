@@ -33,7 +33,7 @@ void InstParser::parse(Instruction *inst) {
             do_call_family(inst); break;
         }
         case Instruction::InvokeInstType: {
-            //do_call_family(inst); break;
+            do_call_family(inst); break;
         }
         case Instruction::LoadInstType: {
             break;
@@ -191,7 +191,7 @@ string InstParser::parse_basic_type() {
     return fulltype;
 }
 
-/* The complete call instruction format is more complicated, we assume it always has the folloing form
+/*
  * <result> = [tail | musttail | notail ] call [fast-math flags] [cconv] [ret attrs] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]
              [ operand bundles ]
  *
@@ -200,12 +200,19 @@ string InstParser::parse_basic_type() {
  * 'fnty': shall be the signature of the function being called.
  *         The argument types must match the types implied by this signature.
  *         This type can be omitted if the function is not varargs.
+ *
+ * <result> = invoke [cconv] [ret attrs] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]
+              [operand bundles] to label <normal label> unwind label <exception label>
+
+ *   %call.i4.i93 = invoke i8* @_Znam(i64 20) #12
+          to label %invoke.cont unwind label %lpad, !dbg !557
+ *
  */
 void InstParser::do_call_family(Instruction* inst) {
     /* corner cases:
      * %6 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) %4, i8* %5)
      */
-    CallInst* ci = (CallInst*)inst;
+    CallInstFamily* ci = dynamic_cast<CallInstFamily*>(inst);
     if (ci->has_assignment()) {
         get_word('=');
 //        get_word();
@@ -224,15 +231,17 @@ void InstParser::do_call_family(Instruction* inst) {
     }
 
     get_word();
-    parser_assert(_word == "call", text(), "Bad call inst, _word: |%s| is not |call|", _word.c_str());
+    parser_assert(_word == "call" || _word == "invoke", text(), "Bad call inst, _word: |%s| is not |call|", _word.c_str());
 
 
     //zpl("word: %s, in: %d", _word.c_str(), InstFlags::in_param_attrs(_word));
     get_lookahead();
-    if (InstFlags::in_fastmaths(_lookahead)) {
-        ci->set_raw_field("fast-math", _lookahead);
-        jump_ahead();
-        get_lookahead();
+    if (inst->type() == Instruction::CallInstType) {
+        if (InstFlags::in_fastmaths(_lookahead)) {
+            ci->set_raw_field("fast-math", _lookahead);
+            jump_ahead();
+            get_lookahead();
+        }
     }
 
     if (InstFlags::in_cconvs(_lookahead)) {
@@ -320,7 +329,7 @@ void InstParser::do_call_family(Instruction* inst) {
             parser_assert(_word == "to", text(), " ");
             parse_compound_type();
             inc_intext_pos();
-            guarantee(_char == '(', " ");
+            guarantee(_char == '(', " ");  // args start here
         }
         else {
             get_word('(', false, false);
@@ -350,6 +359,28 @@ void InstParser::do_call_family(Instruction* inst) {
     string args = jump_to_end_of_scope();
     ci->set_raw_field("args", args.substr(1, args.size()-2)); // strip the ()
 
+    if (!_eol) {
+        get_word();
+        if (_word[0] == '#') {
+            ci->set_raw_field("fn-attrs", _word);
+            if (!_eol)
+                get_word();
+        }
+    }
+
+    if (inst->type() == Instruction::InvokeInstType) {
+        guarantee(_word == "to", "word is %s", _word.c_str());
+        get_word();
+        guarantee(_word == "label", " ");
+        get_word();
+        inst->set_raw_field("normal-label", _word);
+        get_word();
+        guarantee(_word == "unwind", " ");
+        get_word();
+        guarantee(_word == "label", " ");
+        get_word();
+        inst->set_raw_field("exception-label", _word);
+    }
     return;
 }
 
