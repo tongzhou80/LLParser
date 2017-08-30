@@ -26,7 +26,7 @@ class Function: public Value {
     BasicBlock* _entry_block;
     int _dbg_id;
 
-
+    bool _is_copy;
 public:
     Function();
 
@@ -65,6 +65,8 @@ public:
     void rename(string name);
 
     void print_to_stream(FILE* fp);
+
+    bool is_copy()                                         { return _is_copy; }
 };
 
 

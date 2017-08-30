@@ -13,6 +13,7 @@ Function::Function(): Value() {
     _parent = NULL;
     _entry_block = NULL;
     _dbg_id = -1;
+    _is_copy = false;
 }
 
 BasicBlock* Function::create_basic_block(string label) {
@@ -89,6 +90,8 @@ Function* Function::clone(string new_name) {
         string new_header = raw_text().substr(0, dipos) + '{';
         set_raw_text(new_header);
     }
+
+    _is_copy = true;
     return f;
 }
 

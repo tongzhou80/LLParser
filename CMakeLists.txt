@@ -26,6 +26,7 @@ add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone.cpp)
 add_library(HotCallPath SHARED src/transform/hot-call-path/hotCallPath.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
+add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
 install(TARGETS
         Hello
         GlobalHello
@@ -36,6 +37,7 @@ install(TARGETS
         HotCallClone
         HotCallPath
         NewClone
+        PrintCaller
         DESTINATION /home/marena/llparser/passes/)
 
 set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
@@ -76,7 +78,7 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/asmParser/irBuilder.cpp src/asmParser/irBuilder.h
         src/ir/type.cpp src/ir/type.h src/ir/di/diLexicalBlock.cpp
         src/ir/di/diScope.cpp src/ir/di/diScope.h
-        src/ir/di/diLexicalBlock.h src/ir/di/diLexicalBlockFile.cpp src/ir/di/diLexicalBlockFile.h src/ir/comdat.cpp src/ir/comdat.h src/inst/loadInst.cpp src/inst/loadInst.h src/transform/hot-call-clone/hotCallClone.cpp src/inst/bitcastInst.cpp src/inst/bitcastInst.h src/transform/hot-call-path/hotCallPath.cpp src/passes/InterModularPass.cpp src/passes/InterModularPass.h src/ir/di/diType.cpp src/ir/di/diType.h src/ir/di/diCompositeType.cpp src/ir/di/diCompositeType.h src/inst/callInstFamily.cpp src/inst/callInstFamily.h src/inst/invokeInst.cpp src/inst/invokeInst.h src/peripheral/FileParser.cpp src/peripheral/FileParser.h src/utilities/mutex.cpp src/utilities/mutex.h src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h)
+        src/ir/di/diLexicalBlock.h src/ir/di/diLexicalBlockFile.cpp src/ir/di/diLexicalBlockFile.h src/ir/comdat.cpp src/ir/comdat.h src/inst/loadInst.cpp src/inst/loadInst.h src/transform/hot-call-clone/hotCallClone.cpp src/inst/bitcastInst.cpp src/inst/bitcastInst.h src/transform/hot-call-path/hotCallPath.cpp src/passes/InterModularPass.cpp src/passes/InterModularPass.h src/ir/di/diType.cpp src/ir/di/diType.h src/ir/di/diCompositeType.cpp src/ir/di/diCompositeType.h src/inst/callInstFamily.cpp src/inst/callInstFamily.h src/inst/invokeInst.cpp src/inst/invokeInst.h src/peripheral/FileParser.cpp src/peripheral/FileParser.h src/utilities/mutex.cpp src/utilities/mutex.h src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h src/transform/print-caller/printCaller.cpp)
 add_executable(sopt ${SOURCE_FILES} )
 install(TARGETS sopt DESTINATION /home/marena/llparser/bin/)
 target_link_libraries(sopt "-ldl") # for dyopen etc.

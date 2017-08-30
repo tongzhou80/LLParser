@@ -13,13 +13,13 @@
 #include <passes/pass.h>
 #include <ir/irEssential.h>
 #include <utilities/strings.h>
+#include <asmParser/sysDict.h>
 
 
 class CallGraphPass: public Pass {
     bool PrintCloning;
     bool TracingVerbose;
     std::ofstream _ofs;
-
     std::vector<string> _bottoms;
     std::set<string> _visited;
 public:
@@ -49,15 +49,7 @@ bool CallGraphPass::run_on_module(Module *module) {
         _bottoms.insert(_bottoms.end(), bottoms.begin(), bottoms.end());
     }
 
-    string out = SysArgs::cur_target;
-    if (out == "") {
-        out = "callGraph";
-    }
-    out += ".dot";
-
-    if (SysArgs::has_property("output")) {
-        out = SysArgs::get_property("output");
-    }
+    string out = SysDict::filename() + ".dot";
 
     _ofs.open(out);
     _ofs << "digraph {\n";
