@@ -166,8 +166,6 @@ void PassManager::initialize_passes() {
         NewClonePass* p = new NewClonePass();
         p->set_name("NewClonePass");
 
-        //p->arguments()["hot_aps_file"] = "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/test.txt";
-
         //p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
         p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/test.txt");
         add_pass(p);

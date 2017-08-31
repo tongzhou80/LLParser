@@ -30,6 +30,8 @@ struct XPS_CallSite {
 
 #define FUNC_MAX_LEN 1024
 
+// TODO: cloning the whole path one by one might make alter other paths if they overlap, switch to a different algorithm
+
 class NewClonePass: public Pass {
     bool PrintCloning;
     bool MatchVerbose;
@@ -327,7 +329,7 @@ public:
                             has_all = false;
                         }
                     }
-                    zpl("has all: %d", has_all)
+                    zpl("has all: %d\n", has_all)
                     if (has_all) {
                         recognized++;
                         clone_call_path(_stack);
