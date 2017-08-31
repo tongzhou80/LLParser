@@ -4,7 +4,7 @@
 
 
 #include <dlfcn.h>
-#include <unistd.h>
+#include <cstdlib>
 
 #include <algorithm>
 #include <vector>
@@ -167,8 +167,8 @@ void PassManager::initialize_passes() {
         HotCallClonePass* p = new HotCallClonePass();
         p->set_name("NewClonePass");
 
-        //p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
-        p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/test.txt");
+        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/bzip2_hot_a2l.txt");
+        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test.txt");
         add_pass(p);
 
     }

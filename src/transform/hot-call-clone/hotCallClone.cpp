@@ -225,6 +225,10 @@ public:
             }
         }
 
+        if (final) {
+            _caller = final->function()->name();
+        }
+
         if (MatchVerbose) {
             if (final) {
                 DILocation *loc = final->debug_loc();
