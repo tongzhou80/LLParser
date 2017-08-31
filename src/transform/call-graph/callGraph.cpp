@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <set>
+#include <iomanip>
 
 #include <peripheral/sysArgs.h>
 #include <inst/instEssential.h>
@@ -57,11 +58,15 @@ bool CallgraphPass::run_on_module(Module *module) {
                 continue;
             }
 
-            _caller_ofs << F->name() << " " << F->user_list().size() << std::endl;
+            if (F->user_list().empty()) {
+                continue;
+            }
+
+            _caller_ofs << std::left << std::setw(50) << F->name() << F->user_list().size() << std::endl;
             for (auto I: F->user_list()) {
                 if (CallInstFamily* cif = dynamic_cast<CallInstFamily*>(I)) {
                     print_dot_line(I->function()->name(), F->name());
-                    _caller_ofs << " " << I->function()->name() << std::endl;
+                    _caller_ofs << "  - " << I->function()->name() << std::endl;
                 }
             }
         }

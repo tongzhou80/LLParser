@@ -42,6 +42,7 @@ class HotCallClonePass: public Pass {
     int _path_counter;
     int _cxt_counter;
     bool _skip;
+    bool _recursive;
     //const int FUNC_MAX_LEN = 1024;
 public:
     HotCallClonePass() {
@@ -55,6 +56,7 @@ public:
         _cxt_counter = 0;
         _skip = false;
         MatchVerbose = 1;
+        _recursive = 0;
     }
             
     ~HotCallClonePass() {
@@ -89,6 +91,7 @@ public:
                     zpl("has all: %d\n", has_all)
                     if (has_all) {
                         recognized++;
+                        add_partial_caller();
                         //clone_call_path(_stack);
                         _path_counter++;
                     }
@@ -311,7 +314,29 @@ public:
 //        }
 //        _callers[callee].insert(user);
 //    }
+
+    bool has_recursion() {
+        std::set<string> chain;
+        string alloc = _stack[0]->called_function()->name();
+        chain.insert(alloc);
+        for (auto I: _stack) {
+            string caller = I->function()->name();
+            if (chain.find(caller) != chain.end()) {
+                return true;
+            }
+            else {
+                chain.insert(caller);
+            }
+        }
+        return false;
+    }
+
     void add_partial_caller() {
+        if (has_recursion()) {
+            _recursive++;
+            return;
+        }
+
         for (auto I: _stack) {
             Function* callee = I->called_function();
             if (_callers.find(callee) == _callers.end()) {
@@ -340,44 +365,36 @@ public:
             string hot_aps_file = get_argument(arg_name);
             load_hot_aps_file(hot_aps_file);
         }
-//        prune_call_graph();
-//
-//        Function* malloc = module->get_function("malloc");
-//        int cnt = 0;
-//
-//        do {
-//            if (TracingVerbose) {
-//                printf("round: %d", cnt);
-//            }
-//
-//            cnt++;
-//            _black.clear();
-//            _has_overlapped_path = false;  // always assume this round is the last round
-//            //auto& users = _callers[malloc];
-//            auto& users = malloc->user_list();
-//            auto users_copy = users; // user_list might change during the iteration since new functions may be created
-//            for (auto uit = users_copy.begin(); uit != users_copy.end(); ++uit) {
-//                Function* func = (*uit)->function();
-//                do_clone(func, module);
-//
-//            }
-//        } while (_has_overlapped_path && cnt < 10);
-//
-//
-//        string out = SysArgs::filename();
-//        if (out.empty()) {
-//            out = "new";
-//        }
-//        out += ".hotCallClone";
-//
-//        if (SysArgs::has_property("output")) {
-//            out = SysArgs::get_property("output");
-//        }
-//
-//        SysDict::module()->print_to_file(out);
+        prune_call_graph();
+        traverse("malloc");
     }
 
-    void do_clone(Function* f, Module *module) {
+    void traverse(string bottom) {
+        Function* malloc = SysDict::module()->get_function(bottom);
+        int cnt = 0;
+
+        do {
+            if (TracingVerbose) {
+                printf("round: %d", cnt);
+            }
+
+            cnt++;
+            _black.clear();
+            _has_overlapped_path = false;  // always assume this round is the last round
+            //auto& users = _callers[malloc];
+            auto& users = malloc->user_list();
+            auto users_copy = users; // user_list might change during the iteration since new functions may be created
+            for (auto uit = users_copy.begin(); uit != users_copy.end(); ++uit) {
+                Function* func = (*uit)->function();
+                do_clone(func);
+            }
+        } while (_has_overlapped_path && cnt < 10);
+
+        string out = SysDict::filename() + name();
+        SysDict::module()->print_to_file(out);
+    }
+
+    void do_clone(Function* f) {
         if (TracingVerbose) {
             printf("inpsect func: %s\n", f->name_as_c_str());
         }
@@ -409,7 +426,7 @@ public:
             if (num > 0) {
                 _has_overlapped_path = true;  // set the flag to scan again
                 Function* fclone = f->clone();
-                module->append_new_function(fclone);
+                SysDict::module()->append_new_function(fclone);
 
                 if (PrintCloning) {
                     printf("cloned %s to %s\n", f->name_as_c_str(), fclone->name_as_c_str());
@@ -418,9 +435,8 @@ public:
             }
 
             if (_black.find(ci->function()->name()) == _black.end()) {
-                do_clone(ci->function(), module);
+                do_clone(ci->function());
             }
-
         }
     }
 

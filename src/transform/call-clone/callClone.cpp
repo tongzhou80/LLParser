@@ -45,8 +45,8 @@ bool CallClonePass::run_on_module(Module *module) {
         }
     } while (_has_overlapped_path && cnt < 4);
 
-
-    string out = SysArgs::filename();
+    zpl("done")
+    string out = SysDict::filename();
     if (out.empty()) {
         out = "new";
     }
