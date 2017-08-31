@@ -10,6 +10,7 @@
 #include "instruction.h"
 #include "basicBlock.h"
 #include <vector>
+#include <inst/callInstFamily.h>
 
 class BasicBlock;
 class Module;
@@ -57,9 +58,10 @@ public:
 
     int basic_block_num()                                  { return _basic_block_list.size(); }
 
-
     int get_basic_block_index(BasicBlock* bb);
     Instruction* get_instruction(int bi, int ii);
+
+    std::vector<CallInstFamily*> caller_list();
 
     Function* clone(string new_name="");
     void rename(string name);

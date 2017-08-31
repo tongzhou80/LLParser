@@ -44,6 +44,16 @@ Instruction* Function::get_instruction(int bi, int ii) {
     return bb->instruction_list().at(ii);
 }
 
+std::vector<CallInstFamily*> Function::caller_list() {
+    std::vector<CallInstFamily*> callers;
+    for (auto I: user_list()) {
+        if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
+            callers.push_back(ci);
+        }
+    }
+    return callers;
+}
+
 /**@brief the copy is exactly the same as "this", except that
  * 1. it has no parent (not in the module yet)
  * 2. it has no users

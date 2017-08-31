@@ -34,9 +34,9 @@ class HotCallClonePass: public Pass {
     std::set<string> _black;
     bool _has_overlapped_path;
     std::ofstream _ofs;
-    std::map<Function*, std::set<Instruction*> > _callers;  // partial callers
+    std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
 
-    std::vector<Instruction*> _stack;
+    std::vector<CallInstFamily*> _stack;
     string _caller;
     string _callee;
     int _path_counter;
@@ -111,7 +111,7 @@ public:
                     }
 
                     if (!_skip) {
-                        Instruction* ret = match_callsite(line);
+                        CallInstFamily* ret = match_callsite(line);
                         _stack.push_back(ret);
                     }
                 }
@@ -128,7 +128,7 @@ public:
         guarantee(matched == 2, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
     }
 
-    Instruction* match_callsite(string & line) {
+    CallInstFamily* match_callsite(string & line) {
         guarantee(Strings::conatins(line, "("), " ");
         line = line.substr(line.find('('));  // strip the exe name before '('
 
@@ -159,7 +159,7 @@ public:
             line_num = std::stoi(lino_str);
         }
 
-        Instruction* ret = NULL;
+        CallInstFamily* ret = NULL;
 
         if (_callee.empty()) {
             ret = approximately_match_alloc(file, line_num);
@@ -175,7 +175,7 @@ public:
         return ret;
     }
 
-    Instruction* approximately_match_alloc(string filename, int line) {
+    CallInstFamily* approximately_match_alloc(string filename, int line) {
         CallInstFamily* final = NULL;
 
         // level 1
@@ -230,12 +230,12 @@ public:
     }
 
     // todo: use CallInstFamily
-    Instruction* approximately_match(string filename, int line) {
+    CallInstFamily* approximately_match(string filename, int line) {
 
         Function* calleef = SysDict::module()->get_function(_callee);
-        Instruction* final = NULL;
+        CallInstFamily* final = NULL;
         guarantee(calleef, " ");
-        auto users = calleef->user_list();
+        auto users = calleef->caller_list();
 
         // level 0
         if (users.size() == 1) {
@@ -243,18 +243,18 @@ public:
         }
 
         // level 1
-        std::map<Instruction*, int> users_offsets;
-        std::vector<Instruction*> other_callers;
+        std::map<CallInstFamily*, int> users_offsets;
+        std::vector<CallInstFamily*> other_callers;
         if (!final) {
             for (auto I: calleef->user_list()) {
-                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
                     if (Strings::conatins(filename, loc->filename())) {
-                        users_offsets[I] = std::abs(line-loc->line());
+                        users_offsets[ci] = std::abs(line-loc->line());
                     }
                     else {
-                        other_callers.push_back(I);
+                        other_callers.push_back(ci);
                     }
                 }
             }
@@ -267,7 +267,7 @@ public:
             }
             else {
                 int closest = users_offsets.begin()->second;
-                Instruction* closest_I = users_offsets.begin()->first;
+                CallInstFamily* closest_I = users_offsets.begin()->first;
                 if (!final) {
                     for (auto it = users_offsets.begin(); it != users_offsets.end(); ++it) {
                         if (it->second < closest) {
@@ -304,12 +304,21 @@ public:
     }
 
 
-    void add_partial_caller(Function* callee, Instruction* user) {
-        if (_callers.find(callee) == _callers.end()) {
-            std::set<Instruction*> callers;
-            _callers[callee] = callers;
+//    void add_partial_caller(Function* callee, CallInstFamily* user) {
+//        if (_callers.find(callee) == _callers.end()) {
+//            std::set<CallInstFamily*> callers;
+//            _callers[callee] = callers;
+//        }
+//        _callers[callee].insert(user);
+//    }
+    void add_partial_caller() {
+        for (auto I: _stack) {
+            Function* callee = I->called_function();
+            if (_callers.find(callee) == _callers.end()) {
+                _callers[callee] = std::set<CallInstFamily*>();
+            }
+            _callers[callee].insert(I);
         }
-        _callers[callee].insert(user);
     }
 
     void prune_call_graph() {
@@ -395,7 +404,7 @@ public:
 //    }
         int num = 0;
         for (auto it = users_copy.begin(); it != users_copy.end(); ++it, ++num) {
-            CallInst* ci = dynamic_cast<CallInst*>(*it);
+            CallInstFamily* ci = dynamic_cast<CallInstFamily*>(*it);
             guarantee(ci, " ");
             if (num > 0) {
                 _has_overlapped_path = true;  // set the flag to scan again
