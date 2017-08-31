@@ -330,7 +330,7 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        //clone_call_path(_stack);
+                        clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;

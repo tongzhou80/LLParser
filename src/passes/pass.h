@@ -56,9 +56,10 @@ public:
         Pass::_name = _name;
     }
 
+    std::map<string, string>& arguments()                  { return _args; };
     void parse_arguments(string args);
     string get_argument(string key);
-    string set_argument(string key, string value)          { _args[key] = value; }
+    void set_argument(string key, string value)            { _args[key] = value; }
     bool has_argument(string key);
 
     void set_unloader(pass_unloader v)                     { _unloader = v; }
