@@ -156,14 +156,14 @@ void PassManager::destroy() {
 }
 
 /* for debug, addr2line can't show line numbers in a .so */
-#include <transform/new-clone/newClone.cpp>
+#include <transform/hot-call-clone/hotCallClone.cpp>
 void PassManager::initialize_passes() {
 //    HelloFunction* hello = new HelloFunction();
 //    add_parse_time_pass(hello);
     //add_pass("ATrace");
 
     if (DebugRun) {
-        NewClonePass* p = new NewClonePass();
+        HotCallClonePass* p = new HotCallClonePass();
         p->set_name("NewClonePass");
 
         //p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
