@@ -46,27 +46,6 @@ void SysArgs::init(SoptInitArgs* initArgs) {
     }
 }
 
-bool SysArgs::get_next_file() {
-    if (_file_id < (int)(_filenames.size()-1)) {
-        _file_id++;
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-string& SysArgs::filename() {
-    guarantee(_file_id < (int)_filenames.size() && _file_id > -1, "_file_id: %d, _filename.size(): %d", _file_id, _filenames.size());
-    return _filenames[_file_id];
-//    if (_filenames.size() > 0) {
-//        return _filenames[0];
-//    }
-//    else {
-//        return "";
-//    }
-}
-
 void SysArgs::add_target_file(string name) {
     _filenames.push_back(name);
 }

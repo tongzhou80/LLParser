@@ -50,12 +50,12 @@ public:
 
         _has_overlapped_path = false;
 
-        PrintCloning = false;
-        TracingVerbose = false;
+        PrintCloning = true;
+        TracingVerbose = true;
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
-        MatchVerbose = 1;
+        MatchVerbose = 0;
         _recursive = 0;
     }
             
@@ -120,7 +120,7 @@ public:
                 }
             }
         }
-        zpl("recog: %d, path: %d, cxt: %d", recognized, _path_counter, _cxt_counter);
+        zpl("recog: %d, cxt: %d, recursive: %d", recognized, _cxt_counter, _recursive);
     }
 
     int match_header(string& line) {
@@ -174,7 +174,7 @@ public:
             ret = approximately_match(file, line_num);
         }
         _callee = _caller;
-        zpl("new callee: %s", _callee.c_str())
+
         return ret;
     }
 
@@ -225,8 +225,18 @@ public:
             }
         }
 
-        if (final) {
-            zpl("infer alloc: %s", final->called_function()->name_as_c_str())
+        if (MatchVerbose) {
+            if (final) {
+                DILocation *loc = final->debug_loc();
+                guarantee(loc, "This pass needs full debug info, please compile with -g");
+                printf("alloc: (%s, %s, %s, %d)\n",
+                       final->function()->name_as_c_str(),
+                final->called_function()->name_as_c_str(),
+                filename.c_str(), line);
+
+            } else {
+                printf("(%s, %s, %s, %d) => None\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line);
+            }
         }
 
         return final;
@@ -337,13 +347,16 @@ public:
             return;
         }
 
+        zpl("got context:")
         for (auto I: _stack) {
             Function* callee = I->called_function();
             if (_callers.find(callee) == _callers.end()) {
                 _callers[callee] = std::set<CallInstFamily*>();
             }
             _callers[callee].insert(I);
+            zpl("  %s -> %s", I->function()->name_as_c_str(), callee->name_as_c_str())
         }
+        zpl("")
     }
 
     void prune_call_graph() {
@@ -375,7 +388,7 @@ public:
 
         do {
             if (TracingVerbose) {
-                printf("round: %d", cnt);
+                printf("round: %d\n", cnt);
             }
 
             cnt++;

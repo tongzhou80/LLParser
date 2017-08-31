@@ -220,9 +220,7 @@ void PassManager::add_pass(string name) {
     if (ld_path != "") {
         _pass_lib_path = ld_path;
     }
-    zp1(name.c_str())
     char path[1024], loader[1024], unloader[1024];
-    zp1(name.c_str())
     string pass_name = name;
     string args;
     int arg_pos = name.find('?');
