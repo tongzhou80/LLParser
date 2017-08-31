@@ -41,6 +41,7 @@ class NewClonePass: public Pass {
     string _callee;
     int _path_counter;
     int _cxt_counter;
+    bool _skip;
     //const int FUNC_MAX_LEN = 1024;
 public:
     NewClonePass() {
@@ -51,6 +52,7 @@ public:
         TracingVerbose = false;
         _path_counter = 1;
         _cxt_counter = 0;
+        _skip = false;
     }
 
     ~NewClonePass() {
@@ -66,6 +68,9 @@ public:
     }
 
     Instruction* match_callsite(string & line) {
+        guarantee(Strings::conatins(line, "("), " ");
+        line = line.substr(line.find('('));  // strip the exe name before '('
+
         int pos1 = line.find(' ');
         string bt_symbol = line.substr(0, pos1);
         string fileline = line.substr(pos1+1);
@@ -97,6 +102,9 @@ public:
 
         if (_callee.empty()) {
             ret = approximately_match_alloc(file, line_num);
+            if (ret) {
+                _skip = true;
+            }
             //return approximately_match(file, line_num);
         }
         else {
@@ -133,40 +141,108 @@ public:
 //    }
 
     Instruction* approximately_match_alloc(string filename, int line) {
-        guarantee(!_caller.empty(), " ");
-        Function* callerf = SysDict::module()->get_function(_caller);
-        std::map<Instruction*, int> offsets;
-        for (auto bit = callerf->begin(); bit != callerf->end(); ++bit) {
-            BasicBlock* B = *bit;
-            for (auto iit = B->callinst_list().begin(); iit != B->callinst_list().end(); ++iit) {
-                Instruction* I = *iit;
-                //CallInst* ci = (CallInst*)I;
-                CallInst* ci = static_cast<CallInst*>(I);
-                if (ci->called_function()) {
-                    string callee = ci->called_function()->name();
-                    if (callee == "malloc" || callee == "calloc" || callee == "realloc") {
-                        DILocation* loc = ci->debug_loc();
-                        guarantee(loc, " ");
-                        offsets[I] = std::abs(loc->line()-line);
+        Instruction* final = NULL;
+
+        // level 1
+        std::map<Instruction*, int> users_offsets;
+        std::vector<Instruction*> other_callers;
+        if (!final) {
+            for (auto I: SysDict::module()->get_function("malloc")->user_list()) {
+                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                    DILocation *loc = ci->debug_loc();
+                    guarantee(loc, "This pass needs full debug info, please compile with -g");
+                    if (Strings::conatins(filename, loc->filename())) {
+                        users_offsets[I] = std::abs(line-loc->line());
+                    }
+                    else {
+                        other_callers.push_back(I);
                     }
                 }
+            }
 
+            for (auto I: SysDict::module()->get_function("calloc")->user_list()) {
+                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                    DILocation *loc = ci->debug_loc();
+                    guarantee(loc, "This pass needs full debug info, please compile with -g");
+                    if (Strings::conatins(filename, loc->filename())) {
+                        users_offsets[I] = std::abs(line-loc->line());
+                    }
+                    else {
+                        other_callers.push_back(I);
+                    }
+                }
+            }
+
+            for (auto I: SysDict::module()->get_function("realloc")->user_list()) {
+                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                    DILocation *loc = ci->debug_loc();
+                    guarantee(loc, "This pass needs full debug info, please compile with -g");
+                    if (Strings::conatins(filename, loc->filename())) {
+                        users_offsets[I] = std::abs(line-loc->line());
+                    }
+                    else {
+                        other_callers.push_back(I);
+                    }
+                }
+            }
+
+            if (users_offsets.size() == 0) {
+                final = NULL;
+            }
+            else if (users_offsets.size() == 1) {
+                final = users_offsets.begin()->first;
+            }
+            else {
+                int closest = users_offsets.begin()->second;
+                Instruction* closest_I = users_offsets.begin()->first;
+                if (!final) {
+                    for (auto it = users_offsets.begin(); it != users_offsets.end(); ++it) {
+                        if (it->second < closest) {
+                            closest = it->second;
+                            closest_I = it->first;
+                        }
+                    }
+                    final = closest_I;
+                }
             }
         }
 
-        if (offsets.size() == 0) {
-            return NULL;
-        }
-        int closest = offsets.begin()->second;
-        Instruction* closest_I = offsets.begin()->first;
+        return final;
 
-        for (auto it = offsets.begin(); it != offsets.end(); ++it) {
-            if (it->second < closest) {
-                closest = it->second;
-                closest_I = it->first;
-            }
-        }
-        return closest_I;
+//        guarantee(!_caller.empty(), " ");
+//        Function* callerf = SysDict::module()->get_function(_caller);
+//        std::map<Instruction*, int> offsets;
+//        for (auto bit = callerf->begin(); bit != callerf->end(); ++bit) {
+//            BasicBlock* B = *bit;
+//            for (auto iit = B->callinst_list().begin(); iit != B->callinst_list().end(); ++iit) {
+//                Instruction* I = *iit;
+//                //CallInst* ci = (CallInst*)I;
+//                CallInst* ci = static_cast<CallInst*>(I);
+//                if (ci->called_function()) {
+//                    string callee = ci->called_function()->name();
+//                    if (callee == "malloc" || callee == "calloc" || callee == "realloc") {
+//                        DILocation* loc = ci->debug_loc();
+//                        guarantee(loc, " ");
+//                        offsets[I] = std::abs(loc->line()-line);
+//                    }
+//                }
+//
+//            }
+//        }
+//
+//        if (offsets.size() == 0) {
+//            return NULL;
+//        }
+//        int closest = offsets.begin()->second;
+//        Instruction* closest_I = offsets.begin()->first;
+//
+//        for (auto it = offsets.begin(); it != offsets.end(); ++it) {
+//            if (it->second < closest) {
+//                closest = it->second;
+//                closest_I = it->first;
+//            }
+//        }
+//        return closest_I;
     }
 
 
@@ -269,13 +345,14 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        //clone_call_path(_stack);
+                        clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;
                     _stack.clear();
                     _caller.clear();
                     _callee.clear();
+                    _skip = false;
                 }
             }
             else {
@@ -285,8 +362,14 @@ public:
                     is_header = false;
                 }
                 else {
-                    Instruction* ret = match_callsite(line);
-                    _stack.push_back(ret);
+                    if (Strings::conatins(line, "__libc_start_main")) {
+                        _skip = true;
+                    }
+
+                    if (!_skip) {
+                        Instruction* ret = match_callsite(line);
+                        _stack.push_back(ret);
+                    }
                 }
             }
         }

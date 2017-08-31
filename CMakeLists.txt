@@ -4,7 +4,7 @@ project(LLParser)
 include_directories(src/)
 SET(CMAKE_CXX_FLAGS "-std=c++11 -g -rdynamic")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 find_package(OpenMP)
@@ -21,18 +21,21 @@ add_library(Hello SHARED src/transform/hello/hello.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
 add_library(CallClone SHARED src/transform/call-clone/callClone.cpp)
-add_library(CallGraph SHARED src/transform/call-graph/callGraph.cpp)
+add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone.cpp)
 add_library(HotCallPath SHARED src/transform/hot-call-path/hotCallPath.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
 add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
+
+set_target_properties(NewClone PROPERTIES COMPILE_FLAGS "-g -rdynamic")
+
 install(TARGETS
         Hello
         GlobalHello
         Malloc
         CallClone
-        CallGraph
+        Callgraph
         ATrace
         HotCallClone
         HotCallPath

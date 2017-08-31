@@ -67,6 +67,7 @@ public:
     void print_to_stream(FILE* fp);
 
     bool is_copy()                                         { return _is_copy; }
+    bool set_is_copy(bool v=1)                             { _is_copy = 1; }
 };
 
 

@@ -2,12 +2,12 @@
 // Created by GentlyGuitar on 6/8/2017.
 //
 
-#ifdef __linux__
+
 #include <dlfcn.h>
 #include <unistd.h>
 
+#include <algorithm>
 
-#endif
 #include <peripheral/argsParser.h>
 #include <peripheral/sysArgs.h>
 #include <utilities/strings.h>
@@ -155,10 +155,15 @@ void PassManager::destroy() {
         delete pass_manager;
 }
 
+/* for debug, addr2line can't show line numbers in a .so */
+#include <transform/new-clone/newClone.cpp>
 void PassManager::initialize_passes() {
 //    HelloFunction* hello = new HelloFunction();
 //    add_parse_time_pass(hello);
     //add_pass("ATrace");
+    NewClonePass* p = new NewClonePass();
+    p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
+    add_pass(p);
 }
 
 int PassManager::insert_with_priority(std::vector<Pass *>& list, Pass *p) {
@@ -198,10 +203,6 @@ void PassManager::add_pass(Pass *p) {
 
 /// The loaded passes will be deleted in PassManager's destructor
 void PassManager::add_pass(string name) {
-    if (!isupper(name[0])) {
-        name[0] = toupper(name[0]);
-    }
-
     string ld_path = SysArgs::get_property("ld-pass-path");
     if (ld_path != "") {
         _pass_lib_path = ld_path;
@@ -231,6 +232,20 @@ void PassManager::add_pass(string name) {
         sprintf(unloader, "__unload_pass_%sPass", classname.c_str());
     }
     else { /* otherwise use ld-pass-path */
+        /* rename ab-cd to AbCd */
+        if (!isupper(pass_name[0])) {
+            pass_name[0] = toupper(pass_name[0]);
+        }
+
+        while (pass_name.find('-') != pass_name.npos) {
+            int p = pass_name.find('-');
+            if (!isupper(pass_name[p+1])) {
+                pass_name[p+1] = toupper(pass_name[p+1]);
+            }
+            pass_name[p] = ' ';
+        }
+        pass_name.erase(std::remove(pass_name.begin(), pass_name.end(), ' '), pass_name.end());
+
         sprintf(path, "%s/lib%s.so", _pass_lib_path.c_str(), pass_name.c_str());
         sprintf(loader, "__load_pass_%sPass", pass_name.c_str());
         sprintf(unloader, "__unload_pass_%sPass", pass_name.c_str());

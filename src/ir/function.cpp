@@ -88,10 +88,10 @@ Function* Function::clone(string new_name) {
     int dipos = raw_text().find("!dbg");
     if (dipos != string::npos) {
         string new_header = raw_text().substr(0, dipos) + '{';
-        set_raw_text(new_header);
+        f->set_raw_text(new_header);
     }
 
-    _is_copy = true;
+    f->set_is_copy();
     return f;
 }
 
@@ -105,11 +105,10 @@ void Function::rename(string name) {
         if (SysDict::module()->get_function(name)) {
             throw SymbolTableError("Cannot rename function '"+_name+"' to '"+name+"', this name already exists in the symbol table!");
         }
-        string raw = raw_text();
+        string& raw = raw_text();
         string old = '@' + _name;
         string neu = '@' + name;
         Strings::replace(raw, old, neu);
-        set_raw_text(raw);
         _name = name;
     }
     else {

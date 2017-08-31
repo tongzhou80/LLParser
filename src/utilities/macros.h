@@ -50,4 +50,8 @@ typedef std::string string;
   std::printf(fmt, ##args); \
   std::printf("\n");
 
+#define zp1(arg) \
+  std::printf(#arg ": %s", arg); \
+  std::printf("\n");
+
 #endif //LLPARSER_MACROS_H

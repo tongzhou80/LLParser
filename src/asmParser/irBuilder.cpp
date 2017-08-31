@@ -107,7 +107,7 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
 
     if (bb) {
         bb->append_instruction(inst);
-        inst->set_owner(bb->parent()->name());
+        inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes
     }
 
 

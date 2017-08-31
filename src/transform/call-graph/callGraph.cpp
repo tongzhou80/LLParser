@@ -16,22 +16,17 @@
 #include <asmParser/sysDict.h>
 
 
-class CallGraphPass: public Pass {
-    bool PrintCloning;
-    bool TracingVerbose;
-    std::ofstream _ofs;
+class CallgraphPass: public Pass {
+    bool PrintCaller;
+    std::ofstream _dot_ofs;
+    std::ofstream _caller_ofs;
     std::vector<string> _bottoms;
     std::set<string> _visited;
 public:
-    CallGraphPass() {
+    CallgraphPass() {
         set_is_module_pass();
 
-        PrintCloning = true;
-        TracingVerbose = true;
-    }
-
-    ~CallGraphPass() {
-        printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
+        PrintCaller = true;
     }
 
     bool run_on_module(Module* module);
@@ -43,25 +38,31 @@ public:
     //bool do_finalization(Module* module);
 };
 
-bool CallGraphPass::run_on_module(Module *module) {
+bool CallgraphPass::run_on_module(Module *module) {
     if (has_argument("bottom")) {
         auto bottoms = Strings::split(get_argument("bottom"), ',');
         _bottoms.insert(_bottoms.end(), bottoms.begin(), bottoms.end());
     }
 
-    string out = SysDict::filename() + ".dot";
+    string out1 = SysDict::filename() + ".dot";
+    string out2 = SysDict::filename() + ".callers";
 
-    _ofs.open(out);
-    _ofs << "digraph {\n";
+    _dot_ofs.open(out1);
+    _caller_ofs.open(out2);
+    _dot_ofs << "digraph {\n";
 
     if (_bottoms.empty()) {
-        auto& functions = module->function_list();
-        for (auto fi = functions.begin(); fi != functions.end(); ++fi) {
-            Function* F = *fi;
-            for (auto ui = F->user_begin(); ui != F->user_end(); ++ui) {
-                Instruction* I = *ui;
-                print_dot_line(I->function()->name(), F->name());
-                //_ofs << '"' << I->function()->name() << "\" -> \"" << F->name() << "\";\n";
+        for (auto F: module->function_list()) {
+            if (F->is_copy()) {
+                continue;
+            }
+
+            _caller_ofs << F->name() << " " << F->user_list().size() << std::endl;
+            for (auto I: F->user_list()) {
+                if (CallInstFamily* cif = dynamic_cast<CallInstFamily*>(I)) {
+                    print_dot_line(I->function()->name(), F->name());
+                    _caller_ofs << " " << I->function()->name() << std::endl;
+                }
             }
         }
     }
@@ -72,28 +73,31 @@ bool CallGraphPass::run_on_module(Module *module) {
         }
     }
 
-    _ofs << "}\n";
-    _ofs.close();
+    _dot_ofs << "}\n";
+    _dot_ofs.close();
+    _caller_ofs.close();
 
-    // call dot as well
-    pid_t pid = fork();
-    if (pid == -1) {
-        fprintf(stderr, "fork process (dot) failed\n");
-    }
-    else if (pid == 0) {
-        execlp("dot", "dot", "-Tpng", "-O", out.c_str(), NULL);
-    }
-    else {
-        wait(NULL);
+    if (has_argument("dot")) {
+        // call dot as well
+        pid_t pid = fork();
+        if (pid == -1) {
+            fprintf(stderr, "fork process (dot) failed\n");
+        }
+        else if (pid == 0) {
+            execlp("dot", "dot", "-Tpng", "-O", out1.c_str(), NULL);
+        }
+        else {
+            wait(NULL);
 //        The wait() system call suspends execution of the calling process
 //        until one of its children terminates.  The call wait(&wstatus) is
 //        equivalent to:
 //
 //        waitpid(-1, &wstatus, 0);
+        }
     }
 }
 
-void CallGraphPass::traverse(Function *F, Module* module) {
+void CallgraphPass::traverse(Function *F, Module* module) {
     guarantee(F, "function %s not found", F->name_as_c_str());
 
     _visited.insert(F->name());
@@ -101,7 +105,7 @@ void CallGraphPass::traverse(Function *F, Module* module) {
         Instruction* I = *ui;
         string caller_name = I->function()->name();
         print_dot_line(caller_name, F->name());
-        //_ofs << '"' << caller_name << "\" -> \"" << F->name() << "\";\n";
+        //_dot_ofs << '"' << caller_name << "\" -> \"" << F->name() << "\";\n";
 
         if (_visited.find(caller_name) == _visited.end()) {
             traverse(module->get_function(caller_name), module);
@@ -110,8 +114,8 @@ void CallGraphPass::traverse(Function *F, Module* module) {
 
 }
 
-void CallGraphPass::print_dot_line(string caller, string callee) {
-    _ofs << '"' << caller << "\" -> \"" << callee << "\";\n";
+void CallgraphPass::print_dot_line(string caller, string callee) {
+    _dot_ofs << '"' << caller << "\" -> \"" << callee << "\";\n";
 }
 
-REGISTER_PASS(CallGraphPass);
+REGISTER_PASS(CallgraphPass);

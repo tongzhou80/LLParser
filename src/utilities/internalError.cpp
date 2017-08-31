@@ -107,6 +107,7 @@ void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63
         string addr = symbol_str.substr(pos1+1, pos2-pos1-1);
         int pos3 = symbol_str.find('(');
         string exe = symbol_str.substr(0, pos3);
+
         if (pos3 != string::npos &&
             exe.find("libc.so") == exe.npos
             && exe.find("libstdc++.so") == exe.npos

@@ -30,7 +30,7 @@ class Pass {
     bool _is_instruction_pass;
 
     bool _is_parse_time;
-    std::map<std::string, std::string> _args;
+    std::map<string, string> _args;
     pass_unloader _unloader;
     string _name;
 public:
@@ -47,9 +47,10 @@ public:
         Pass::_name = _name;
     }
 
-    void parse_arguments(std::string args);
-    std::string get_argument(std::string key);
-    bool has_argument(std::string key);
+    void parse_arguments(string args);
+    string get_argument(string key);
+    string set_argument(string key, string value)          { _args[key] = value; }
+    bool has_argument(string key);
 
     void set_unloader(pass_unloader v)                     { _unloader = v; }
     void unload();
