@@ -138,7 +138,7 @@ public:
         } while (_has_overlapped_path && cnt < 10);
 
 
-        string out = SysArgs::cur_target;
+        string out = SysArgs::filename();
         if (out.empty()) {
             out = "new";
         }

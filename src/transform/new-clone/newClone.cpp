@@ -231,9 +231,7 @@ public:
 
     // todo: use CallInstFamily
     Instruction* approximately_match(string filename, int line) {
-        if (_callee == "spec_compress") {
-            zpl("kkk")
-        }
+
         Function* calleef = SysDict::module()->get_function(_callee);
         Instruction* final = NULL;
         guarantee(calleef, " ");

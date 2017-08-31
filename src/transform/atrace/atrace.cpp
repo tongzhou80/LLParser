@@ -31,7 +31,7 @@ public:
     }
 
     bool do_finalization(Module* M) {
-        string out = SysArgs::cur_target;
+        string out = SysArgs::filename();
         if (out.empty()) {
             out = "new";
         }

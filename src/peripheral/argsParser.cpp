@@ -130,8 +130,9 @@ void ArgsParser::parse_short_flag() {
             passes = Strings::split(_text, '+');
         }
         guarantee(passes.size() != 0, ".");
-        _passes.insert(_passes.end(), passes.begin(), passes.end());
-        //_passes.push_back(_text);
+        for (auto p: passes) {
+            SysArgs::passes().push_back(p);
+        }
     }
     else if (_word == "-path") {
         get_arg();
@@ -176,7 +177,9 @@ void ArgsParser::parse_long_option() {
             passes = Strings::split(value, '+');
         }
         guarantee(passes.size() != 0, ".");
-        _passes.insert(_passes.end(), passes.begin(), passes.end());
+        for (auto p: passes) {
+            SysArgs::passes().push_back(p);
+        }
     } else if (opt == "--ld-pass-path") {
         if (_eoa) {
             fprintf(stderr, "--ld-pass-path requires an argument!\n");

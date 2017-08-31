@@ -17,6 +17,7 @@ int SysArgs::_file_id = -1;
 std::vector<string> SysArgs::_filenames;
 std::map<string, string> SysArgs::_properties;
 std::set<string> SysArgs::_flags;
+std::vector<string> SysArgs::_passes;
 string SysArgs::cur_target;
 
 void SysArgs::init(SoptInitArgs* initArgs) {

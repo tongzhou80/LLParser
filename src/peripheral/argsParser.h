@@ -11,7 +11,6 @@ struct SoptInitArgs;
 
 class ArgsParser: public StringParser {
     SoptInitArgs* _args;
-    std::vector<string> _passes;
     bool _eoa;
     int _p;
 public:
@@ -23,7 +22,7 @@ public:
     void parse_config_files();
     void set_bool_flag(string flag, int v);
 
-    std::vector<string> passes()                    { return _passes; }
+
 
 };
 

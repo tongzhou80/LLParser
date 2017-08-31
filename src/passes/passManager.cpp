@@ -169,9 +169,8 @@ void PassManager::initialize_passes() {
         add_pass(p);
     }
 
-    for (int i = 0; i < ap.passes().size(); ++i) {
-        string pass = ap.passes()[i];
-        pm->add_pass(ap.passes()[i]);
+    for (auto p: SysArgs::passes()) {
+        add_pass(p);
     }
 }
 

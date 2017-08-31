@@ -22,7 +22,7 @@ class SysArgs {
     static std::vector<string> _filenames;
     static std::map<string, string> _properties;
     static std::set<string> _flags;
-
+    static std::vector<string> _passes;
 public:
     static string cur_target;
 
@@ -31,9 +31,12 @@ public:
 
     static bool get_next_file();
     static string& filename();
-    static std::vector<string>& filenames()                { return _filenames; }
+    static std::vector<string>& filenames()                       { return _filenames; }
 
-    static void set_property(string key, string value)     { _properties[key] = value; }
+    static std::vector<string>& passes()                          { return _passes; }
+
+
+    static void set_property(string key, string value)            { _properties[key] = value; }
     static string get_property(string key);
     static bool has_property(string key);
 
