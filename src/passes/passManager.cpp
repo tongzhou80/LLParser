@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include <algorithm>
-
+#include <vector>
 #include <peripheral/argsParser.h>
 #include <peripheral/sysArgs.h>
 #include <utilities/strings.h>
@@ -127,21 +127,21 @@ PassManager::PassManager() {
 }
 
 PassManager::~PassManager() {
-    /* Must unload, can't delete */
-    for (auto p: _global_passes) {
-        p->unload();
-    }
+    std::vector<std::vector<Pass*> > all_passes;
+    all_passes.push_back(_global_passes);
+    all_passes.push_back(_module_passes);
+    all_passes.push_back(_function_passes);
+    all_passes.push_back(_basic_block_passes);
 
-    for (auto p: _module_passes) {
-        p->unload();
-    }
-
-    for (auto p: _function_passes) {
-        p->unload();
-    }
-
-    for (auto p: _basic_block_passes) {
-        p->unload();
+    for (auto l: all_passes) {
+        for (auto p: l) {
+            if (p->is_dynamic()) {
+                p->unload();
+            }
+            else {
+                delete p;
+            }
+        }
     }
 }
 
@@ -265,7 +265,7 @@ void PassManager::add_pass(string name) {
 
         Pass* pass_obj = ldp();
         pass_obj->set_unloader(unldp);
-        
+        pass_obj->set_is_dynamic();
         if (!args.empty()) {
             pass_obj->parse_arguments(args);
         }

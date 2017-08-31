@@ -147,41 +147,21 @@ public:
         std::map<Instruction*, int> users_offsets;
         std::vector<Instruction*> other_callers;
         if (!final) {
-            for (auto I: SysDict::module()->get_function("malloc")->user_list()) {
-                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
-                    DILocation *loc = ci->debug_loc();
-                    guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::conatins(filename, loc->filename())) {
-                        users_offsets[I] = std::abs(line-loc->line());
-                    }
-                    else {
-                        other_callers.push_back(I);
-                    }
-                }
-            }
-
-            for (auto I: SysDict::module()->get_function("calloc")->user_list()) {
-                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
-                    DILocation *loc = ci->debug_loc();
-                    guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::conatins(filename, loc->filename())) {
-                        users_offsets[I] = std::abs(line-loc->line());
-                    }
-                    else {
-                        other_callers.push_back(I);
-                    }
-                }
-            }
-
-            for (auto I: SysDict::module()->get_function("realloc")->user_list()) {
-                if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
-                    DILocation *loc = ci->debug_loc();
-                    guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::conatins(filename, loc->filename())) {
-                        users_offsets[I] = std::abs(line-loc->line());
-                    }
-                    else {
-                        other_callers.push_back(I);
+            std::vector<string> candidates = {"malloc", "calloc", "realloc"};
+            for (auto c: candidates) {
+                Function* alloc = SysDict::module()->get_function(c);
+                if (alloc) {
+                    for (auto I: alloc->user_list()) {
+                        if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                            DILocation *loc = ci->debug_loc();
+                            guarantee(loc, "This pass needs full debug info, please compile with -g");
+                            if (Strings::conatins(filename, loc->filename())) {
+                                users_offsets[I] = std::abs(line-loc->line());
+                            }
+                            else {
+                                other_callers.push_back(I);
+                            }
+                        }
                     }
                 }
             }

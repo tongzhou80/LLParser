@@ -22,6 +22,7 @@ typedef void (*pass_unloader)(Pass*);
 
 /* represent an immutable pass */
 class Pass {
+    bool _is_dynamic;
     int _priority;
     bool _is_global_pass;
     bool _is_module_pass;
@@ -38,6 +39,14 @@ public:
 
     int priority()                  { return _priority; }
     void set_priority(int p)        { _priority = p; }
+
+    bool is_dynamic() const {
+        return _is_dynamic;
+    }
+
+    void set_is_dynamic(bool _is_dynamic=true) {
+        Pass::_is_dynamic = _is_dynamic;
+    }
 
     const string &name() const {
         return _name;

@@ -8,6 +8,7 @@
 
 
 Pass::Pass() {
+    _is_dynamic = false;
     _priority = 0;
     _is_global_pass = false;
     _is_module_pass = false;
