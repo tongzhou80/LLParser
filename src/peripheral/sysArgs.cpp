@@ -25,11 +25,6 @@ void SysArgs::init(SoptInitArgs* initArgs) {
     ArgsParser ap;
     ap.parse_args(initArgs);
 
-    for (int i = 0; i < ap.passes().size(); ++i) {
-        string pass = ap.passes()[i];
-        pm->add_pass(ap.passes()[i]);
-    }
-
     if (DebugRun) {
         std::vector<string> benches;
         benches.push_back("401.bzip2");
@@ -43,7 +38,7 @@ void SysArgs::init(SoptInitArgs* initArgs) {
             string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4);
             //parser->parse("../../test/fortran/a.ll");
             //parser->parse("../../test/clone/clone3.ll");
-            path = "../../test/fortran/spec_backtrace.o.ll";
+            //path = "../../test/fortran/spec_backtrace.o.ll";
             //path = "../../test/clone/clone3.ll";
             add_target_file(path);
         }

@@ -26,13 +26,12 @@ void* llparser_start(string* filename) {
 int main(int argc, char** argv) {
     Flags::init();
     SysDict::init();
-    PassManager::init();
     Errors::init();
     SoptInitArgs sopt_args;
     sopt_args.argc = argc;
     sopt_args.argv = argv;
     SysArgs::init(&sopt_args);
-
+    PassManager::init();
 
     /* todo:
      * callinst_list could be std::set, which is more error-resistent

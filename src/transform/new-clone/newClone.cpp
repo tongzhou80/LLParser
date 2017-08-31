@@ -102,7 +102,7 @@ public:
 
         if (_callee.empty()) {
             ret = approximately_match_alloc(file, line_num);
-            if (ret) {
+            if (!ret) {
                 _skip = true;
             }
             //return approximately_match(file, line_num);
@@ -141,25 +141,25 @@ public:
 //    }
 
     Instruction* approximately_match_alloc(string filename, int line) {
-        Instruction* final = NULL;
+        CallInstFamily* final = NULL;
 
         // level 1
-        std::map<Instruction*, int> users_offsets;
-        std::vector<Instruction*> other_callers;
+        std::map<CallInstFamily*, int> users_offsets;
+        std::vector<CallInstFamily*> other_callers;
         if (!final) {
             std::vector<string> candidates = {"malloc", "calloc", "realloc"};
             for (auto c: candidates) {
                 Function* alloc = SysDict::module()->get_function(c);
                 if (alloc) {
                     for (auto I: alloc->user_list()) {
-                        if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
+                        if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                             DILocation *loc = ci->debug_loc();
                             guarantee(loc, "This pass needs full debug info, please compile with -g");
                             if (Strings::conatins(filename, loc->filename())) {
-                                users_offsets[I] = std::abs(line-loc->line());
+                                users_offsets[ci] = std::abs(line-loc->line());
                             }
                             else {
-                                other_callers.push_back(I);
+                                other_callers.push_back(ci);
                             }
                         }
                     }
@@ -174,7 +174,7 @@ public:
             }
             else {
                 int closest = users_offsets.begin()->second;
-                Instruction* closest_I = users_offsets.begin()->first;
+                CallInstFamily* closest_I = users_offsets.begin()->first;
                 if (!final) {
                     for (auto it = users_offsets.begin(); it != users_offsets.end(); ++it) {
                         if (it->second < closest) {
@@ -185,6 +185,10 @@ public:
                     final = closest_I;
                 }
             }
+        }
+
+        if (final) {
+            zpl("infer alloc: %s", final->called_function()->name_as_c_str())
         }
 
         return final;
@@ -225,8 +229,11 @@ public:
 //        return closest_I;
     }
 
-
+    // todo: use CallInstFamily
     Instruction* approximately_match(string filename, int line) {
+        if (_callee == "spec_compress") {
+            zpl("kkk")
+        }
         Function* calleef = SysDict::module()->get_function(_callee);
         Instruction* final = NULL;
         guarantee(calleef, " ");
@@ -325,7 +332,7 @@ public:
                     zpl("has all: %d", has_all)
                     if (has_all) {
                         recognized++;
-                        clone_call_path(_stack);
+                        //clone_call_path(_stack);
                         _path_counter++;
                     }
                     _cxt_counter++;

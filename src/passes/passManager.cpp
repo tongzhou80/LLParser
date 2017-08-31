@@ -161,9 +161,18 @@ void PassManager::initialize_passes() {
 //    HelloFunction* hello = new HelloFunction();
 //    add_parse_time_pass(hello);
     //add_pass("ATrace");
-    NewClonePass* p = new NewClonePass();
-    p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
-    add_pass(p);
+
+    if (DebugRun) {
+        NewClonePass* p = new NewClonePass();
+        //p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/bzip2_hot_a2l.txt");
+        p->set_argument("hot_aps_file", "/home/tzhou/ClionProjects/LLParser/src/transform/new-clone/test/test.txt");
+        add_pass(p);
+    }
+
+    for (int i = 0; i < ap.passes().size(); ++i) {
+        string pass = ap.passes()[i];
+        pm->add_pass(ap.passes()[i]);
+    }
 }
 
 int PassManager::insert_with_priority(std::vector<Pass *>& list, Pass *p) {
@@ -203,12 +212,14 @@ void PassManager::add_pass(Pass *p) {
 
 /// The loaded passes will be deleted in PassManager's destructor
 void PassManager::add_pass(string name) {
+
     string ld_path = SysArgs::get_property("ld-pass-path");
     if (ld_path != "") {
         _pass_lib_path = ld_path;
     }
+    zp1(name.c_str())
     char path[1024], loader[1024], unloader[1024];
-
+    zp1(name.c_str())
     string pass_name = name;
     string args;
     int arg_pos = name.find('?');
