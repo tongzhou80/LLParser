@@ -72,6 +72,7 @@ std::vector<CallInstFamily*> Function::caller_list() {
  *
  * @return
  */
+//todo: may need to creat a Function from scratch
 Function* Function::clone(string new_name) {
     Function* f = new Function(*this);
     f->set_parent(NULL);
@@ -102,6 +103,8 @@ Function* Function::clone(string new_name) {
     }
 
     f->set_is_copy();
+    f->set_copy_cnt(0);
+    f->set_copy_prototype(this);
     return f;
 }
 

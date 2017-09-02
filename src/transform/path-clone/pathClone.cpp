@@ -3,7 +3,6 @@
 //
 
 #include <set>
-#include <algorithm>
 #include <utilities/macros.h>
 #include <asmParser/sysDict.h>
 #include <passes/pass.h>
@@ -14,20 +13,29 @@
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
 
+struct XPS_CallSite {
+    string func;
+    string file;
+    int line;
+    int column;
+
+    XPS_CallSite(const string &func, const string &file, int line) : func(func), file(file), line(line) {}
+
+    XPS_CallSite(const string &func, const string &file, int line, int column) : func(func), file(file), line(line),
+                                                                                 column(column) {}
+};
+
 #define FUNC_MAX_LEN 1024
 
-class HotCallClonePass: public Pass {
+class PathClonePass: public Pass {
     bool PrintCloning;
     bool TracingVerbose;
     bool MatchVerbose;
     std::set<string> _black;
     bool _has_overlapped_path;
     std::ofstream _ofs;
-    //std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
+    std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
     std::vector<std::vector<CallInstFamily*>> _paths;
-    std::map<CallInstFamily*, std::vector<CallInstFamily*>> _callers_map;
-    std::map<CallInstFamily*, int> _dr_caller_freq;
-    CallInstFamily* _search_root;
 
     std::vector<CallInstFamily*> _stack;
     string _caller;
@@ -36,10 +44,9 @@ class HotCallClonePass: public Pass {
     int _cxt_counter;
     bool _skip;
     int _recursive;
-    bool _done;
     //const int FUNC_MAX_LEN = 1024;
 public:
-    HotCallClonePass() {
+    PathClonePass() {
         set_is_module_pass();
 
         _has_overlapped_path = false;
@@ -52,82 +59,11 @@ public:
         MatchVerbose = 0;
         _recursive = 0;
     }
-            
-    ~HotCallClonePass() {
+
+    ~PathClonePass() {
         printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
     }
 
-    void construct_call_callers_map() {
-        _callers_map.clear();
-        _dr_caller_freq.clear();
-        _search_root = NULL;
-        int max_freq = 0;
-        for (auto context: _paths) {
-            for (int i = 0; i < context.size()-1; ++i) {
-                auto I = context[i];
-
-                // for each direct caller of malloc/..
-                if (i == 0) {
-                    if (_dr_caller_freq.find(I) == _dr_caller_freq.end()) {
-                        _dr_caller_freq[I] = 0;
-                    }
-                    _dr_caller_freq[I]++;
-                    if (_dr_caller_freq[I] > max_freq) {
-                        max_freq = _dr_caller_freq[I];
-                        _search_root = I;
-                    }
-                }
-
-                if (_callers_map.find(I) == _callers_map.end()) {
-                    _callers_map[I] = std::vector<CallInstFamily*>();
-                }
-
-                auto& v = _callers_map[I];
-                auto new_element = context[i+1];
-                if (std::find(v.begin(), v.end(), new_element) == v.end())
-                    v.push_back(new_element);
-            }
-        }
-
-    }
-
-    void do_one() {
-        construct_call_callers_map();
-        /* if all direct callers of malloc are distinct, terminates */
-        if (_dr_caller_freq[_search_root] == 1) {
-            _done = true;
-            return;
-        }
-
-        while (_callers_map[_search_root].size() == 1) {
-            _search_root = _callers_map[_search_root][0];
-        }
-
-        auto& callers = _callers_map[_search_root];
-        guarantee(callers.size() != 0, "root: %p", _search_root);
-        zpl("root: %p, callers: %d", _search_root, callers.size())
-        for (auto i = 1; i < callers.size(); ++i) {
-            Function* cloned_callee = _search_root->function()->clone();
-            SysDict::module()->append_new_function(cloned_callee);
-            update_callee_in_all_paths(callers[i], cloned_callee);
-        }
-    }
-
-    void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
-        for (auto& stack: _paths) {
-            for (int i = 1; i < stack.size(); ++i) {
-                CallInstFamily* I = stack[i];
-                if (I == caller) {
-                    zpl("repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
-                    I->replace_callee(new_callee->name());
-                    auto callee_call = stack[i-1];
-                    int i_index = callee_call->get_index_in_block();
-                    int b_index = callee_call->parent()->get_index_in_function();
-                    stack[i-1] = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-                }
-            }
-        }
-    }
 
     // todo: the hot_aps_file must have an appending new line to be correctly parsed for now
     void load_hot_aps_file(string filename) {
@@ -137,6 +73,7 @@ public:
             fprintf(stderr, "open file %s failed.\n", filename.c_str());
         }
         string line;
+        std::vector<XPS_CallSite*> callstack;
         bool is_header = true;
         int recognized = 0;
 
@@ -319,8 +256,8 @@ public:
                 guarantee(loc, "This pass needs full debug info, please compile with -g");
                 printf("alloc: (%s, %s, %s, %d)\n",
                        final->function()->name_as_c_str(),
-                final->called_function()->name_as_c_str(),
-                filename.c_str(), line);
+                       final->called_function()->name_as_c_str(),
+                       filename.c_str(), line);
 
             } else {
                 printf("(%s, %s, %s, %d) => None\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line);
@@ -330,6 +267,7 @@ public:
         return final;
     }
 
+    // todo: use CallInstFamily
     CallInstFamily* approximately_match(string filename, int line) {
         Function* calleef = SysDict::module()->get_function(_callee);
 
@@ -351,7 +289,7 @@ public:
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
                     if (Strings::conatins(filename, loc->filename()) && std::abs(line-loc->line()) < 10) {
-                    //if (ci->owner() == _caller) {
+                        //if (ci->owner() == _caller) {
                         users_offsets[ci] = std::abs(line-loc->line());
                     }
                     else {
@@ -455,6 +393,36 @@ public:
         return false;
     }
 
+    void add_partial_caller() {
+        if (has_recursion()) {
+            _recursive++;
+            return;
+        }
+
+        zpl("got context: %d", has_recursion())
+        for (auto I: _stack) {
+            Function* callee = I->called_function();
+            if (_callers.find(callee) == _callers.end()) {
+                _callers[callee] = std::set<CallInstFamily*>();
+            }
+            _callers[callee].insert(I);
+            zpl("  %s -> %s", I->function()->name_as_c_str(), callee->name_as_c_str())
+        }
+        zpl("")
+    }
+
+    void prune_call_graph() {
+        auto l = SysDict::module()->function_list();
+        for (auto fi = l.begin(); fi != l.end(); ++fi) {
+            Function* F = *fi;
+            if (_callers.find(F) != _callers.end()) {
+                F->user_list() = Function::InstList(_callers[F].begin(), _callers[F].end());
+            }
+            else {
+                F->user_list().clear();
+            }
+        }
+    }
 
     bool run_on_module(Module* module) {
         string arg_name = "hot_aps_file";
@@ -463,14 +431,7 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         print_paths();
-        while (!_done) {
-            do_one();
-            zpl("one clone")
-            print_paths();
-        }
-
-
-        //prune_call_callers_map();
+        //prune_call_graph();
         //traverse("malloc");
     }
 
@@ -541,4 +502,4 @@ public:
 };
 
 
-REGISTER_PASS(HotCallClonePass);
+REGISTER_PASS(PathClonePass);

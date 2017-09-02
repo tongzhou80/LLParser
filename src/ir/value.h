@@ -16,12 +16,26 @@ protected:
     string _name;
     //std::map<string, string> _properties;
     int _copy_cnt;
+    Value* _copy_prototype;
     std::vector<Instruction*> _users; 
 public:
     Value();
     virtual string name()                                { return _name; }
     virtual const char* name_as_c_str()                  { return _name.c_str(); };
     virtual void set_name(string name)                   { _name = name; }
+
+    int copy_cnt()                                       { return _copy_cnt; }
+    void set_copy_cnt(int cnt)                           { _copy_cnt = cnt; }
+
+    Value *copy_prototype() const {
+        return _copy_prototype;
+    }
+
+    void set_copy_prototype(Value *_copy_prototype) {
+        Value::_copy_prototype = _copy_prototype;
+    }
+
+    string prototype_name();
 
     /* caller/user interfaces */
     void append_user(Instruction* user)                    { _users.push_back(user); }

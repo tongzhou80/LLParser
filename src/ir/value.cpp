@@ -10,6 +10,7 @@
 Value::Value(): Shadow() {
     _name = "";
     _copy_cnt = 0;
+    _copy_prototype = NULL;
 }
 //
 //bool Value::has_property(string key) {
@@ -33,6 +34,14 @@ Value::Value(): Shadow() {
 //void Value::set_property(string key, string value) {
 //    _properties[key] = value;
 //}
+
+string Value::prototype_name() {
+    Value* orig = this;
+    while (orig->copy_prototype()) {
+        orig = orig->copy_prototype();
+    }
+    return orig->name();
+}
 
 void Value::remove_user(Instruction *user) {
     auto& vec = user_list();
