@@ -11,15 +11,6 @@ DISubprogram::DISubprogram() {
     _line = -1;
 }
 
-string DISubprogram::filename() {
-    if (_file) {
-        return _file->filename();
-    }
-    else {
-        return "";
-    }
-}
-
 void DISubprogram::resolve() {
     DI_SET_STR_FIELD(name);
 

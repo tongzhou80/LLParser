@@ -3,3 +3,9 @@
 //
 
 #include "diScope.h"
+#include "diEssential.h"
+
+string DIScope::filename() {
+    guarantee(_file, " ");
+    return _file->filename();
+}

@@ -25,6 +25,9 @@ void DILocation::resolve() {
 }
 
 void DILocation::second_resolve() {
+    if (_number == 42531) {
+        zpl("42531")
+    }
     /* resolve indirect symbols */
     for (_inline_root = inlinedAt(); _inline_root; ) {
         // todo: verify that the referenced inlined location should already be parsed at this point
@@ -96,22 +99,24 @@ void DILocation::second_resolve() {
 //}
 
 int DILocation::line() {
-    if (_inline_root) {
-        return _inline_root->line();
-    }
-    else {
-        return _line;
-    }
+    return _line;
+//    if (_inline_root) {
+//        return _inline_root->line();
+//    }
+//    else {
+//        return _line;
+//    }
 }
 
 string DILocation::filename() {
-    DISubprogram*& p = _subprogram;
-    if (p == NULL) {
-        return "";
-    }
-    else {
-        return p->filename();
-    }
+    return _scope->filename();
+//    DISubprogram*& p = _subprogram;
+//    if (p == NULL) {
+//        return "";
+//    }
+//    else {
+//        return p->filename();
+//    }
 }
 //
 //DISubprogram* DILocation::get_subprogram() {

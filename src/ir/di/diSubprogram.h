@@ -25,12 +25,9 @@ class DIFile;
 class DISubprogram: public DIScope {
     // string _diname;  // already have _name field from Value class
     DIScope* _scope;  // more specific than DIScope
-    DIFile* _file;
     int _line;
 public:
     DISubprogram();
-
-    string filename();
 
     int line()                                        { return _line; }
     void set_line(int line)                           { _line = line; }
