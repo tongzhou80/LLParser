@@ -28,13 +28,13 @@ void SysArgs::init(SoptInitArgs* initArgs) {
 
     if (DebugRun) {
         std::vector<string> benches;
-        benches.push_back("401.bzip2");
+        //benches.push_back("401.bzip2");
         //benches.push_back("astar");
         //benches.push_back("mcf");
         //benches.push_back("gobmk");
         //benches.push_back("h264ref");
         //benches.push_back("libquantum");
-        //benches.push_back("403.gcc");
+        benches.push_back("403.gcc");
         for (int i = 0; i < benches.size(); ++i) {
             string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4);
             //parser->parse("../../test/fortran/a.ll");

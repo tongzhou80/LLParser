@@ -35,6 +35,7 @@ class HotCallClonePass: public Pass {
     bool _has_overlapped_path;
     std::ofstream _ofs;
     std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
+    std::vector<std::vector<CallInstFamily*>> _paths;
 
     std::vector<CallInstFamily*> _stack;
     string _caller;
@@ -42,7 +43,7 @@ class HotCallClonePass: public Pass {
     int _path_counter;
     int _cxt_counter;
     bool _skip;
-    bool _recursive;
+    int _recursive;
     //const int FUNC_MAX_LEN = 1024;
 public:
     HotCallClonePass() {
@@ -91,7 +92,10 @@ public:
                     zpl("has all: %d\n", has_all)
                     if (has_all) {
                         recognized++;
-                        add_partial_caller();
+                        if (!has_direct_recursion()) {
+                            _paths.push_back(_stack);
+                        }
+                        //add_partial_caller();
                         //clone_call_path(_stack);
                         _path_counter++;
                     }
@@ -121,6 +125,20 @@ public:
             }
         }
         zpl("recog: %d, cxt: %d, recursive: %d", recognized, _cxt_counter, _recursive);
+    }
+
+    void print_paths() {
+        for (auto v: _paths) {
+            string callee = v[0]->called_function()->name();
+            printf("%s", callee.c_str());
+            for (auto I: v) {
+                guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+                printf(" -> %s", I->function()->name_as_c_str());
+                callee = I->function()->name();
+                // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
+            }
+            printf("\n");
+        }
     }
 
     int match_header(string& line) {
@@ -172,6 +190,9 @@ public:
         }
         else {
             ret = approximately_match(file, line_num);
+        }
+        if (_callee == "gen_adddi3") {
+            zpl("kkk: %s", _caller.c_str());
         }
         _callee = _caller;
 
@@ -250,6 +271,9 @@ public:
     CallInstFamily* approximately_match(string filename, int line) {
 
         Function* calleef = SysDict::module()->get_function(_callee);
+        if (_callee == "compile_file") {
+            zpl("callers: %d", calleef->user_list().size())
+        }
         CallInstFamily* final = NULL;
         guarantee(calleef, " ");
         auto users = calleef->caller_list();
@@ -267,7 +291,8 @@ public:
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::conatins(filename, loc->filename())) {
+                    if (Strings::conatins(filename, loc->filename()) && std::abs(line-loc->line() < 10)) {
+                    //if (ci->owner() == _caller) {
                         users_offsets[ci] = std::abs(line-loc->line());
                     }
                     else {
@@ -301,9 +326,21 @@ public:
             final = other_callers[0];
         }
 
-        if (_caller.empty() && final) {
-            _caller = final->owner();
-            zpl("infer caller: %s", _caller.c_str())
+        if (final) {
+            if (!_caller.empty()) {
+                if (final->owner() != _caller) {
+                    return NULL;
+                }
+            }
+            else {
+                _caller = final->owner();
+                zpl("infer caller: %s", _caller.c_str())
+            }
+
+        }
+
+        if (_callee == "gen_adddi3") {
+            zpl("kkk: %s, caller: %s", final->owner().c_str(), _caller.c_str());
         }
 
         if (MatchVerbose) {
@@ -321,6 +358,7 @@ public:
     }
 
 
+    
 //    void add_partial_caller(Function* callee, CallInstFamily* user) {
 //        if (_callers.find(callee) == _callers.end()) {
 //            std::set<CallInstFamily*> callers;
@@ -345,13 +383,23 @@ public:
         return false;
     }
 
+    bool has_direct_recursion() {
+        for (auto I: _stack) {
+            if (I->called_function()->name() == I->function()->name()) {
+                _recursive++;
+                return true;
+            }
+        }
+        return false;
+    }
+
     void add_partial_caller() {
         if (has_recursion()) {
             _recursive++;
             return;
         }
 
-        zpl("got context:")
+        zpl("got context: %d", has_recursion())
         for (auto I: _stack) {
             Function* callee = I->called_function();
             if (_callers.find(callee) == _callers.end()) {
@@ -382,8 +430,9 @@ public:
             string hot_aps_file = get_argument(arg_name);
             load_hot_aps_file(hot_aps_file);
         }
-        prune_call_graph();
-        traverse("malloc");
+        print_paths();
+        //prune_call_graph();
+        //traverse("malloc");
     }
 
     void traverse(string bottom) {
@@ -426,16 +475,8 @@ public:
         }
 
         auto& users = f->user_list();
-        //auto& users = _callers[f];
         auto users_copy = users;
-//    if (users_copy.size() > 1) {
-//        if (f->name() == "BZ2_bzReadOpen") {
-//            zpl("%s is called in ", f->name().c_str());
-//            for (auto u: users) {
-//                zpl("  %s", u->function()->name().c_str());
-//            }
-//        }
-//    }
+
         int num = 0;
         for (auto it = users_copy.begin(); it != users_copy.end(); ++it, ++num) {
             CallInstFamily* ci = dynamic_cast<CallInstFamily*>(*it);

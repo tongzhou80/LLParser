@@ -166,8 +166,7 @@ void PassManager::initialize_passes() {
     if (DebugRun) {
         HotCallClonePass* p = new HotCallClonePass();
         p->set_name("NewClonePass");
-
-        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/bzip2_hot_a2l.txt");
+        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_hot_a2l.txt");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test.txt");
         add_pass(p);
 
