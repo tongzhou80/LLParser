@@ -798,9 +798,7 @@ Module* LLParser::parse() {
     pm->apply_finalization(module());
     Locks::pass_manager_lock->unlock();
 
-    //PassManager::pass_manager->apply_parse_time_passes(module);
-
-    //PassManager::pass_manager->apply_parse_epilogue();
+    /* perform post check */
     return module();
 }
 

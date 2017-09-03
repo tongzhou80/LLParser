@@ -72,6 +72,7 @@ public:
 
     // check
     void check_after_parse();
+    void check_after_pass();
 
     void resolve_debug_info();
 };

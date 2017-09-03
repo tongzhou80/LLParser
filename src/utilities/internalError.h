@@ -42,6 +42,12 @@ public:
     SymbolTableError(): runtime_error("") {}
 };
 
+class SymbolRedefinitionError: public std::runtime_error {
+public:
+    SymbolRedefinitionError(std::string msg): runtime_error(msg) {}
+    SymbolRedefinitionError(): runtime_error("") {}
+};
+
 class BadPassArgumentError: public std::runtime_error {
 public:
     BadPassArgumentError(std::string msg): runtime_error(msg) {}

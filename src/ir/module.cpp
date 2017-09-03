@@ -52,6 +52,11 @@ void Module::insert_new_function(int pos, Function *inserted) {
     guarantee(inserted != NULL, "inserted function is NULL");
     guarantee(inserted->parent() == NULL, "inserted function already belong to a module");
 
+    if (_function_map.find(inserted->name()) != _function_map.end()) {
+        string msg = "invalid redefinition of function "+ inserted->name();
+        throw SymbolRedefinitionError(msg);
+    }
+
     // iterate all the CallInst of the inserted function
     if (inserted->is_defined()) {
         for (auto bit = inserted->begin(); bit != inserted->end(); ++bit) {
@@ -205,4 +210,10 @@ void Module::check_after_parse() {
 //    for (auto f = l3.begin(); f != l3.end(); ++f) {
 //        (*f)->dump();
 //    }
+}
+
+void Module::check_after_pass() {
+    for (auto F: function_list()) {
+
+    }
 }

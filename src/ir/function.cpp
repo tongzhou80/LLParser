@@ -88,6 +88,9 @@ Function* Function::clone(string new_name) {
         _entry_block = *(f->begin());
     }
 
+    if (name() == "xmalloc") {
+        zpl("kkk")
+    }
     if (new_name.empty()) {
         new_name = name()+'.'+std::to_string((long long)++_copy_cnt);
     }
@@ -96,15 +99,16 @@ Function* Function::clone(string new_name) {
     zpl("cloned %s to %s", name_as_c_str(), f->name_as_c_str())
 
     /* strip DISubprogram info */
-    int dipos = raw_text().find("!dbg");
+    int dipos = f->raw_text().find("!dbg");
     if (dipos != string::npos) {
-        string new_header = raw_text().substr(0, dipos) + '{';
+        string new_header = f->raw_text().substr(0, dipos) + '{';
         f->set_raw_text(new_header);
     }
 
     f->set_is_copy();
     f->set_copy_cnt(0);
     f->set_copy_prototype(this);
+
     return f;
 }
 
