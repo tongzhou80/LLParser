@@ -22,6 +22,7 @@ class HotCallClonePass: public Pass {
     bool MatchVerbose;
     std::set<string> _black;
     bool _has_overlapped_path;
+    int _cloned;
     std::ofstream _ofs;
     //std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
     std::vector<std::vector<CallInstFamily*>> _paths;
@@ -51,6 +52,7 @@ public:
         _skip = false;
         MatchVerbose = 0;
         _recursive = 0;
+        _cloned = 0;
     }
             
     ~HotCallClonePass() {
@@ -93,6 +95,7 @@ public:
 
     void do_one() {
         construct_call_callers_map();
+        auto save = _search_root;
         /* if all direct callers of malloc are distinct, terminates */
         if (_dr_caller_freq[_search_root] == 1) {
             _done = true;
@@ -104,11 +107,13 @@ public:
         }
 
         auto& callers = _callers_map[_search_root];
-        guarantee(callers.size() != 0, "root: %p", _search_root);
-        zpl("root: %p, callers: %d", _search_root, callers.size())
+        if (callers.size() == 0)
+            guarantee(callers.size() != 0, "root: %p", _search_root);
+        //zpl("root: %p, callers: %d", _search_root, callers.size())
         for (auto i = 1; i < callers.size(); ++i) {
             Function* cloned_callee = _search_root->function()->clone();
             SysDict::module()->append_new_function(cloned_callee);
+            _cloned++;
             update_callee_in_all_paths(callers[i], cloned_callee);
         }
     }
@@ -202,6 +207,40 @@ public:
             }
             printf("\n");
         }
+    }
+
+    void get_distinct_paths() {
+        std::vector<std::vector<CallInstFamily*>> distinct_set;
+        std::set<string> contexts;
+        int removed = 0;
+        for (auto v: _paths) {
+            string context;
+            for (auto I: v) {
+                char buf[128];
+                sprintf(buf, "%p", I);
+                context += string(buf) + ' ';
+            }
+
+            if (contexts.find(context) != contexts.end()) {
+//                string callee = v[0]->called_function()->name();
+//                printf("%s", callee.c_str());
+//                for (auto I: v) {
+//                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+//                    printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
+//                    callee = I->function()->name();
+//                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
+//                }
+//                guarantee(0, "re: %s", context.c_str());
+                removed++;
+            }
+            else {
+                contexts.insert(context);
+                distinct_set.push_back(v);
+            }
+        }
+        _paths = distinct_set;
+
+        zpd(removed);
     }
 
     int match_header(string& line) {
@@ -462,14 +501,16 @@ public:
             string hot_aps_file = get_argument(arg_name);
             load_hot_aps_file(hot_aps_file);
         }
-        print_paths();
+        get_distinct_paths();
+//        print_paths();
         while (!_done) {
             do_one();
             zpl("one clone")
-            print_paths();
+            //print_paths();
         }
 
-
+        SysDict::module()->print_to_file(SysDict::filename() + name());
+        zpd(_cloned)
         //prune_call_callers_map();
         //traverse("malloc");
     }
