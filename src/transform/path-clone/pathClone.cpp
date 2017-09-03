@@ -191,9 +191,7 @@ public:
         else {
             ret = approximately_match(file, line_num);
         }
-        if (_callee == "gen_adddi3") {
-            zpl("kkk: %s", _caller.c_str());
-        }
+
         _callee = _caller;
 
         return ret;
@@ -335,10 +333,6 @@ public:
                 zpl("infer caller: %s", _caller.c_str())
             }
 
-
-            if (_callee == "gen_adddi3") {
-                zpl("kkk: %s, caller: %s", final->owner().c_str(), _caller.c_str());
-            }
         }
 
 

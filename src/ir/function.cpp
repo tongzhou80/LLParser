@@ -88,9 +88,6 @@ Function* Function::clone(string new_name) {
         _entry_block = *(f->begin());
     }
 
-    if (name() == "xmalloc") {
-        zpl("kkk")
-    }
     if (new_name.empty()) {
         new_name = name()+'.'+std::to_string((long long)++_copy_cnt);
     }

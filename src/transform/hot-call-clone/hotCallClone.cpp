@@ -485,25 +485,27 @@ public:
     }
 
     bool has_direct_recursion() {
-        std::map<string, int> _counters;
+        std::map<CallInstFamily*, int> counters;
         for (auto I: _stack) {
-            _counters[I->function()->name()]++;
-            if (I->called_function()->name() == I->function()->name()) {
-//                auto v = _stack;
-//                string callee = v[0]->called_function()->name();
-//                printf("skip: %s", callee.c_str());
-//                for (auto I: v) {
-//                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
-//                    printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
-//                    callee = I->function()->name();
-//                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
-//                }
-//                printf("\n");
-
+            counters[I]++;
+        }
+        for (auto i: counters) {
+            if (i.second > 2) {
                 _recursive++;
+
+                auto& v = _stack;
+                string callee = v[0]->called_function()->name();
+                printf("skip: %s", callee.c_str());
+                for (auto I: v) {
+                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+                    printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
+                    callee = I->function()->name();
+                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
+                }
                 return true;
             }
         }
+
         return false;
     }
 
@@ -515,15 +517,15 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         get_distinct_paths();
-////        print_paths();
-//        while (!_done) {
-//            do_one();
-//            zpl("one clone")
-//            //print_paths();
-//        }
-//
-//        SysDict::module()->print_to_file(SysDict::filename() + '.' + name());
-//        zpd(_cloned)
+//        print_paths();
+        while (!_done) {
+            do_one();
+            zpl("one clone")
+            //print_paths();
+        }
+
+        SysDict::module()->print_to_file(SysDict::filename() + '.' + name());
+        zpd(_cloned)
     }
 
 
