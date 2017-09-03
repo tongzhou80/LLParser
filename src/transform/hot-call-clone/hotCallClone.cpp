@@ -33,6 +33,7 @@ class HotCallClonePass: public Pass {
     std::vector<CallInstFamily*> _stack;
     string _caller;
     string _callee;
+    int _hot_counter;
     int _path_counter;
     int _cxt_counter;
     bool _skip;
@@ -53,6 +54,7 @@ public:
         MatchVerbose = 0;
         _recursive = 0;
         _cloned = 0;
+        _hot_counter = 0;
     }
             
     ~HotCallClonePass() {
@@ -511,6 +513,10 @@ public:
 
 
     bool run_on_module(Module* module) {
+        insert_declaration("malloc", "ben_malloc", true);
+        insert_declaration("calloc", "ben_calloc", true);
+        insert_declaration("realloc", "ben_realloc", true);
+
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
             string hot_aps_file = get_argument(arg_name);
@@ -524,11 +530,49 @@ public:
             //print_paths();
         }
 
-        SysDict::module()->print_to_file(SysDict::filename() + '.' + name());
         zpd(_cloned)
+        replace_malloc();
+
+        SysDict::module()->print_to_file(SysDict::filename() + '.' + name());
     }
 
+    void replace_malloc() {
+        for (auto p: _paths) {
+            CallInstFamily* ci = p[0];
+            string old_callee = ci->called_function()->name();
+            guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
+            ci->replace_callee("ben_"+old_callee);
+            string new_args = "i32 " + std::to_string(_hot_counter) + ", " + ci->get_raw_field("args");
+            ci->replace_args(new_args);
+        }
+    }
 
+    bool insert_declaration(string oldname, string newname, bool add_id=true) {
+        Function* func = SysDict::module()->get_function(oldname);
+
+        if (func == NULL) {
+            return 0;
+        }
+        guarantee(func->is_external(), "malloc family should be external");
+        //Function* newfunc = SysDict::module()->create_child_function(_new_malloc);
+
+        Function* existed = SysDict::module()->get_function(newname);
+        if (existed) {
+            return 0; // return if already inserted
+        }
+
+        /* manipulate the text */
+        string text = func->raw_text();
+        string old_call = oldname + '(';
+        string new_call = newname + "(i32, ";
+        if (!add_id || Strings::startswith(oldname, "f90_")) {  // a bit funky
+            new_call = newname + '(';
+        }
+
+        Strings::replace(text, old_call, new_call);
+        Function* newfunc = IRBuilder::create_function_declaration(text);
+        SysDict::module()->insert_function_after(func, newfunc);
+    }
 
     void traverse(string bottom) {
         Function* malloc = SysDict::module()->get_function(bottom);
