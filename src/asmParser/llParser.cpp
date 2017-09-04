@@ -764,6 +764,8 @@ Module* LLParser::parse() {
     _module = new Module();
     SysDict::add_module(this);
 
+    Timer t;
+    t.start();
 
     getline_nonempty();
     parse_header(module());
@@ -771,9 +773,22 @@ Module* LLParser::parse() {
     parse_structs(module());
     parse_comdats();
     parse_globals(module());
+    t.stop();
+    zpl("1: %.3f seconds", t.seconds());
+    t.resume();
     parse_functions(module());
+    t.stop();
+    zpl("2: %.3f seconds", t.seconds());
+    t.resume();
     parse_attributes(module());
+    t.stop();
+    zpl("3: %.3f seconds", t.seconds());
+    t.resume();
     parse_metadatas(module());
+    t.stop();
+    zpl("4: %.3f seconds", t.seconds());
+    t.resume();
+
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX

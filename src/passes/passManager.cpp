@@ -156,7 +156,7 @@ void PassManager::destroy() {
 }
 
 /* for debug, addr2line can't show line numbers in a .so */
-#include <transform/hot-call-clone/hotCallClone.cpp>
+#include <transform/hot-call-clone/hotCallClone1.cpp>
 #include <transform/path-clone/pathClone.cpp>
 #include <transform/call-graph/callGraph.cpp>
 void PassManager::initialize_passes() {
@@ -167,7 +167,8 @@ void PassManager::initialize_passes() {
     if (DebugRun) {
         HotCallClonePass* p = new HotCallClonePass();
         p->set_name("HotCallClonePass");
-        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_hot_a2l.txt");
+        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_hot_a2l.txt.1");
+        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_all.txt");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test1.txt");
         add_pass(p);
 

@@ -36,7 +36,7 @@ void SysArgs::init(SoptInitArgs* initArgs) {
         //benches.push_back("libquantum");
         benches.push_back("403.gcc");
         for (int i = 0; i < benches.size(); ++i) {
-            string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4);
+            string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4) +".ll";
             //parser->parse("../../test/fortran/a.ll");
             //parser->parse("../../test/clone/clone3.ll");
             //path = "../../test/fortran/spec_backtrace.o.ll";
