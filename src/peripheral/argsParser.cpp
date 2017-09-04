@@ -133,8 +133,11 @@ void ArgsParser::parse_long_option() {
         SysArgs::print_help();
         exit(0);
     }
-    else if (opt == "--debug") {
-        SysArgs::set_property("debug", "");
+    else if (opt == "--save-dbg") {
+        SysArgs::set_property("save-dbg", "");
+    }
+    else if (opt == "--load-dbg") {
+        SysArgs::set_property("load-dbg", "");
     }
     else if (opt == "--load" || opt == "-load") {
         if (_eoa) {

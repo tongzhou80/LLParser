@@ -15,7 +15,7 @@
 
 int SysArgs::_file_id = -1;
 std::vector<string> SysArgs::_filenames;
-std::map<string, string> SysArgs::_properties;
+std::map<string, string> SysArgs::_options;
 std::set<string> SysArgs::_flags;
 std::vector<string> SysArgs::_passes;
 string SysArgs::cur_target;
@@ -50,16 +50,16 @@ void SysArgs::add_target_file(string name) {
     _filenames.push_back(name);
 }
 
-string SysArgs::get_property(string key) {
-    if (_properties.find(key) == _properties.end()) {
+string SysArgs::get_option(string key) {
+    if (_options.find(key) == _options.end()) {
         return "";
     } else {
-        return _properties[key];
+        return _options[key];
     }
 }
 
-bool SysArgs::has_property(string key) {
-    if (_properties.find(key) == _properties.end()) {
+bool SysArgs::has_option(string key) {
+    if (_options.find(key) == _options.end()) {
         return false;
     } else {
         return true;

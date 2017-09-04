@@ -20,7 +20,7 @@ struct SoptInitArgs {
 class SysArgs {
     static int _file_id;
     static std::vector<string> _filenames;
-    static std::map<string, string> _properties;
+    static std::map<string, string> _options;
     static std::set<string> _flags;
     static std::vector<string> _passes;
 public:
@@ -36,9 +36,13 @@ public:
     static std::vector<string>& passes()                          { return _passes; }
 
 
-    static void set_property(string key, string value)            { _properties[key] = value; }
-    static string get_property(string key);
-    static bool has_property(string key);
+    static void set_option(string key, string value)              { _options[key] = value; }
+    static string get_option(string key);
+    static bool has_option(string key);
+
+    static void set_property(string key, string value)            { set_option(key, value); }
+    static string get_property(string key)                        { return get_option(key); }
+    static bool has_property(string key)                          { return has_option(key); }
 
     static void set_flag(string f)                           { _flags.insert(f); }
     static bool get_flag(string f)                           { return _flags.find(f) != _flags.end(); }
