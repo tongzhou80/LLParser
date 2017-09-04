@@ -167,30 +167,38 @@ public:
         auto& callers = _callers_map[_search_root];
         if (callers.size() == 0)
             guarantee(callers.size() != 0, "root: %p", _search_root);
-        //zpl("root: %p, callers: %d", _search_root, callers.size())
+        zpl("root: %p, callers: %d", _search_root, callers.size())
 
         Function* cloned_callee = _search_root->function()->clone();
         SysDict::module()->append_new_function(cloned_callee);
         _cloned++;
 
+        int updated = 0;
         for (auto xps_caller: callers) {
             if (xps_caller->hotness == 1) {
                 update_callee_in_all_all_paths(xps_caller->caller, cloned_callee);
+                updated++;
             }
         }
-
+        //guarantee(updated != callers.size(), " ");
     }
 
     void update_callee_in_all_all_paths(CallInstFamily* caller, Function* new_callee) {
+        bool is_replaced = false;
         for (auto& stack: _hot_paths) {
             for (int i = 1; i < stack.size(); ++i) {
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
-                    zpl("repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
-                    I->replace_callee(new_callee->name());
+                    if (!is_replaced) {
+                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        I->replace_callee(new_callee->name());
+                        is_replaced = true;
+                    }
+
                     auto callee_call = stack[i-1];
                     int i_index = callee_call->get_index_in_block();
                     int b_index = callee_call->parent()->get_index_in_function();
+                    //zpl("in path replace %p to %p", stack[i-1], new_callee->get_instruction(b_index, i_index));
                     stack[i-1] = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 }
             }
@@ -200,8 +208,12 @@ public:
             for (int i = 1; i < stack.size(); ++i) {
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
-                    zpl("repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
-                    I->replace_callee(new_callee->name());
+                    if (!is_replaced) {
+                        zpl("repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        I->replace_callee(new_callee->name());
+                        is_replaced = true;
+                    }
+
                     auto callee_call = stack[i-1];
                     int i_index = callee_call->get_index_in_block();
                     int b_index = callee_call->parent()->get_index_in_function();
