@@ -61,63 +61,40 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
 
     parse_config_files();
 
-    while (1) {
-        get_arg();
-        if (_eoa) {
-            break;
-        }
-        if (Strings::startswith(_text, "-XX:")) {
+    if (init_args->argc == 1) {
+        return;
+    }
+
+    string args;
+    for (int i = 1; i < init_args->argc; ++i) {
+        args += string(init_args->argv[i]) + ' ';
+    }
+    set_text(args);
+
+    while (!_eol) {
+        get_word_until(" =");
+        if (Strings::startswith(_word, "-XX:")) {
             int xx_len = strlen("-XX:");
-            if (_text[xx_len] == '+') {
-                Flags::set_flag(_text.substr(xx_len+1), true);
+            if (_word[xx_len] == '+') {
+                Flags::set_flag(_word.substr(xx_len+1), true);
             }
-            else if (_text[xx_len] == '-') {
+            else if (_word[xx_len] == '-') {
                 Flags::set_flag(_text.substr(xx_len+1), false);
             }
             else {
                 guarantee(0, "Bad formatted option: %s (miss a '+' or '-'?)", _text.c_str());
             }
         }
-        else if (Strings::startswith(_text, "--")) {
+        else if (Strings::startswith(_word, "-")) {
             parse_long_option();
         }
-        else if (Strings::startswith(_text, "-")) {
-            parse_short_flag();
-        }
         else {
-            SysArgs::add_target_file(_text);
+            SysArgs::add_target_file(_word);
         }
     }
-//    for (int i = 1; i < init_args->argc; ++i) {
-//        string this_arg = init_args->argv[i];
-//        set_text(this_arg);
-//        if (Strings::startswith(_text, "-XX:")) {
-//            int xx_len = strlen("-XX:");
-//            if (_text[xx_len] == '+') {
-//                Flags::set_flag(_text.substr(xx_len+1), true);
-//            }
-//            else if (_text[xx_len] == '-') {
-//                Flags::set_flag(_text.substr(xx_len+1), false);
-//            }
-//            else {
-//                guarantee(0, "assignment not supported");
-//            }
-//        }
-//        else if (Strings::startswith(_text, "--")) {
-//            parse_long_option();
-//        }
-//        else if (Strings::startswith(_text, "-")) {
-//            parse_short_flag();
-//        }
-//        else {
-//            SysArgs::add_target_file(_text);
-//        }
-//
-//    }
 }
 
 void ArgsParser::parse_short_flag() {
-    get_word();
     if (_word == "-g") {
         SysArgs::set_flag("debug-info");
     }
@@ -150,31 +127,26 @@ void ArgsParser::parse_short_flag() {
 }
 
 void ArgsParser::parse_long_option() {
-    get_word('=');
     string opt = _word;
-    string value;
-    if (!_eol) {
-        get_word();
-        value = _word;
-    }
-    else {
-        get_arg();
-        value = _text;
-    }
 
     if (opt == "--help") {
         SysArgs::print_help();
         exit(0);
     }
-    else if (opt == "--load") {
+    else if (opt == "--debug") {
+        SysArgs::set_property("debug", "");
+    }
+    else if (opt == "--load" || opt == "-load") {
         if (_eoa) {
             fprintf(stderr, "--load requires an argument!\n");
             exit(0);
         }
 
-        auto passes = Strings::split(value, ',');
+        get_word();
+
+        auto passes = Strings::split(_word, ',');
         if (passes.size() == 0) {
-            passes = Strings::split(value, '+');
+            passes = Strings::split(_word, '+');
         }
         guarantee(passes.size() != 0, ".");
         for (auto p: passes) {
@@ -185,16 +157,69 @@ void ArgsParser::parse_long_option() {
             fprintf(stderr, "--ld-pass-path requires an argument!\n");
             exit(0);
         }
-        SysArgs::set_property("ld-pass-path", value);
+        get_word();
+        SysArgs::set_property("ld-pass-path", _word);
     }
-    else if (opt == "--output") {
+    else if (opt == "--output" || opt == "-o") {
         if (_eoa) {
             fprintf(stderr, "--output requires an argument!\n");
             exit(0);
         }
-        SysArgs::set_property("output", value);
+        get_word();
+        SysArgs::set_property("output", _word);
     }
     else {
         std::cout << "ignored long option: " << opt << std::endl;
     }
 }
+
+
+//void ArgsParser::parse_long_option() {
+//    get_word('=');
+//    string opt = _word;
+//    string value;
+//    if (!_eol) {
+//        get_word();
+//        value = _word;
+//    }
+//    else {
+//        get_arg();
+//        value = _text;
+//    }
+//
+//    if (opt == "--help") {
+//        SysArgs::print_help();
+//        exit(0);
+//    }
+//    else if (opt == "--load") {
+//        if (_eoa) {
+//            fprintf(stderr, "--load requires an argument!\n");
+//            exit(0);
+//        }
+//
+//        auto passes = Strings::split(value, ',');
+//        if (passes.size() == 0) {
+//            passes = Strings::split(value, '+');
+//        }
+//        guarantee(passes.size() != 0, ".");
+//        for (auto p: passes) {
+//            SysArgs::passes().push_back(p);
+//        }
+//    } else if (opt == "--ld-pass-path") {
+//        if (_eoa) {
+//            fprintf(stderr, "--ld-pass-path requires an argument!\n");
+//            exit(0);
+//        }
+//        SysArgs::set_property("ld-pass-path", value);
+//    }
+//    else if (opt == "--output") {
+//        if (_eoa) {
+//            fprintf(stderr, "--output requires an argument!\n");
+//            exit(0);
+//        }
+//        SysArgs::set_property("output", value);
+//    }
+//    else {
+//        std::cout << "ignored long option: " << opt << std::endl;
+//    }
+//}

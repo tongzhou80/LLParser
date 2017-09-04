@@ -20,7 +20,7 @@ public:
     void parse_long_option();
     void parse_short_flag();
     void parse_config_files();
-    void set_bool_flag(string flag, int v);
+
 
 
 
