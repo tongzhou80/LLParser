@@ -25,7 +25,9 @@ class HotCallClonePass: public Pass {
     int _cloned;
     std::ofstream _ofs;
     //std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
-    std::vector<std::vector<CallInstFamily*>> _paths;
+    //std::vector<std::vector<CallInstFamily*>> _paths;
+    std::vector<std::vector<CallInstFamily*>> _cold_paths;
+    std::vector<std::vector<CallInstFamily*>> _hot_paths;
     std::map<CallInstFamily*, std::vector<CallInstFamily*>> _callers_map;
     std::map<CallInstFamily*, int> _dr_caller_freq;
     CallInstFamily* _search_root;
@@ -66,7 +68,7 @@ public:
         _dr_caller_freq.clear();
         _search_root = NULL;
         int max_freq = 0;
-        for (auto context: _paths) {
+        for (auto context: _hot_paths) {
             for (int i = 0; i < context.size()-1; ++i) {
                 auto I = context[i];
 
@@ -93,6 +95,32 @@ public:
             }
         }
 
+        for (auto context: _cold_paths) {
+            for (int i = 0; i < context.size()-1; ++i) {
+                auto I = context[i];
+
+                // for each direct caller of malloc/..
+                if (i == 0) {
+                    if (_dr_caller_freq.find(I) == _dr_caller_freq.end()) {
+                        _dr_caller_freq[I] = 0;
+                    }
+                    _dr_caller_freq[I]++;
+                    if (_dr_caller_freq[I] > max_freq) {
+                        max_freq = _dr_caller_freq[I];
+                        _search_root = I;
+                    }
+                }
+
+                if (_callers_map.find(I) == _callers_map.end()) {
+                    _callers_map[I] = std::vector<CallInstFamily*>();
+                }
+
+                auto& v = _callers_map[I];
+                auto new_element = context[i+1];
+                if (std::find(v.begin(), v.end(), new_element) == v.end())
+                    v.push_back(new_element);
+            }
+        }
     }
 
     void do_one() {
@@ -121,12 +149,35 @@ public:
     }
 
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
-        for (auto& stack: _paths) {
+        bool is_replaced = false;
+        for (auto& stack: _hot_paths) {
             for (int i = 1; i < stack.size(); ++i) {
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
-                    zpl("repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
-                    I->replace_callee(new_callee->name());
+                    if (!is_replaced) {
+                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        I->replace_callee(new_callee->name());
+                        is_replaced = true;
+                    }
+
+                    auto callee_call = stack[i-1];
+                    int i_index = callee_call->get_index_in_block();
+                    int b_index = callee_call->parent()->get_index_in_function();
+                    stack[i-1] = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
+                }
+            }
+        }
+
+        for (auto& stack: _cold_paths) {
+            for (int i = 1; i < stack.size(); ++i) {
+                CallInstFamily* I = stack[i];
+                if (I == caller) {
+                    if (!is_replaced) {
+                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        I->replace_callee(new_callee->name());
+                        is_replaced = true;
+                    }
+
                     auto callee_call = stack[i-1];
                     int i_index = callee_call->get_index_in_block();
                     int b_index = callee_call->parent()->get_index_in_function();
@@ -135,6 +186,7 @@ public:
             }
         }
     }
+
 
     // todo: the hot_aps_file must have an appending new line to be correctly parsed for now
     void load_hot_aps_file(string filename) {
@@ -145,6 +197,7 @@ public:
         }
         string line;
         bool is_header = true;
+        int hot = 0;
         int recognized = 0;
 
         while (std::getline(ifs, line)) {
@@ -163,22 +216,29 @@ public:
                     if (has_all) {
                         recognized++;
                         if (!has_direct_recursion()) {
-                            _paths.push_back(_stack);
+                            //_all_paths.push_back(path);
+                            if (hot == 1) {
+                                _hot_paths.push_back(_stack);
+                            }
+                            else {
+                                _cold_paths.push_back(_stack);
+                            }
                         }
                         //add_partial_caller();
                         //clone_call_path(_stack);
                         _path_counter++;
                     }
-                    _cxt_counter++;
-                    _stack.clear();
-                    _caller.clear();
-                    _callee.clear();
-                    _skip = false;
                 }
+                _cxt_counter++;
+                _stack.clear();
+                _caller.clear();
+                _callee.clear();
+                _skip = false;
+                hot = false;
             }
             else {
                 if (is_header) {
-                    match_header(line);
+                    hot = match_header(line);
                     zpl("header: %s", line.c_str())
                     is_header = false;
                 }
@@ -198,7 +258,7 @@ public:
     }
 
     void print_paths() {
-        for (auto v: _paths) {
+        for (auto v: _hot_paths) {
             string callee = v[0]->called_function()->name();
             printf("%s", callee.c_str());
             for (auto I: v) {
@@ -215,7 +275,7 @@ public:
         std::vector<std::vector<CallInstFamily*>> distinct_set;
         std::set<string> contexts;
         int removed = 0;
-        for (auto v: _paths) {
+        for (auto v: _hot_paths) {
             string context;
             for (auto I: v) {
                 char buf[128];
@@ -240,7 +300,35 @@ public:
                 distinct_set.push_back(v);
             }
         }
-        _paths = distinct_set;
+        _hot_paths = distinct_set;
+
+        distinct_set.clear();
+        for (auto v: _cold_paths) {
+            string context;
+            for (auto I: v) {
+                char buf[128];
+                sprintf(buf, "%p", I);
+                context += string(buf) + ' ';
+            }
+
+            if (contexts.find(context) != contexts.end()) {
+//                string callee = v[0]->called_function()->name();
+//                printf("%s", callee.c_str());
+//                for (auto I: v) {
+//                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+//                    printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
+//                    callee = I->function()->name();
+//                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
+//                }
+//                guarantee(0, "re: %s", context.c_str());
+                removed++;
+            }
+            else {
+                contexts.insert(context);
+                distinct_set.push_back(v);
+            }
+        }
+        _cold_paths = distinct_set;
 
         zpd(removed);
     }
@@ -251,6 +339,12 @@ public:
 
         int matched = sscanf(line.c_str(), "%d %s", &apid, hotness);
         guarantee(matched == 2, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
+        if (string(hotness) == "0xffffffff") {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 
     CallInstFamily* match_callsite(string & line) {
@@ -537,7 +631,7 @@ public:
     }
 
     void replace_malloc() {
-        for (auto p: _paths) {
+        for (auto p: _hot_paths) {
             CallInstFamily* ci = p[0];
             string old_callee = ci->called_function()->name();
             guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
