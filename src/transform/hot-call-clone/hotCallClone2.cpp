@@ -602,7 +602,11 @@ public:
         zpd(round)
         replace_malloc();
 
-        SysDict::module()->print_to_file(SysDict::filename() + '.' + name());
+        string out = SysArgs::get_option("output");
+        if (out.empty()) {
+            out = SysDict::filename() + '.' + name();
+        }
+        SysDict::module()->print_to_file(out);
     }
 
     void replace_malloc() {
