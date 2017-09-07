@@ -178,10 +178,14 @@ void LLParser::parse_globals(Module * module) {
         _has_globals = true;
         GlobalVariable* gv = new GlobalVariable();
         inc_intext_pos();
-        get_word(); // name
+        get_word('=');
+        Strings::strip(_word);
         gv->set_name(_word);
         get_word();
+
+        // todo: 'alias' does not have to be right after '='
         if (_word == "alias") {
+            set_text(_text);
             break;
         }
         gv->set_raw_text(line());
@@ -198,12 +202,12 @@ void LLParser::parse_aliases() {
         get_word(); // name
         alias->set_name(_word);
         get_word();
+        guarantee(_word == "=", " ");
+        get_word();
         if (InstFlags::in_linkages(_word)) {
             alias->set_raw_field("linkage", _word);
         }
 
-        // todo: more optional flags
-        get_word();
         parser_assert(_word == "alias", text(), " ");
         get_word('@'); // skip to @
         get_word();
