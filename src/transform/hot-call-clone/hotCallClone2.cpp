@@ -50,6 +50,7 @@ class HotCallClonePass: public Pass {
     int _cxt_counter;
     bool _skip;
     int _recursive;
+    int _recognized;
     bool _done;
     //const int FUNC_MAX_LEN = 1024;
 public:
@@ -66,6 +67,7 @@ public:
         MatchVerbose = 0;
         _recursive = 0;
         _cloned = 0;
+        _recognized = 0;
         _hot_counter = 0;
     }
 
@@ -204,7 +206,6 @@ public:
         bool is_header = true;
         string header;
         int hot = 0;
-        int recognized = 0;
 
         while (std::getline(ifs, line)) {
             // got a whole call stack
@@ -220,7 +221,7 @@ public:
                     }
                     zpl("has all: %d\n", has_all)
                     if (has_all) {
-                        recognized++;
+                        _recognized++;
                         if (!has_direct_recursion()) {
                             XPS_Path* path = new XPS_Path();
                             path->path = _stack;
@@ -256,7 +257,7 @@ public:
                 }
             }
         }
-        zpl("recog: %d, cxt: %d, recursive: %d", recognized, _cxt_counter, _recursive);
+
     }
 //
 //    void print_all_paths() {
@@ -389,7 +390,7 @@ public:
                             if (Strings::conatins(filename, loc->filename())
                                 && std::abs(line-loc->line()) < 10) {
                                 if (SysDict::module()->language() == Module::Language::cpp) {
-                                    if (loc->function() == _caller) {
+                                    if (loc->function_linkage_name() == _caller) {
                                         users_offsets[ci] = std::abs(line-loc->line());
                                     }
                                 }
@@ -449,9 +450,6 @@ public:
     }
 
     CallInstFamily* approximately_match(string filename, int line) {
-        if (_callee == "_ZN6soplex9spx_allocIPNS_7DataSetIiE4ItemEEEvRT_i") {
-            zpl("kkk")
-        }
         Function* calleef = SysDict::module()->get_function(_callee);
 
         CallInstFamily* final = NULL;
@@ -509,6 +507,10 @@ public:
 
         if (final) {
             if (!_caller.empty()) {
+                if (Alias* alias = SysDict::module()->get_alias(_caller)) {
+                    _caller = dynamic_cast<Function*>(alias->aliasee())->name();
+                }
+
                 if (final->owner() != _caller) {
                     return NULL;
                 }
@@ -518,10 +520,6 @@ public:
                 zpl("infer caller: %s", _caller.c_str())
             }
 
-
-            if (_callee == "gen_adddi3") {
-                zpl("kkk: %s, caller: %s", final->owner().c_str(), _caller.c_str());
-            }
         }
 
 
@@ -612,8 +610,6 @@ public:
             //print_all_paths();
         }
 
-        zpd(_cloned)
-        zpd(round)
         replace_malloc();
 
         string out = SysArgs::get_option("output");
@@ -621,6 +617,9 @@ public:
             out = SysDict::filename() + '.' + name();
         }
         SysDict::module()->print_to_file(out);
+
+        zpl("======== Summary ======");
+        zpl("recog: %d, cxt: %d, recursive: %d, cloned: %d, round: %d", _recognized, _cxt_counter, _recursive, _cloned, round);
     }
 
     void replace_malloc() {

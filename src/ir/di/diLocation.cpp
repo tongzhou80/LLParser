@@ -157,6 +157,16 @@ string DILocation::function() {
     return _subprogram->name();
 }
 
+string DILocation::function_name() {
+    guarantee(_subprogram != NULL, "An instruction should have a function scope");
+    return _subprogram->name();
+}
+
+string DILocation::function_linkage_name() {
+    guarantee(_subprogram != NULL, "An instruction should have a function scope");
+    return _subprogram->linkageName();
+}
+
 string DILocation::dump(bool newline) {
     string ss = this->filename() + ':' + std::to_string((long long)this->line()) + " (" + this->function().c_str() + ')';
     printf("%s", ss.c_str());

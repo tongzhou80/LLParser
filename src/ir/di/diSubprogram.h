@@ -23,7 +23,7 @@ class DIFile;
 //};
 
 class DISubprogram: public DIScope {
-    // string _diname;  // already have _name field from Value class
+    string _linkageName;
     DIScope* _scope;  // more specific than DIScope
     int _line;
 public:
@@ -31,6 +31,14 @@ public:
 
     int line()                                        { return _line; }
     void set_line(int line)                           { _line = line; }
+
+    const string &linkageName() const {
+        return _linkageName;
+    }
+
+    void set_linkageName(const string &_linkageName) {
+        DISubprogram::_linkageName = _linkageName;
+    }
 
     void resolve();
 };

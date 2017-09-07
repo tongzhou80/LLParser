@@ -33,6 +33,8 @@ public:
 
     string filename();
     string function();
+    string function_name();
+    string function_linkage_name();
     string dump(bool newline=true);
 
     void resolve();

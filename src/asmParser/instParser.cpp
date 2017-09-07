@@ -295,10 +295,6 @@ void InstParser::do_call_family(Instruction* inst) {
               ret_ty.c_str(), fnty.c_str());
     }
 
-    if (ci->owner() == "_ZN6soplex7DataSetIiEC2Ei") {
-        zpl("kkk")
-    }
-
     /* deal with bitcast first if at all
      * corner cases:
      * tail call void bitcast (void (%struct.bContext*, %struct.uiBlock.22475* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)* @uiPupBlock
