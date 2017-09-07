@@ -182,6 +182,11 @@ void Module::print_to_stream(FILE *fp) {
     }
     fprintf(fp, "\n");
 
+    for (auto it: _alias_map) {
+        it.second->print_to_stream(fp);
+    }
+    fprintf(fp, "\n");
+
     auto& l3 = _function_list;
     for (auto f = l3.begin(); f != l3.end(); ++f) {
         (*f)->print_to_stream(fp);
