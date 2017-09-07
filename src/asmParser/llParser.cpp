@@ -164,36 +164,47 @@ void LLParser::parse_structs(Module* module) {
 
 void LLParser::parse_comdats() {
     Module* module = SysDict::module();
-    while (true) {
-        if (_char == '$') {
-            Comdat* value = new Comdat();
-            value->set_raw_text(line());
-            module->add_comdat(value);
-        }
-        else {
-            break;
-        }
+    while (_char == '$') {
+        Comdat* value = new Comdat();
+        value->set_raw_text(line());
+        module->add_comdat(value);
         get_real_line();
     }
 }
 
 void LLParser::parse_globals(Module * module) {
-    while (true) {
+    while (Strings::startswith(line(), "@") && !Strings::conatins(line(), " alias ")) {
+        _has_globals = true;
 
-        if (Strings::startswith(line(), "@")) {
-            _has_globals = true;
+        GlobalVariable* gv = new GlobalVariable();
+        gv->set_raw_text(line());
+        module->add_global_variable(gv);
+        get_real_line();
+    }
+}
 
-            GlobalVariable* gv = new GlobalVariable();
-            gv->set_raw_text(line());
-            module->add_global_variable(gv);
+void LLParser::parse_aliases() {
+    while (Strings::startswith(line(), "@") && Strings::conatins(line(), " alias ")) {
+        Alias* alias = new Alias();
 
-            if (!LazyParsing) {
-                guarantee(0, "ShouldNotReachHere: LazyParsing must be on for now");
-            }
+        inc_intext_pos();
+        get_word(); // name
+        alias->set_name(_word);
+        get_word();
+        if (InstFlags::in_linkages(_word)) {
+            alias->set_raw_field("linkage", _word);
         }
-        else {
-            break;
-        }
+
+        // todo: more optional flags
+        get_word();
+        parser_assert(_word == "alias", text(), " ");
+        get_word('@'); // skip to @
+        get_word();
+        alias->set_raw_field("aliasee", _word);
+        parser_assert(_eol, line(), "should be end of line");
+
+        alias->set_raw_text(line());
+        SysDict::module()->add_alias(alias->name(), alias);
         get_real_line();
     }
 }
@@ -296,8 +307,13 @@ Function* LLParser::parse_function_header(Module* module) {
     return func;
 }
 
-/// Functions created are fully-parsed functions that are not
-/// associated to any module
+/**@brief Parse the function header and return a Function pointer
+ *
+ * Basic blocks are not parsed yet.
+ *
+ * @param text
+ * @return
+ */
 Function* LLParser::create_function(string &text) {
     set_line(text);
     get_word();
@@ -764,30 +780,16 @@ Module* LLParser::parse() {
     _module = new Module();
     SysDict::add_module(this);
 
-    Timer t;
-    t.start();
-
     getline_nonempty();
     parse_header(module());
     parse_module_level_asms();
     parse_structs(module());
     parse_comdats();
     parse_globals(module());
-    t.stop();
-    zpl("1: %.3f seconds", t.seconds());
-    t.resume();
+    parse_aliases();
     parse_functions(module());
-    t.stop();
-    zpl("2: %.3f seconds", t.seconds());
-    t.resume();
     parse_attributes(module());
-    t.stop();
-    zpl("3: %.3f seconds", t.seconds());
-    t.resume();
     parse_metadatas(module());
-    t.stop();
-    zpl("4: %.3f seconds", t.seconds());
-    t.resume();
 
 
     // DILocation is slightly more complicated, so resolve some data in advance

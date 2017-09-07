@@ -58,7 +58,11 @@ void CallInstFamily::replace_args(string newargs) {
 }
 
 void CallInstFamily::resolve_callee_symbol(string fn_name) {
-    /* args parsing is more complex, not deal with it for now */
+    if (Alias* alias = SysDict::module()->get_alias(fn_name)) {
+        string aliasee = alias->get_raw_field("aliasee");
+        fn_name = aliasee;
+    }
+
     Function* callee = SysDict::module()->get_function(fn_name);
     if (callee == NULL) {
         callee = SysDict::module()->create_child_function_symbol(fn_name);

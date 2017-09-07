@@ -65,6 +65,7 @@ public:
     void parse_structs(Module* );
     void parse_comdats();
     void parse_globals(Module* );
+    void parse_aliases();
     void parse_functions(Module* );
     void parse_function_declaration(Module* );
     void parse_function_definition(Module* );

@@ -335,9 +335,6 @@ void InstParser::do_call_family(Instruction* inst) {
             fn_name = _word;
         }
 
-//        if (fn_name.find("f90_") != fn_name.npos) {
-//            zpl("kkk")
-//        }
         ci->resolve_callee_symbol(fn_name);
     }
     else if (_char == '%') {

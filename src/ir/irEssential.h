@@ -10,6 +10,7 @@
 #include "structType.h"
 #include "comdat.h"
 #include "globalVariable.h"
+#include "alias.h"
 #include "function.h"
 #include "basicBlock.h"
 #include "instruction.h"

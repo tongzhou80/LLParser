@@ -441,7 +441,7 @@ public:
         Function* calleef = SysDict::module()->get_function(_callee);
 
         CallInstFamily* final = NULL;
-        guarantee(calleef, " ");
+        guarantee(calleef, "Function %s not found", _callee.c_str());
         auto users = calleef->caller_list();
 
         // level 0
