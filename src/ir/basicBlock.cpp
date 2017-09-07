@@ -178,6 +178,9 @@ BasicBlock* BasicBlock::clone() {
 }
 
 void BasicBlock::print_to_stream(FILE *fp) {
+#ifdef PRODUCTION
+    if (!raw_text().empty())
+#endif
     fprintf(fp, "%s\n", raw_text().c_str());
 
     auto& l = _instruction_list;

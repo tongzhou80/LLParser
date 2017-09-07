@@ -66,10 +66,10 @@ public:
     void parse_comdats();
     void parse_globals(Module* );
     void parse_aliases();
-    void parse_functions(Module* );
-    void parse_function_declaration(Module* );
-    void parse_function_definition(Module* );
-    Function* parse_function_header(Module* );
+    void parse_functions();
+    void parse_function_declaration();
+    void parse_function_definition();
+    Function* parse_function_header();
     Function* create_function(string& text);
     Function* parse_function_name_and_args();
     void parse_basic_block(BasicBlock* bb);

@@ -220,19 +220,14 @@ void LLParser::parse_aliases() {
     }
 }
 
-/* A function either starts with "declare" or "define"
- */
-void LLParser::parse_functions(Module * module) {
-    int counter = 0;
+void LLParser::parse_functions() {
     while (true) {
-//        if (Strings::contains(line(), "bzlib")) {
-//            zpl("cc %s", line().c_str());
-//        }
-        if (Strings::startswith(line(), "define")) {
-            parse_function_definition(module);
+        // should either start with 'declare' or 'define'
+        if (line()[2] == 'f') {
+            parse_function_definition();
         }
-        else if (Strings::startswith(line(), "declare")) {
-            parse_function_declaration(module);
+        else if (line()[2] == 'c') {
+            parse_function_declaration();
         }
         else {
             break;
@@ -242,36 +237,45 @@ void LLParser::parse_functions(Module * module) {
     }
 }
 
-/* This function parses a string like "@BZ2_blockSort(%struct.EState* nocapture)" */
+/*
+ * Function Syntax
+ * define [linkage] [visibility] [DLLStorageClass]
+       [cconv] [ret attrs]
+       <ResultType> @<FunctionName> ([argument list])
+       [(unnamed_addr|local_unnamed_addr)] [fn Attrs] [section "name"]
+       [comdat [($name)]] [align N] [gc] [prefix Constant]
+       [prologue Constant] [personality Constant] (!name !N)* { ... }
+
+ * Parameter Syntax
+ * <type> [parameter Attrs] [name]
+ */
+/**@brief Parse a string that contains a function's name and args, return a Function* with no parent
+ *
+ * @return
+ */
 Function* LLParser::parse_function_name_and_args() {
     /* To parse all args we must parse types, leave as todo */
-//    if (Strings::contains(line(), "BZ2_bzlibVersion")) {
-//        printf("hh");
-//    }
     guarantee(_char == '@', "Bad function header");
     inc_inline_pos();
 
-    get_word('(');
+    get_word('(', false, false);
     string name = _word;
-    string args = "";  // todo: parse args
+    string params = jump_to_end_of_scope();  // todo: parse params
     int dbg = -1;
 
     // fast-forward to !dbg
-    get_word('!');
-    if (!_eol) {
-        get_word('!');
-        guarantee(_word == "dbg ", "! not followed by dbg: %s", _word.c_str());
-        get_word(' ');
+    int pos = text().find("!dbg");
+    if (pos != string::npos) {
+        set_intext_pos(pos+strlen("!dbg !"));
+        get_word();
         dbg = std::stoi(_word);
     }
 
     if (FunctionParsingVerbose) {
         printf("  name: |%s|\n"
                "  args: |%s|\n",
-               name.c_str(), args.c_str());
+               name.c_str(), params.c_str());
     }
-
-    guarantee(!Strings::contains(args, "("), "args should not contain '(': %s", args.c_str());
 
     Function* func = SysDict::module()->get_function(name);
 
@@ -309,7 +313,7 @@ Function* LLParser::parse_function_name_and_args() {
  * Parameter Syntax
  * <type> [parameter Attrs] [name]
  */
-Function* LLParser::parse_function_header(Module* module) {
+Function* LLParser::parse_function_header() {
     Function* func = create_function(line());
 
     if (func->parent() == NULL) {
@@ -326,7 +330,14 @@ Function* LLParser::parse_function_header(Module* module) {
  * @return
  */
 Function* LLParser::create_function(string &text) {
-    set_line(text);
+    int len = text.length();
+    if (text[len-1] == '{') {
+        len--;
+    }
+    if (text[len-1] == ' ') {
+        len--;
+    }
+    set_line(text.substr(0, len));
     get_word();
     string declare_or_define = _word;
     string linkage, cconv, ret_attrs, ret_type;
@@ -382,9 +393,8 @@ Function* LLParser::create_function(string &text) {
     return func;
 }
 
-void LLParser::parse_function_definition(Module * module) {
-    Function* func = parse_function_header(module);
-    guarantee(line()[line().size()-1] == '{', "function definition should end with a '{'");
+void LLParser::parse_function_definition() {
+    Function* func = parse_function_header();
 
     get_real_line();
     bool first_bb = true;
@@ -408,11 +418,6 @@ void LLParser::parse_function_definition(Module * module) {
             break;
         }
     }
-
-
-//    if (UseParseTimePasses) {
-//        PassManager::pass_manager->apply_parse_time_passes(func);
-//    }
 }
 
 void LLParser::parse_basic_block_header(BasicBlock *bb) {
@@ -563,12 +568,8 @@ Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
 //}
 
 
-void LLParser::parse_function_declaration(Module * module) {
-    Function* func = parse_function_header(module);
-
-//    if (UseParseTimePasses) {
-//        PassManager::pass_manager->apply_parse_time_passes(func);
-//    }
+void LLParser::parse_function_declaration() {
+    Function* func = parse_function_header();
 }
 
 void LLParser::parse_attributes(Module *module) {
@@ -798,7 +799,7 @@ Module* LLParser::parse() {
     parse_comdats();
     parse_globals(module());
     parse_aliases();
-    parse_functions(module());
+    parse_functions();
     parse_attributes(module());
     parse_metadatas(module());
 

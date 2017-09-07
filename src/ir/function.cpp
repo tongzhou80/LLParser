@@ -72,7 +72,7 @@ std::vector<CallInstFamily*> Function::caller_list() {
  *
  * @return
  */
-//todo: may need to creat a Function from scratch
+//todo: may need to create a Function from scratch
 Function* Function::clone(string new_name) {
     Function* f = new Function(*this);
     f->set_parent(NULL);
@@ -101,6 +101,8 @@ Function* Function::clone(string new_name) {
         string new_header = f->raw_text().substr(0, dipos) + '{';
         f->set_raw_text(new_header);
     }
+
+    Strings::replace(f->raw_text(), " comdat ", " ");  // todo
 
     f->set_is_copy();
     f->set_copy_cnt(0);
@@ -136,8 +138,8 @@ void Function::print_to_stream(FILE *fp) {
         fprintf(fp, "%s\n", raw_text().c_str());
     }
     else {
-        //fprintf(fp, "%s {\n", raw_text().c_str());
-        fprintf(fp, "%s\n", raw_text().c_str());
+        fprintf(fp, "%s {\n", raw_text().c_str());
+        //fprintf(fp, "%s\n", raw_text().c_str());
         auto l = _basic_block_list;
         for (int i = 0; i < l.size(); ++i) {
             auto bb = l[i];

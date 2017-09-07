@@ -25,6 +25,7 @@ public:
 
     string text()                                        { return _text; }
     void set_text(string& );
+    void set_intext_pos(int p);
 
     string jump_to_end_of_scope();
     void skip_ws();

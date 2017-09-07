@@ -17,6 +17,17 @@ void StringParser::set_text(string & text) {
     _fail = false;
 }
 
+/**@brief This function won't set _eol in any case.
+ * In other words, the argument can't be an out-of-range position
+ *
+ * @param p
+ */
+void StringParser::set_intext_pos(int p) {
+    guarantee(_intext_pos < _text.size() && _intext_pos > -1, "range check");
+    _intext_pos = p;
+    _char = _text[_intext_pos];
+}
+
 bool StringParser::match(string s) {
     for (int i = 0; i < s.size(); ++i) {
         if (!_eol && s[i] == _char) {
