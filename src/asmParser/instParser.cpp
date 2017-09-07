@@ -511,10 +511,11 @@ string InstParser::parse_compound_type() {
     return ty;
 }
 
-/**@brief parse structs of the following form:
+/**@brief parse structs of the following form: (not parsing the * at the end, if any)
  *
  * %struct.name
  * %class.name
+ * %union.name
  * %"struct..."
  * %"class..."
  *
@@ -526,7 +527,7 @@ string InstParser::parse_complex_structs() {
         inc_intext_pos();
     }
 
-    if (_char == 's' || _char == 'c') {
+    if (_char == 's' || _char == 'c' || _char == 'u') {
         get_word();
         ty += _word;
     }

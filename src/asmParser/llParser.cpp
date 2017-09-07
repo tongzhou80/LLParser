@@ -174,10 +174,16 @@ void LLParser::parse_comdats() {
 }
 
 void LLParser::parse_globals(Module * module) {
-    while (Strings::startswith(line(), "@") && !Strings::conatins(line(), " alias ")) {
+    while (Strings::startswith(line(), "@")) {
         _has_globals = true;
-
         GlobalVariable* gv = new GlobalVariable();
+        inc_intext_pos();
+        get_word(); // name
+        gv->set_name(_word);
+        get_word();
+        if (_word == "alias") {
+            break;
+        }
         gv->set_raw_text(line());
         module->add_global_variable(gv);
         get_real_line();
@@ -185,7 +191,7 @@ void LLParser::parse_globals(Module * module) {
 }
 
 void LLParser::parse_aliases() {
-    while (Strings::startswith(line(), "@") && Strings::conatins(line(), " alias ")) {
+    while (Strings::startswith(line(), "@")) {
         Alias* alias = new Alias();
 
         inc_intext_pos();
