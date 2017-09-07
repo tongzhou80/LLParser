@@ -130,7 +130,7 @@ void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63
 
 void Errors::die() {
     //std::terminate();
-    exit(0);
+    exit(1);
 }
 
 void Errors::semantic_error_handler() {

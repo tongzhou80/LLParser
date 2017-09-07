@@ -71,15 +71,15 @@ void SysArgs::print_help() {
     std::cout << "Usage: sopt [OPTION] <file>\n"
               "Parse a .ll file and perform some analysis or transformations on the IR\n"
               "\nOptions:\n"
-              << std::setw(30) << "  -g" << "Tell the parser debug info is available, which enables some optimizations;\n"
-              << std::setw(30) << "  " << "  Debug info is always parsed if present, even without -g\n"
+//              << std::setw(30) << "  -g" << "tell the parser debug info is available, which enables some optimizations;\n"
+//              << std::setw(30) << "  " << "debug info is always parsed if present, even without -g\n"
 
-              << std::setw(30) << "  -load, --load" << "Name of the pass loaded. Use ',' or '+' as delimiter for multiple passes\n"
+              << std::setw(30) << "  -load, --load" << "name of the pass loaded. Use ',' or '+' as delimiter for multiple passes\n"
 
-              << std::setw(30) << "  -path, --ld-pass-path" << "Specify the path to load passes from. Defaults to the path configured in $HOME/.sopt/config\n"
-              << std::setw(30) << "  " << "  If $HOME/.sopt/config is not found, the load path defaults to '../passes/'\n"
+              << std::setw(30) << "  -path, --ld-pass-path" << "specify the path to load passes from. Defaults to the path configured in $HOME/.sopt/config\n"
+              << std::setw(30) << "  " << "if $HOME/.sopt/config is not found, the load path defaults to '../passes/'\n"
 
-              << std::setw(30) << "  -o, --output" << "Specify the output file name. Usually passes need to produce a file after transformation\n"
+              << std::setw(30) << "  -o, --output" << "specify the output file name. Usually passes need to produce a file after transformation\n"
 
               << "\nA pass may also accept arguments; the arguments should be appended to the pass name using '?' as the delimiter. \n"
               << "The current syntax is --load=<pass>?arg1=xxx?arg2=xxx, or -load <pass>?arg1=xxx?arg2=xxx etc.\n\n"
