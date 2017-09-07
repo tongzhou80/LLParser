@@ -230,7 +230,7 @@ void PassManager::add_pass(string name) {
     }
 
     /* if pass is an .so file, use its path */
-    if (Strings::conatins(pass_name, ".so")) {
+    if (Strings::contains(pass_name, ".so")) {
         //char cwd[1024];
         //getcwd(cwd, 1024);
         //sprintf(path, "%s/%s", cwd, pass_name.c_str());

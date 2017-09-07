@@ -225,7 +225,7 @@ void LLParser::parse_aliases() {
 void LLParser::parse_functions(Module * module) {
     int counter = 0;
     while (true) {
-//        if (Strings::conatins(line(), "bzlib")) {
+//        if (Strings::contains(line(), "bzlib")) {
 //            zpl("cc %s", line().c_str());
 //        }
         if (Strings::startswith(line(), "define")) {
@@ -245,7 +245,7 @@ void LLParser::parse_functions(Module * module) {
 /* This function parses a string like "@BZ2_blockSort(%struct.EState* nocapture)" */
 Function* LLParser::parse_function_name_and_args() {
     /* To parse all args we must parse types, leave as todo */
-//    if (Strings::conatins(line(), "BZ2_bzlibVersion")) {
+//    if (Strings::contains(line(), "BZ2_bzlibVersion")) {
 //        printf("hh");
 //    }
     guarantee(_char == '@', "Bad function header");
@@ -271,7 +271,7 @@ Function* LLParser::parse_function_name_and_args() {
                name.c_str(), args.c_str());
     }
 
-    guarantee(!Strings::conatins(args, "("), "args should not contain '(': %s", args.c_str());
+    guarantee(!Strings::contains(args, "("), "args should not contain '(': %s", args.c_str());
 
     Function* func = SysDict::module()->get_function(name);
 
@@ -430,7 +430,7 @@ void LLParser::parse_basic_block_header(BasicBlock *bb) {
         bb->set_name(_word);
     }
 
-    if (!Strings::conatins(line(), "; preds")) {
+    if (!Strings::contains(line(), "; preds")) {
         return;
     }
 
@@ -459,7 +459,7 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
             parse_basic_block_header(bb);
             get_real_line();
         }
-        else if (line()[0] != ' ' && Strings::conatins(line(), ":")) {
+        else if (line()[0] != ' ' && Strings::contains(line(), ":")) {
             parse_basic_block_header(bb);
             get_real_line();
         }
@@ -524,7 +524,7 @@ void LLParser::set_line_to_full_instruction() {
             full += line();
         } while (!Strings::startswith(line(), "]"));
     }
-    else if (Strings::conatins(line(), " invoke ")) {
+    else if (Strings::contains(line(), " invoke ")) {
         full += '\n';
         get_real_line();
         parser_assert(Strings::startswith(line(), "to"), line(), "invalid invoke inst");

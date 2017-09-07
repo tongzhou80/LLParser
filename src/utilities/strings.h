@@ -18,8 +18,8 @@ public:
     static bool startswith(const std::string& s, const std::string substr, bool skip_ws=true);
     static bool endswith(const std::string& s, const char* substr);
     static bool endswith(const std::string& s, const std::string substr);
-    static bool conatins(const std::string& s, const char* substr)             { return s.find(substr) != std::string::npos; }
-    static bool conatins(const std::string& s, const std::string substr)             { return s.find(substr) != std::string::npos; }
+    static bool contains(const std::string& s, const char* substr)             { return s.find(substr) != std::string::npos; }
+    static bool contains(const std::string& s, const std::string substr)             { return s.find(substr) != std::string::npos; }
     static char first_nonws_char(const std::string& s);
     static bool is_number(const std::string& s);
     static bool replace(std::string& s, std::string& oldsub, std::string& newsub);

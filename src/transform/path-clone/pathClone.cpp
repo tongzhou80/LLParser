@@ -113,7 +113,7 @@ public:
                     is_header = false;
                 }
                 else {
-                    if (Strings::conatins(line, "__libc_start_main")) {
+                    if (Strings::contains(line, "__libc_start_main")) {
                         _skip = true;
                     }
 
@@ -150,7 +150,7 @@ public:
     }
 
     CallInstFamily* match_callsite(string & line) {
-        guarantee(Strings::conatins(line, "("), " ");
+        guarantee(Strings::contains(line, "("), " ");
         line = line.substr(line.find('('));  // strip the exe name before '('
 
         int pos1 = line.find(' ');
@@ -212,7 +212,7 @@ public:
                         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                             DILocation *loc = ci->debug_loc();
                             guarantee(loc, "This pass needs full debug info, please compile with -g");
-                            if (Strings::conatins(filename, loc->filename())) {
+                            if (Strings::contains(filename, loc->filename())) {
                                 users_offsets[ci] = std::abs(line-loc->line());
                             }
                             else {
@@ -286,7 +286,7 @@ public:
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::conatins(filename, loc->filename()) && std::abs(line-loc->line()) < 10) {
+                    if (Strings::contains(filename, loc->filename()) && std::abs(line-loc->line()) < 10) {
                         //if (ci->owner() == _caller) {
                         users_offsets[ci] = std::abs(line-loc->line());
                     }
