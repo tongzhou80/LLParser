@@ -202,6 +202,7 @@ public:
         }
         string line;
         bool is_header = true;
+        string header;
         int hot = 0;
         int recognized = 0;
 
@@ -238,6 +239,7 @@ public:
             }
             else {
                 if (is_header) {
+                    header = line;
                     hot = match_header(line);
                     zpl("header: %s", line.c_str())
                     is_header = false;
@@ -384,8 +386,17 @@ public:
                         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                             DILocation *loc = ci->debug_loc();
                             guarantee(loc, "This pass needs full debug info, please compile with -g");
-                            if (Strings::conatins(filename, loc->filename())) {
-                                users_offsets[ci] = std::abs(line-loc->line());
+                            if (Strings::conatins(filename, loc->filename())
+                                && std::abs(line-loc->line()) < 10) {
+                                if (SysDict::module()->language() == Module::Language::cpp) {
+                                    if (loc->function() == _caller) {
+                                        users_offsets[ci] = std::abs(line-loc->line());
+                                    }
+                                }
+                                else {
+                                    users_offsets[ci] = std::abs(line-loc->line());
+                                }
+
                             }
                             else {
                                 other_callers.push_back(ci);
@@ -438,6 +449,9 @@ public:
     }
 
     CallInstFamily* approximately_match(string filename, int line) {
+        if (_callee == "_ZN6soplex9spx_allocIPNS_7DataSetIiE4ItemEEEvRT_i") {
+            zpl("kkk")
+        }
         Function* calleef = SysDict::module()->get_function(_callee);
 
         CallInstFamily* final = NULL;

@@ -12,7 +12,9 @@ class Function;
 class Alias: public Value {
     Value* _aliasee;
 public:
+    Alias(): _aliasee(NULL) {}
     Value* aliasee()                                              { return _aliasee; }
+    void set_aliasee(Value* a)                                    { _aliasee = a; }
 };
 
 #endif //LLPARSER_ALIAS_H

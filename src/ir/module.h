@@ -23,6 +23,14 @@ class MetaData;
 class DILocation;
 
 class Module: public Value {
+public:
+    enum Language {
+        c,
+        cpp,
+        f90
+    };
+private:
+    Language _lang;
     string _module_id;
     std::map<string, string> _headers;
     std::vector<string> _module_level_inline_asms;
@@ -37,6 +45,10 @@ class Module: public Value {
     std::map<string, MetaData*> _named_metadata_map;
     std::vector<MetaData*> _unnamed_metadata_list;
 public:
+    Module(): _lang(Language::c) {}
+
+    Module::Language language()                            { return _lang; }
+    void set_language(Language l)                          { _lang = l; }
     std::vector<GlobalVariable*>& global_list()            { return _global_list; }
     std::map<string, Alias*>& alias_map()                  { return _alias_map; }
     std::vector<Function*>& function_list()                { return _function_list; }
@@ -80,6 +92,7 @@ public:
     void check_after_pass();
 
     void resolve_debug_info();
+    void resolve_aliases();
 };
 
 

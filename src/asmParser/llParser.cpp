@@ -165,6 +165,7 @@ void LLParser::parse_structs(Module* module) {
 void LLParser::parse_comdats() {
     Module* module = SysDict::module();
     while (_char == '$') {
+        module->set_language(Module::Language::cpp); //todo: not sure if this is a good way to do it
         Comdat* value = new Comdat();
         value->set_raw_text(line());
         module->add_comdat(value);
@@ -795,7 +796,7 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     SysDict::module()->resolve_debug_info();
-
+    SysDict::module()->resolve_aliases();
 
     SysDict::module()->check_after_parse();
 

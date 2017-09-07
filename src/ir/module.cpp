@@ -17,6 +17,9 @@ string Module::get_header(string key) {
 }
 
 Function* Module::get_function(string key) {
+    if (Alias* alias = get_alias(key)) {
+        return dynamic_cast<Function*>(alias->aliasee());
+    }
     if (_function_map.find(key) == _function_map.end()) {
         return NULL;
     } else {
@@ -133,6 +136,15 @@ void Module::resolve_debug_info() {
 
     for (auto it = more.begin(); it != more.end(); ++it) {
         (*it)->second_resolve();
+    }
+}
+
+void Module::resolve_aliases() {
+    for (auto it: _alias_map) {
+        Alias* a = it.second;
+        Function* f = get_function(a->get_raw_field("aliasee"));
+        guarantee(f, " ");
+        a->set_aliasee(f);
     }
 }
 
