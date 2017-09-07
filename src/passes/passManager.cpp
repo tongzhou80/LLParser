@@ -170,7 +170,7 @@ void PassManager::initialize_passes() {
         p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_hot_a2l.txt.1");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_all.txt");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test1.txt");
-        add_pass(p);
+        //add_pass(p);
 
     }
 

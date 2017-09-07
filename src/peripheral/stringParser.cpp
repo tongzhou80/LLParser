@@ -219,6 +219,11 @@ void StringParser::jump_ahead() {
     }
 }
 
+/**@brief When current char is '(', '{', '[' or '<', jump to the end of the scope and return the skipped part
+ *
+ * One assumption of this function is that the left mark (like '[') must be different from the right mark.
+ * @return
+ */
 string StringParser::jump_to_end_of_scope() {
     int num = 1;
     char left = _char;

@@ -166,8 +166,7 @@ string InstParser::parse_basic_type() {
             break;
         }
         case '%': {
-            get_word();
-            fulltype = _word;
+            fulltype = parse_complex_structs();
             break;
         }
         case '{': {  // structure type like %5 = tail call { i64, { float, float }* } @quantum_new_matrix(i32 2, i32 2) #9, !dbg !2700
@@ -512,6 +511,36 @@ string InstParser::parse_compound_type() {
         }
     }
 
+    return ty;
+}
+
+/**@brief parse structs of the following form:
+ *
+ * %struct.name
+ * %class.name
+ * %"struct..."
+ * %"class..."
+ *
+ * @return
+ */
+string InstParser::parse_complex_structs() {
+    string ty = "%";
+    if (_char == '%') {
+        inc_intext_pos();
+    }
+
+    if (_char == 's' || _char == 'c') {
+        get_word();
+        ty += _word;
+    }
+    else if (_char == '"') {
+        inc_intext_pos();
+        get_word('"');
+        ty +=  '"' + _word + '"';
+    }
+    else {
+        parser_assert(0, text(), " ");
+    }
     return ty;
 }
 

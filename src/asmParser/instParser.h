@@ -23,6 +23,7 @@ public:
     string get_first_word(string& );
     string parse_basic_type();
     string parse_compound_type();
+    string parse_complex_structs();
     void parse_function_pointer_type();
     void fastforwad_bitcast();
 
