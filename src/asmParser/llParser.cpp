@@ -6,10 +6,9 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+
 #include <peripheral/sysArgs.h>
 #include <utilities/mutex.h>
-#include <peripheral/timer.h>
-//#include <peripheral/sysArgs.h>
 #include "llParser.h"
 #include "instParser.h"
 #include "sysDict.h"
@@ -31,8 +30,8 @@ LLParser::~LLParser() {
     }
 }
 
-/* version string should contains 1 or 2 dots, such as 3.8.0 */
 void LLParser::set_llvm_version(string v) {
+    /* version string should contains 1 or 2 dots, such as 3.8.0 */
     _major_version = v[0] - '0';
     _minor_version = atof((const char*)&v[2]);
 }
@@ -129,14 +128,6 @@ void LLParser::parse_module_level_asms() {
 // todo: structs need finer-grain parse
 void LLParser::parse_structs(Module* module) {
     while (true) {
-//        if (Strings::startswith(line(), "%struct") || Strings::startswith(line(), "%union")) {
-//            _has_structs = true;
-//
-//            StructType* st = new StructType();
-//            st->set_raw_text(line());
-//            module->add_struct_type(st);
-//        }
-//        else if (Strings::startswith(line(), "%")) {
         if (Strings::startswith(line(), "%")) {
             StructType* st = new StructType();
             st->set_raw_text(line());
@@ -806,9 +797,11 @@ Module* LLParser::parse() {
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
+
     SysDict::module()->resolve_debug_info();
     SysDict::module()->resolve_aliases();
 
+    /* perform post check */
     SysDict::module()->check_after_parse();
 
     Locks::pass_manager_lock->lock();
@@ -827,7 +820,6 @@ Module* LLParser::parse() {
     pm->apply_finalization(module());
     Locks::pass_manager_lock->unlock();
 
-    /* perform post check */
     return module();
 }
 

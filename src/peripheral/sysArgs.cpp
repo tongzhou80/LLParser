@@ -28,8 +28,8 @@ void SysArgs::init(SoptInitArgs* initArgs) {
 
     if (DebugRun) {
         std::vector<string> benches;
-        //benches.push_back("450.soplex");
-        benches.push_back("401.bzip2");
+        benches.push_back("450.soplex");
+        //benches.push_back("401.bzip2");
         //benches.push_back("astar");
         //benches.push_back("mcf");
         //benches.push_back("gobmk");
