@@ -683,82 +683,6 @@ DISubprogram* LLParser::parse_disubprogram() {
     }
     return data;
 }
-//
-//DILocation* LLParser::parse_dilocation() {
-//    /* !1225 = !DILocation(line: 42, column: 3, scope: !1222) */
-//    /* !2404 = !DILocation(line: 0, scope: !258) */
-//    DILocation* data = new DILocation();
-//
-//    while (!_eol) {
-//        get_word_until(",)");
-//        int colon_pos = _word.find(':');
-//        string key = _word.substr(0, colon_pos);
-//        string value = _word.substr(colon_pos+2);
-//        if (value[0] == '!') {
-//            value = value.substr(1);
-//            guarantee(Strings::is_number(value), "! should be followed by a number!");
-//        }
-//
-//        if (key == "line") {
-//            data->set_line(std::stoi(value));
-//        }
-//        else if (key == "column") {
-//            data->set_column(std::stoi(value));
-//        }
-//        else if (key == "scope") {
-//            data->set_scope_id(std::stoi(value));
-//        }
-//        else if (key == "inlinedAt") {
-//            data->set_inlined_pos(std::stoi(value));
-//        }
-//        else {
-//            parser_assert(0, line(), "Bad key: %s", key.c_str());
-//        }
-//    }
-////    get_word(':');
-////    parser_assert(_word == "name", line(), "Bad DILocation format");
-////    get_word_until(",)");
-////    data->set_line(std::stoi(_word));
-////
-////    get_word(':');
-////    if (_word == "column") {
-////        get_word_until(",)");
-////        data->set_column(std::stoi(_word));
-////        get_word(':');
-////    }
-////
-////    parser_assert(_word == "scope", line(), "Bad DILocation format");
-////    get_word_until(",)");
-////    data->set_scope_id(std::stoi(_word.substr(1)));
-//
-////    const int nfields = 3;
-////    const char* fields[nfields] = { "line", "column", "scope" };
-////    for (int i = 0; i < nfields; ++i) {
-////        get_word(':');
-////        guarantee(_word == fields[i], "Bad DILocation format");
-////        get_word_until(",)");
-////
-////        if (i == 0) {
-////            data->set_line(std::stoi(_word));
-////        }
-////        else if (i == 1) {
-////            data->set_column(std::stoi(_word));
-////        }
-////        else if (i == 2) {
-////            data->set_scope_id(std::stoi(_word.substr(1)));
-////        }
-////    }
-//    if (!_eol) {
-//        get_word(':');
-//        if (_word == "inlinedAt") {
-//            get_word(')');
-//            data->set_inlined_pos(std::stoi(_word.substr(1)));
-//        }
-//    }
-//
-//    return data;
-//}
-
 
 Module* LLParser::parse(string file) {
     reset_parser();
@@ -767,12 +691,11 @@ Module* LLParser::parse(string file) {
     return parse();
 }
 
-
+Module* LLParser::parse() {
 /* 1. the parser always read in one line ahead, namely _line
  *    the next parsing phase will start from _line
  * 2. empty line is always skipped since they should not have meaning
  */
-Module* LLParser::parse() {
     _ifs.open(_file_name.c_str());
     if (!_ifs.is_open()) {
         fprintf(stderr, "open file %s failed.\n", _file_name.c_str());
@@ -797,7 +720,6 @@ Module* LLParser::parse() {
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
-
     SysDict::module()->resolve_debug_info();
     SysDict::module()->resolve_aliases();
 
