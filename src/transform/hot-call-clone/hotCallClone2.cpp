@@ -216,6 +216,19 @@ public:
 
                 bool has_all = true;
                 if (!_stack.empty()) {
+                    std::vector<CallInstFamily*> usable_stack;
+                    for (auto I:_stack) {
+                        if (I) {
+                            usable_stack.push_back(I);
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    _stack = usable_stack;
+                    if (_stack.empty()) {
+                        has_all = false;
+                    }
                     for (int i = 0; i < _stack.size(); ++i) {
                         if (!_stack[i]) {
                             has_all = false;
