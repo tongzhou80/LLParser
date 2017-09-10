@@ -28,7 +28,7 @@ void Pass::unload() {
 }
 
 void Pass::parse_arguments(string args) {
-    auto pairs = Strings::split(args, '?');
+    auto pairs = Strings::split(args, ':');
     for (int i = 0; i < pairs.size(); ++i) {
         auto pair = Strings::split(pairs[i], '=');
         if (pair.size() == 1) {

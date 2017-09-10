@@ -31,7 +31,6 @@ Below is an incomplete list of advantages LLParser could have over LLVM's librar
 - No need to compile LLVM from source and study its enormous core libraries, which are not necessarily consistent across versions.
 - LLParser is much more light-weight, manageable and highly flexible.
 - Especially good for simple transformations such as inserting an instruction, adding an argument, etc.
-- Modest build requirements (GCC > 4.4 with C++0x) (Will give up this abstinence soon).
 - No complex data structures, mostly raw STL, which is easy to handle.
 
 LLParser also implements hot-pluggable passes, so that your pass can be loaded at run time by specifying in the command line.
@@ -49,11 +48,11 @@ $ make
 
 Running `make` makes a `debug` directory where binaries and libraries are placed. 
 
-## Run
+## Run A Pass
 
 ```bash
 $ cd debug/bin
-$ ./sopt --help
+$ ./sopt -load ../pass/libHello.so yourIR.ll
 ```
 
 ## Overview

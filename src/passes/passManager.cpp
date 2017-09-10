@@ -223,7 +223,7 @@ void PassManager::add_pass(string name) {
     char path[1024], loader[1024], unloader[1024];
     string pass_name = name;
     string args;
-    int arg_pos = name.find('?');
+    int arg_pos = name.find(':');
     if (arg_pos != name.npos) {
         pass_name = name.substr(0, arg_pos);
         args = name.substr(arg_pos+1);

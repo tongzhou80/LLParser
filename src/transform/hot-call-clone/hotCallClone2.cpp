@@ -51,6 +51,7 @@ class HotCallClonePass: public Pass {
     bool _skip;
     int _recursive;
     int _recognized;
+    int _ben_num;
     bool _done;
     //const int FUNC_MAX_LEN = 1024;
 public:
@@ -67,6 +68,7 @@ public:
         MatchVerbose = 0;
         _recursive = 0;
         _cloned = 0;
+        _ben_num = 0;
         _recognized = 0;
         _hot_counter = 0;
     }
@@ -619,7 +621,7 @@ public:
         SysDict::module()->print_to_file(out);
 
         zpl("======== Summary ======");
-        zpl("recog: %d, cxt: %d, recursive: %d, cloned: %d, round: %d", _recognized, _cxt_counter, _recursive, _cloned, round);
+        zpl("recog: %d, cxt: %d, recursive: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _cloned, round, _ben_num);
     }
 
     void replace_malloc() {
@@ -635,6 +637,7 @@ public:
 
                 guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
                 ci->replace_callee("ben_"+old_callee);
+                _ben_num++;
                 string new_args = "i32 " + std::to_string(_hot_counter) + ", " + ci->get_raw_field("args");
                 ci->replace_args(new_args);
             }
