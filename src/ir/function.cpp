@@ -98,7 +98,7 @@ Function* Function::clone(string new_name) {
     /* strip DISubprogram info */
     int dipos = f->raw_text().find("!dbg");
     if (dipos != string::npos) {
-        string new_header = f->raw_text().substr(0, dipos) + '{';
+        string new_header = f->raw_text().substr(0, dipos);
         f->set_raw_text(new_header);
     }
 
