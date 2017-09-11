@@ -30,6 +30,12 @@ int Instruction::get_index_in_block() {
     return parent()->get_instruction_index(this);
 }
 
+Point2D<int> Instruction::get_position_in_function() {
+    int x = parent()->get_index_in_function();
+    int y = get_index_in_block();
+    return Point2D<int>(x, y);
+}
+
 void Instruction::copy_metadata_from(Instruction *i) {
     //_properties = i->properties();
     _dbg_id = i->dbg_id();

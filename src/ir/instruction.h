@@ -5,6 +5,7 @@
 #ifndef LLPARSER_INSTRUCTION_H
 #define LLPARSER_INSTRUCTION_H
 
+#include <peripheral/timer.h>
 #include "value.h"
 
 class BasicBlock;
@@ -70,6 +71,12 @@ public:
      * @return
      */
     int get_index_in_block();
+
+    /** @brief Return a Point2D instance
+     *
+     * @return
+     */
+    Point2D<int> get_position_in_function();
 
     /** @brief Clone this instruction except the parent.
      *

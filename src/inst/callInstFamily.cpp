@@ -39,6 +39,7 @@ void CallInstFamily::replace_callee(string callee) {
     }
     string old = called_function()->name();
     Strings::replace(_raw_text, old, callee);  // todo: this should be fine, but I am not sure
+    zpl("%p(%s) replace callee with %p (%s)", this, this->get_position_in_function().c_str(), new_callee, new_callee->name_as_c_str())
     set_called_function(new_callee);
 
     new_callee->append_user(this);
