@@ -244,7 +244,7 @@ public:
                 auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 stack[stack.size()-1] = ci_in_new_callee;
                 zpl("path pos %d to %s", stack.size()-1, ci_in_new_callee->function()->name_as_c_str())
-                print_path(stack);
+                    //print_path(stack);
                 return;
             }
 
@@ -265,7 +265,7 @@ public:
                     auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                     stack[i-1] = ci_in_new_callee;
                     zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
-                    print_path(stack);
+                        //print_path(stack);
                 }
             }
         }
@@ -312,7 +312,8 @@ public:
                     zpl("has all: %d\n", has_all)
                     if (has_all) {
                         _recognized++;
-                        if (!has_direct_recursion()) {
+                        //if (!has_direct_recursion()) {
+                        if (!has_continuous_recursion()) {
                             XPS_Path* path = new XPS_Path();
                             path->path = _stack;
                             path->hotness = hot;
@@ -718,7 +719,7 @@ public:
         }
         SysDict::module()->print_to_file(out);
 
-        //print_all_paths();
+        print_all_paths();
 
         zpl("======== Summary ======");
         zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
