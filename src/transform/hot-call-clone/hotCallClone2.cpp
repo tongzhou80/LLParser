@@ -106,7 +106,14 @@ public:
                 auto new_element = new XPS_Caller();
                 new_element->caller = context[i+1];
                 new_element->xps_path = xps_path;
-                v.push_back(new_element);
+                bool existed = false;
+                for (auto xps_caller: v) {
+                    if (xps_caller->caller == new_element->caller) {
+                        existed = true;
+                    }
+                }
+                if (!existed)
+                    v.push_back(new_element);
             }
         }
     }
@@ -147,55 +154,68 @@ public:
         auto& callers = _callers_map[_search_root];
         if (callers.size() == 0)
             guarantee(callers.size() != 0, "root: %p", _search_root);
-        zpl("root: %p, callers: %d", _search_root, callers.size())
+        zpl("root: %p(%s %d %d), callers: %d", _search_root,
+            _search_root->function()->name_as_c_str(), _search_root->parent()->get_index_in_function(),
+            _search_root->get_index_in_block(), callers.size())
+
+        for (auto ci: callers) {
+            zpl("caller: %s %d %d", ci->caller->function()->name_as_c_str(), ci->caller->parent()->get_index_in_function(), ci->caller->get_index_in_block())
+        }
+
         for (auto i = 1; i < callers.size(); ++i) {
             Function* cloned_callee = _search_root->function()->clone();
             SysDict::module()->append_new_function(cloned_callee);
             _cloned++;
-            update_callee_in_path(callers[i], cloned_callee);
+            //update_callee_in_path(callers[i], cloned_callee);
+            update_callee_in_all_paths(callers[i], cloned_callee);
         }
+
     }
-
-    void update_callee_in_path(XPS_Caller* caller, Function* new_callee) {
-        auto& stack = caller->xps_path->path;
-        for (int i = 1; i < stack.size(); ++i) {
-            CallInstFamily* I = stack[i];
-            if (I == caller->caller) {
-                zpl("in callinst %p repalce %s to %s", I, I->called_function()->name_as_c_str(), new_callee->name_as_c_str())
-                I->replace_callee(new_callee->name());
-
-                auto callee_call = stack[i-1];
-                int i_index = callee_call->get_index_in_block();
-                int b_index = callee_call->parent()->get_index_in_function();
-                zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
-                stack[i-1] = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-            }
-        }
-    }
-
-//    void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
-//        bool is_replaced = false;
-//        for (auto& xps_path: _all_paths) {
-//            auto stack = xps_path->path;
-//            for (int i = 1; i < stack.size(); ++i) {
-//                CallInstFamily* I = stack[i];
-//                if (I == caller) {
-//                    if (!is_replaced) {
-//                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
-//                        I->replace_callee(new_callee->name());
-//                        is_replaced = true;
-//                    }
 //
-//                    auto callee_call = stack[i-1];
-//                    int i_index = callee_call->get_index_in_block();
-//                    int b_index = callee_call->parent()->get_index_in_function();
-//                    //zpl("in path replace %p to %p", stack[i-1], new_callee->get_instruction(b_index, i_index));
-//                    stack[i-1] = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-//                }
+//    void update_callee_in_path(XPS_Caller* caller, Function* new_callee) {
+//        auto& stack = caller->xps_path->path;
+//        for (int i = 1; i < stack.size(); ++i) {
+//            CallInstFamily* I = stack[i];
+//            if (I == caller->caller) {
+//                zpl("in callinst %p repalce %s to %s", I, I->called_function()->name_as_c_str(), new_callee->name_as_c_str())
+//                I->replace_callee(new_callee->name());
+//
+//                auto callee_call = stack[i-1];
+//                int i_index = callee_call->get_index_in_block();
+//                int b_index = callee_call->parent()->get_index_in_function();
+//                zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
+//                auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
+//                stack[i-1] = ci_in_new_callee;
+//                zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
 //            }
 //        }
-//
 //    }
+
+    void update_callee_in_all_paths(XPS_Caller* caller, Function* new_callee) {
+        bool is_replaced = false;
+        for (auto& xps_path: _all_paths) {
+            auto& stack = xps_path->path;
+            for (int i = 1; i < stack.size(); ++i) {
+                CallInstFamily* I = stack[i];
+                if (I == caller->caller) {
+                    if (!is_replaced) {
+                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        I->replace_callee(new_callee->name());
+                        is_replaced = true;
+                    }
+
+                    auto callee_call = stack[i-1];
+                    int i_index = callee_call->get_index_in_block();
+                    int b_index = callee_call->parent()->get_index_in_function();
+                    zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
+                    auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
+                    stack[i-1] = ci_in_new_callee;
+                    zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
+                }
+            }
+        }
+
+    }
 
     // todo: the hot_aps_file must have an appending new line to be correctly parsed for now
     void load_hot_aps_file(string filename) {
@@ -616,7 +636,7 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         get_distinct_all_paths();
-//        print_all_paths();
+        print_all_paths();
         int round = 0;
         while (!_done) {
             do_one();
