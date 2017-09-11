@@ -633,6 +633,8 @@ public:
         }
         SysDict::module()->print_to_file(out);
 
+        print_all_paths();
+
         zpl("======== Summary ======");
         zpl("recog: %d, cxt: %d, recursive: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _cloned, round, _ben_num);
     }
@@ -684,29 +686,18 @@ public:
         SysDict::module()->insert_function_after(func, newfunc);
     }
 
-    void traverse(string bottom) {
-        Function* malloc = SysDict::module()->get_function(bottom);
-        int cnt = 0;
-
-        do {
-            if (TracingVerbose) {
-                printf("round: %d\n", cnt);
+    void print_all_paths() {
+        for (auto v: _all_paths) {
+            string callee = v->path[0]->called_function()->name();
+            printf("%d: %s", v->hotness, callee.c_str());
+            for (auto I: v->path) {
+                guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+                printf(" <- %s(%d, %d)", I->function()->name_as_c_str(), I->parent()->get_index_in_function(), I->get_index_in_block());
+                callee = I->function()->name();
+                // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
             }
-
-            cnt++;
-            _black.clear();
-            _has_overlapped_path = false;  // always assume this round is the last round
-            //auto& users = _callers[malloc];
-            auto& users = malloc->user_list();
-            auto users_copy = users; // user_list might change during the iteration since new functions may be created
-            for (auto uit = users_copy.begin(); uit != users_copy.end(); ++uit) {
-                Function* func = (*uit)->function();
-                do_clone(func);
-            }
-        } while (_has_overlapped_path && cnt < 10);
-
-        string out = SysDict::filename() + name();
-        SysDict::module()->print_to_file(out);
+            printf("\n");
+        }
     }
 
     void do_clone(Function* f) {

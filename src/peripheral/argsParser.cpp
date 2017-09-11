@@ -140,7 +140,7 @@ void ArgsParser::parse_long_option() {
         SysArgs::set_property("load-dbg", "");
     }
     else if (opt == "--load" || opt == "-load") {
-        if (_eoa) {
+        if (_eol) {
             fprintf(stderr, "--load requires an argument!\n");
             exit(0);
         }
@@ -156,7 +156,7 @@ void ArgsParser::parse_long_option() {
             SysArgs::passes().push_back(p);
         }
     } else if (opt == "--ld-pass-path") {
-        if (_eoa) {
+        if (_eol) {
             fprintf(stderr, "--ld-pass-path requires an argument!\n");
             exit(0);
         }
@@ -164,7 +164,7 @@ void ArgsParser::parse_long_option() {
         SysArgs::set_property("ld-pass-path", _word);
     }
     else if (opt == "--output" || opt == "-o") {
-        if (_eoa) {
+        if (_eol) {
             fprintf(stderr, "--output requires an argument!\n");
             exit(0);
         }

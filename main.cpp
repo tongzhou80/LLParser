@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
     /* todo:
      * callinst_list could be std::set, which is more error-resistent
-     * Instruction needs a function_name field for debug
+     * structs and globals need more parsing
      */
 
     pthread_t* tids = NULL;
