@@ -301,7 +301,7 @@ public:
                         }
                     }
                     _stack = usable_stack;
-                    if (_stack.empty()) {
+                    if (_stack.size() < 3) {
                         has_all = false;
                     }
                     for (int i = 0; i < _stack.size(); ++i) {
