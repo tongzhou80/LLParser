@@ -164,7 +164,12 @@ string DILocation::function_name() {
 
 string DILocation::function_linkage_name() {
     guarantee(_subprogram != NULL, "An instruction should have a function scope");
-    return _subprogram->linkageName();
+    if (_subprogram->linkageName().empty()) {
+        return _subprogram->name();
+    }
+    else {
+        return _subprogram->linkageName();
+    }
 }
 
 string DILocation::dump(bool newline) {

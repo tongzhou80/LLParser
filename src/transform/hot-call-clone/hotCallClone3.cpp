@@ -68,7 +68,7 @@ public:
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
-        MatchVerbose = 0;
+        MatchVerbose = true;
         _recursive = 0;
         _cloned = 0;
         _ben_num = 0;
@@ -313,7 +313,7 @@ public:
                         }
                     }
                     _stack = usable_stack;
-                    if (_stack.size() < 2) {
+                    if (_stack.size() < _min_cxt) {
                         has_all = false;
                     }
                     for (int i = 0; i < _stack.size(); ++i) {
@@ -332,6 +332,9 @@ public:
                             _all_paths.push_back(path);
                         }
                         _path_counter++;
+                    }
+                    else {
+                        zpl("not match: %s", header.c_str())
                     }
                 }
                 _cxt_counter++;
@@ -389,6 +392,8 @@ public:
             }
 
             if (contexts.find(context) != contexts.end()) {
+                zpd(v->hotness)
+                print_path(v->path);
 //                string callee = v[0]->called_function()->name();
 //                printf("%s", callee.c_str());
 //                for (auto I: v) {
@@ -434,6 +439,10 @@ public:
             int pos2 = bt_symbol.find('+');
             _caller = bt_symbol.substr(1, pos2-1);
             string offset = bt_symbol.substr(pos2+1);
+            
+            if (Alias* alias = SysDict::module()->get_alias(_caller)) {
+                _caller = dynamic_cast<Function*>(alias->aliasee())->name();
+            }
         }
         else {
             _caller = "";
@@ -479,7 +488,8 @@ public:
         std::map<CallInstFamily*, int> users_offsets;
         std::vector<CallInstFamily*> other_callers;
 
-        std::vector<string> candidates = {"malloc", "calloc", "realloc", "_Znam", "_Znwm", "_ZdaPv", "_ZdlPv"};
+        //std::vector<string> candidates = {"malloc", "calloc", "realloc", "_Znam", "_Znwm", "_ZdaPv", "_ZdlPv"};
+        std::vector<string> candidates = {"malloc", "calloc", "realloc"};
         for (auto c: candidates) {
             if (Function* alloc = SysDict::module()->get_function(c)) {
                 for (auto I: alloc->user_list()) {
@@ -527,8 +537,14 @@ public:
         }
 
 
+        
         if (final) {
             _caller = final->function()->name();
+            //zpl("alloc caller: %s, %p", _caller.c_str(), SysDict::module()->get_alias(_caller))
+            if (Alias* alias = SysDict::module()->get_alias(_caller)) {
+                _caller = dynamic_cast<Function*>(alias->aliasee())->name();
+            }
+
             if (dynamic_cast<InvokeInst*>(final)) {
                 zpl("got invoke")
             }
@@ -572,8 +588,21 @@ public:
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
                     if (Strings::contains(filename, loc->filename()) && std::abs(line-loc->line()) < 10) {
-                        //if (ci->owner() == _caller) {
-                        users_offsets[ci] = std::abs(line-loc->line());
+                        if (MatchVerbose) {
+                            printf("loc->filename(): %s, loc->line(): %d, loc function: %s\n",
+                                   loc->filename().c_str(), loc->line(), loc->function_linkage_name().c_str());
+                            printf("filename: %s, line: %d, caller: %s\n\n",
+                                   filename.c_str(), line, _caller.c_str());
+                        }
+                        
+                        if (SysDict::module()->language() == Module::Language::cpp) {
+                            if (loc->function_linkage_name() == _caller) {
+                                users_offsets[ci] = std::abs(line-loc->line());
+                            }
+                        }
+                        else {
+                            users_offsets[ci] = std::abs(line-loc->line());
+                        }
                     }
                     else {
                         other_callers.push_back(ci);
@@ -735,6 +764,7 @@ public:
         if (out.empty()) {
             out = SysDict::filename() + '.' + name();
         }
+        zps(out.c_str())
         SysDict::module()->print_to_file(out);
 
         print_all_paths();
@@ -812,7 +842,6 @@ public:
 
     void print_path(std::vector<CallInstFamily*>& path) {
         string callee = path[0]->called_function()->name();
-        printf("%s", callee.c_str());
         bool terminate = false;
         string msg;
         for (auto I: path) {
@@ -821,7 +850,7 @@ public:
                 msg = "I called: " + I->called_function()->name() + " but should call " + callee + " at " + I->function()->name_as_c_str() + ":" + I->get_position_in_function().c_str();
                 zpl("wrong %p called %p: %s", I, I->called_function(), msg.c_str())
             }
-            printf("%s <- %p %s(%d, %d)\n", callee.c_str(), I, I->function()->name_as_c_str(), I->parent()->get_index_in_function(), I->get_index_in_block());
+            printf("%s <- %s(%p, %s)\n", callee.c_str(), I->function()->name_as_c_str(), I, I->get_position_in_function().c_str());
             callee = I->function()->name();
 
             //zpl("set callee to %s", callee.c_str())
