@@ -76,6 +76,16 @@ const string& SysDict::filename() {
     return llparser()->filename();
 }
 
+const string SysDict::filepath() {
+    auto last_slash = filename().rfind('/');
+    if (last_slash != string::npos) {
+        return filename().substr(0, last_slash+1);
+    }
+    else {
+        return "./";
+    }
+}
+
 /**
  *
  * ThreadLocal data is also initilized here

@@ -702,6 +702,8 @@ public:
 
 
     bool run_on_module(Module* module) {
+        Timer timer;
+        timer.start();
         insert_declaration("malloc", "ben_malloc", true);
         insert_declaration("calloc", "ben_calloc", true);
         insert_declaration("realloc", "ben_realloc", true);
@@ -730,6 +732,12 @@ public:
         SysDict::module()->print_to_file(out);
 
         print_all_paths();
+
+        timer.stop();
+        std::ofstream stat_ofs;
+        stat_ofs.open(SysDict::filename() + ".timing");
+        stat_ofs << timer.seconds() << " " << _cxt_counter << " " << _all_paths.size() << " " << _cloned;
+        stat_ofs.close();
 
         zpl("======== Summary ======");
         zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
