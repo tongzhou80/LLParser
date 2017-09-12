@@ -45,6 +45,7 @@ class HotCallClonePass: public Pass {
     std::vector<CallInstFamily*> _stack;
     string _caller;
     string _callee;
+    int _min_cxt;
     int _hot_counter;
     int _path_counter;
     int _cxt_counter;
@@ -63,6 +64,7 @@ public:
 
         PrintCloning = true;
         TracingVerbose = true;
+        _min_cxt = 2;
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
@@ -704,6 +706,10 @@ public:
     bool run_on_module(Module* module) {
         Timer timer;
         timer.start();
+        if (has_argument("min-cxt")) {
+            _min_cxt = std::stoi(get_argument("min-cxt"));
+            zpd(_min_cxt)
+        }
         insert_declaration("malloc", "ben_malloc", true);
         insert_declaration("calloc", "ben_calloc", true);
         insert_declaration("realloc", "ben_realloc", true);
