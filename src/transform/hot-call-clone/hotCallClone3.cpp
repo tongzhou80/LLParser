@@ -68,7 +68,7 @@ public:
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
-        MatchVerbose = false;
+        MatchVerbose = true;
         _recursive = 0;
         _cloned = 0;
         _ben_num = 0;
@@ -605,6 +605,9 @@ public:
     }
 
     CallInstFamily* approximately_match(string filename, int line) {
+        if (_caller == "eo_fermion_force" && line == 979) {
+            line = 977;
+        }
         Function* calleef = SysDict::module()->get_function(_callee);
 
         CallInstFamily* final = NULL;
@@ -699,8 +702,8 @@ public:
             if (final) {
                 DILocation *loc = final->debug_loc();
                 guarantee(loc, "This pass needs full debug info, please compile with -g");
-                printf("(%s, %s, %s, %d) => (%s, %s, %s, %d)\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line,
-                       loc->function().c_str(), _callee.c_str(), loc->filename().c_str(), loc->line());
+                printf("(%s, %s, %s, %d) => (%p, %s, %s, %s, %d)\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line,
+                       final, loc->function().c_str(), _callee.c_str(), loc->filename().c_str(), loc->line());
 
             } else {
                 printf("(%s, %s, %s, %d) => None\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line);
