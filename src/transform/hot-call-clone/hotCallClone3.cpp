@@ -68,7 +68,7 @@ public:
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
-        MatchVerbose = true;
+        MatchVerbose = false;
         _recursive = 0;
         _cloned = 0;
         _ben_num = 0;
@@ -157,6 +157,7 @@ public:
             if (xps_path->hotness == 1)
                 hot_dr_callers[xps_path->path[0]] = xps_path;
         }
+        //print_all_paths();
 
         bool in_cold_path = false;
         for (auto xps_path: _all_paths) {
@@ -178,7 +179,7 @@ public:
                         root = hot_path->path[i];
                         i++;
                     }
-                    zpl("root: %s %s", root->function()->name_as_c_str(), root->get_position_in_function().c_str());
+                    zpl("root: %p %s %s", root, root->function()->name_as_c_str(), root->get_position_in_function().c_str());
                     auto hot_parent = get_element_in_call_path(hot_path->path, i);
                     auto cold_parent = get_element_in_call_path(cold_path->path, i);
 
@@ -187,11 +188,11 @@ public:
                     _cloned++;
                     //update_callee_in_path(callers[i], cloned_callee);
 
-                    if (cold_parent) {
-                        update_callee_in_all_paths(cold_parent, cloned_callee);
+                    if (hot_parent) {
+                        update_callee_in_all_paths(hot_parent, cloned_callee);
                     }
                     else {
-                        update_callee_in_all_paths(hot_parent, cloned_callee);
+                        update_callee_in_all_paths(cold_parent, cloned_callee);
                     }
                     
                     // XPS_Caller* caller = new XPS_Caller();
@@ -201,6 +202,7 @@ public:
                     zpl("after clone:")
                     print_path(hot_path->path);
                     print_path(cold_path->path);
+                    break;
                 }
             }
         }
@@ -622,7 +624,7 @@ public:
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
-                    if (Strings::contains(filename, loc->filename()) && std::abs(line-loc->line()) < 10) {
+                    if (Strings::contains(filename, loc->filename()) &&  std::abs(line-loc->line()) < 10) {
                         if (MatchVerbose) {
                             printf("loc->filename(): %s, loc->line(): %d, loc function: %s\n",
                                    loc->filename().c_str(), loc->line(), loc->function_linkage_name().c_str());
@@ -636,7 +638,10 @@ public:
                             }
                         }
                         else {
-                            users_offsets[ci] = std::abs(line-loc->line());
+                            if (loc->function_linkage_name() == _caller) {
+                                users_offsets[ci] = std::abs(line-loc->line());
+                            }
+                            //users_offsets[ci] = std::abs(line-loc->line());
                         }
                     }
                     else {
@@ -784,7 +789,7 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         get_distinct_all_paths();
-        //print_all_paths();
+        print_all_paths();
         int round = 0;
         while (!_done) {
             do_one();
