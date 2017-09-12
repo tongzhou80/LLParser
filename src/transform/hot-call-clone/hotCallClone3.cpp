@@ -392,8 +392,8 @@ public:
             }
 
             if (contexts.find(context) != contexts.end()) {
-                zpd(v->hotness)
-                print_path(v->path);
+                zpd(v->hotness);
+                    //print_path(v->path);
 //                string callee = v[0]->called_function()->name();
 //                printf("%s", callee.c_str());
 //                for (auto I: v) {
