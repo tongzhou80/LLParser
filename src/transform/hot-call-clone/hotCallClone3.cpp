@@ -176,17 +176,26 @@ public:
                         root = hot_path->path[i];
                         i++;
                     }
-                    zpl("root: %s %s", root->function()->name_as_c_str(), root->get_position_in_function().c_str())
+                    zpl("root: %s %s", root->function()->name_as_c_str(), root->get_position_in_function().c_str());
+                    auto hot_parent = get_element_in_call_path(hot_path->path, i);
+                    auto cold_parent = get_element_in_call_path(cold_path->path, i);
 
                     Function* cloned_callee = root->function()->clone();
                     SysDict::module()->append_new_function(cloned_callee);
                     _cloned++;
                     //update_callee_in_path(callers[i], cloned_callee);
-                    update_callee_in_all_paths(get_element_in_call_path(cold_path->path, i), cloned_callee);
-                    XPS_Caller* caller = new XPS_Caller();
-                    caller->caller = get_element_in_call_path(cold_path->path, i);
-                    caller->xps_path = cold_path;
-                    //update_callee_in_path(caller, cloned_callee);
+
+                    if (cold_parent) {
+                        update_callee_in_all_paths(cold_parent, cloned_callee);
+                    }
+                    else {
+                        update_callee_in_all_paths(hot_parent, cloned_callee);
+                    }
+                    
+                    // XPS_Caller* caller = new XPS_Caller();
+                    // caller->caller = get_element_in_call_path(cold_path->path, i);
+                    // caller->xps_path = cold_path;
+                    // //update_callee_in_path(caller, cloned_callee);
                     zpl("after clone:")
                     print_path(hot_path->path);
                     print_path(cold_path->path);
@@ -236,6 +245,7 @@ public:
         bool is_replaced = false;
         for (auto& xps_path: _all_paths) {
             auto& stack = xps_path->path;
+            guarantee(caller != NULL, " ");
             if (caller == NULL && stack[stack.size()-1]->function() == new_callee->copy_prototype()) {
                 auto callee_call = stack[stack.size()-1];
                 int i_index = callee_call->get_index_in_block();
@@ -301,7 +311,7 @@ public:
                         }
                     }
                     _stack = usable_stack;
-                    if (_stack.size() < 3) {
+                    if (_stack.size() < 2) {
                         has_all = false;
                     }
                     for (int i = 0; i < _stack.size(); ++i) {
