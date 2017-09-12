@@ -383,33 +383,68 @@ public:
     void get_distinct_all_paths() {
         std::vector<XPS_Path*> distinct_set;
         std::set<string> contexts;
+
+        // for (auto v: _all_paths) {
+        //     if (1) {                
+        //         string context;
+        //         for (auto I: v->path) {
+        //             char buf[128];
+        //             sprintf(buf, "%p", I);
+        //             context += string(buf) + ' ';
+        //         }
+
+        //         if (contexts.find(context) != contexts.end()) {
+        //             zpd(v->hotness);
+        //         }
+        //         else {
+        //             contexts.insert(context);
+        //             distinct_set.push_back(v);
+        //         }
+                
+        //     }
+        // }
+
         for (auto v: _all_paths) {
-            string context;
-            for (auto I: v->path) {
-                char buf[128];
-                sprintf(buf, "%p", I);
-                context += string(buf) + ' ';
-            }
+            if (v->hotness == 1) {                
+                string context;
+                for (auto I: v->path) {
+                    char buf[128];
+                    sprintf(buf, "%p", I);
+                    context += string(buf) + ' ';
+                }
 
-            if (contexts.find(context) != contexts.end()) {
-                zpd(v->hotness);
-                    //print_path(v->path);
-//                string callee = v[0]->called_function()->name();
-//                printf("%s", callee.c_str());
-//                for (auto I: v) {
-//                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
-//                    printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
-//                    callee = I->function()->name();
-//                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
-//                }
-//                guarantee(0, "re: %s", context.c_str());
-
-            }
-            else {
-                contexts.insert(context);
-                distinct_set.push_back(v);
+                if (contexts.find(context) != contexts.end()) {
+                    zpd(v->hotness);
+                }
+                else {
+                    contexts.insert(context);
+                    distinct_set.push_back(v);
+                }
+                
             }
         }
+
+        for (auto v: _all_paths) {
+            if (v->hotness == 0) {                
+                string context;
+                for (auto I: v->path) {
+                    char buf[128];
+                    sprintf(buf, "%p", I);
+                    context += string(buf) + ' ';
+                }
+
+                if (contexts.find(context) != contexts.end()) {
+                    zpd(v->hotness);
+                }
+                else {
+                    contexts.insert(context);
+                    distinct_set.push_back(v);
+                }
+                
+            }
+        }
+        
+        
         _all_paths = distinct_set;
     }
 
