@@ -827,7 +827,7 @@ public:
         timer.stop();
         std::ofstream stat_ofs;
         stat_ofs.open(out + ".timing");
-        stat_ofs << timer.seconds() << " " << _cxt_counter << " " << _all_paths.size() << " " << _cloned;
+        stat_ofs << timer.seconds() << " " << _cxt_counter << " " << _all_paths.size() << " " << _cloned << " " << _ben_num;
         stat_ofs.close();
 
         zpl("======== Summary ======");
