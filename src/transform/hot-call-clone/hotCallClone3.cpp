@@ -47,15 +47,19 @@ class HotCallClonePass: public Pass {
     string _caller;
     string _callee;
     int _min_cxt;
+    bool _done;
+    bool _skip;
+
+    /* statistics */
     int _hot_counter;
     int _path_counter;
     int _cxt_counter;
-    bool _skip;
     int _recursive;
     int _recognized;
     int _ben_num;
-    int _distinct_num;
-    bool _done;
+    int _hot_cxt_counter;
+    int _used_hot_cxt;
+
     //const int FUNC_MAX_LEN = 1024;
 public:
     HotCallClonePass() {
@@ -70,10 +74,12 @@ public:
         _skip = false;
         _recursive = 0;
         _cloned = 0;
+
         _ben_num = 0;
         _recognized = 0;
         _hot_counter = 0;
-        _distinct_num = 0;
+        _hot_cxt_counter = 0;
+        _used_hot_cxt = 0;
     }
 
     ~HotCallClonePass() {
@@ -305,7 +311,6 @@ public:
                 }
             }
         }
-
     }
 
     // todo: the hot_aps_file must have an appending new line to be correctly parsed for now
@@ -318,7 +323,7 @@ public:
         string line;
         bool is_header = true;
         string header;
-        int hot = 0;
+        int is_hot = 0;
 
         while (std::getline(ifs, line)) {
             // got a whole call stack
@@ -352,7 +357,7 @@ public:
                         if (!has_continuous_recursion()) {
                             XPS_Path* path = new XPS_Path();
                             path->path = _stack;
-                            path->hotness = hot;
+                            path->hotness = is_hot;
                             _all_paths.push_back(path);
                         }
                         _path_counter++;
@@ -367,12 +372,12 @@ public:
                 _caller.clear();
                 _callee.clear();
                 _skip = false;
-                hot = false;
+                is_hot = false;
             }
             else {
                 if (is_header) {
                     header = line;
-                    hot = match_header(line);
+                    is_hot = match_header(line);
                     is_header = false;
                 }
                 else {
@@ -479,6 +484,7 @@ public:
         int matched = sscanf(line.c_str(), "%d %s", &apid, hotness);
         guarantee(matched == 2, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
         if (string(hotness) == "0xffffffff") {
+            _hot_cxt_counter++;
             return 1;
         }
         else {
@@ -839,7 +845,7 @@ public:
         timer.stop();
         std::ofstream stat_ofs;
         stat_ofs.open(out + ".timing");
-        stat_ofs << timer.seconds() << " " << _cxt_counter << " " << _all_paths.size() << " " << _cloned << " " << _ben_num;
+        stat_ofs << timer.seconds() << " " << _hot_cxt_counter << " " << _used_hot_cxt << " " << _cloned << " " << _ben_num;
         stat_ofs.close();
 
         zpl("======== Summary ======");
@@ -850,6 +856,7 @@ public:
         for (auto p: _all_paths) {
             auto path = p->path;
             if (p->hotness == 1) {
+                _used_hot_cxt++;
                 CallInstFamily* ci = path[0];
                 string old_callee = ci->called_function()->name();
 
