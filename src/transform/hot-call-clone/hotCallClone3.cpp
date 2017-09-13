@@ -667,10 +667,10 @@ public:
                             }
                         }
                         else {
-                            if (loc->function_linkage_name() == _caller) {
-                                users_offsets[ci] = std::abs(line-loc->line());
-                            }
-                            //users_offsets[ci] = std::abs(line-loc->line());
+//                            if (loc->function_linkage_name() == _caller) {
+//                                users_offsets[ci] = std::abs(line-loc->line());
+//                            }
+                            users_offsets[ci] = std::abs(line-loc->line());
                         }
                     }
                     else {
