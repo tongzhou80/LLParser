@@ -28,8 +28,9 @@ struct XPS_Caller {
 
 class HotCallClonePass: public Pass {
     bool PrintCloning;
-    bool TracingVerbose;
+    bool PathCheck;
     bool MatchVerbose;
+    bool CloneVerbose;
     std::set<string> _black;
     bool _has_overlapped_path;
     int _cloned;
@@ -60,15 +61,13 @@ public:
     HotCallClonePass() {
         set_is_module_pass();
 
-        _has_overlapped_path = false;
-
-        PrintCloning = true;
-        TracingVerbose = true;
+        CloneVerbose = false;
+        MatchVerbose = false;
+        PathCheck = false;
         _min_cxt = 2;
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
-        MatchVerbose = true;
         _recursive = 0;
         _cloned = 0;
         _ben_num = 0;
@@ -78,8 +77,9 @@ public:
     }
 
     ~HotCallClonePass() {
-        printf("pass unloading is not yet implemented! Do stuff in do_finalization!\n");
+
     }
+
     void construct_callers_map() {
         _callers_map.clear();
         _dr_caller_freq.clear();
@@ -157,7 +157,7 @@ public:
             if (xps_path->hotness == 1)
                 hot_dr_callers[xps_path->path[0]] = xps_path;
         }
-        //print_all_paths();
+        //check_all_paths();
 
         bool in_cold_path = false;
         for (auto xps_path: _all_paths) {
@@ -169,17 +169,24 @@ public:
                     /* let the cold path call the clone */
                     auto& hot_path = hot_dr_callers[root];
                     auto& cold_path = xps_path;
-                    zpl("before clone:")
-                    print_path(hot_path->path);
-                    print_path(cold_path->path);
+                    if (PathCheck) {
+                        zpl("before clone:")
+                        check_path(hot_path->path);
+                        check_path(cold_path->path);
+                    }
                     int i = 1; // go upwards until find two different callers
                     while (get_element_in_call_path(hot_path->path, i) == get_element_in_call_path(cold_path->path, i)) {
-                        zpl("go up: %s => %s", root->function()->name_as_c_str(), hot_path->path[i]->function()->name_as_c_str())
+                        if (CloneVerbose) {
+                            zpl("go up: %s => %s", root->function()->name_as_c_str(), hot_path->path[i]->function()->name_as_c_str())
+                        }
 
                         root = hot_path->path[i];
                         i++;
                     }
-                    zpl("root: %p %s %s", root, root->function()->name_as_c_str(), root->get_position_in_function().c_str());
+                    if (CloneVerbose) {
+                        zpl("root: %p %s %s", root, root->function()->name_as_c_str(), root->get_position_in_function().c_str());
+                    }
+
                     auto hot_parent = get_element_in_call_path(hot_path->path, i);
                     auto cold_parent = get_element_in_call_path(cold_path->path, i);
 
@@ -194,14 +201,17 @@ public:
                     else {
                         update_callee_in_all_paths(cold_parent, cloned_callee);
                     }
-                    
+
                     // XPS_Caller* caller = new XPS_Caller();
                     // caller->caller = get_element_in_call_path(cold_path->path, i);
                     // caller->xps_path = cold_path;
                     // //update_callee_in_path(caller, cloned_callee);
-                    zpl("after clone:")
-                    print_path(hot_path->path);
-                    print_path(cold_path->path);
+                    if (PathCheck) {
+                        zpl("after clone:")
+                        check_path(hot_path->path);
+                        check_path(cold_path->path);
+                    }
+
                     break;
                 }
             }
@@ -223,7 +233,7 @@ public:
             auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
             stack[stack.size()-1] = ci_in_new_callee;
             zpl("path pos %d to %s", stack.size()-1, ci_in_new_callee->function()->name_as_c_str())
-            print_path(stack);
+            check_path(stack);
             return;
         }
 
@@ -240,7 +250,7 @@ public:
                 auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 stack[i-1] = ci_in_new_callee;
                 zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
-                print_path(stack);
+                check_path(stack);
             }
         }
     }
@@ -258,7 +268,7 @@ public:
                 auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 stack[stack.size()-1] = ci_in_new_callee;
                 zpl("path pos %d to %s", stack.size()-1, ci_in_new_callee->function()->name_as_c_str())
-                    //print_path(stack);
+                    //check_path(stack);
                 return;
             }
 
@@ -279,7 +289,7 @@ public:
                     auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                     stack[i-1] = ci_in_new_callee;
                     zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
-                        //print_path(stack);
+                        //check_path(stack);
                 }
             }
         }
@@ -323,7 +333,7 @@ public:
                             has_all = false;
                         }
                     }
-                    zpl("has all: %d\n", has_all)
+
                     if (has_all) {
                         _recognized++;
                         //if (!has_direct_recursion()) {
@@ -336,7 +346,8 @@ public:
                         _path_counter++;
                     }
                     else {
-                        zpl("not match: %s", header.c_str())
+                        if (MatchVerbose)
+                            zpl("not match: %s", header.c_str())
                     }
                 }
                 _cxt_counter++;
@@ -350,7 +361,6 @@ public:
                 if (is_header) {
                     header = line;
                     hot = match_header(line);
-                    zpl("header: %s", line.c_str())
                     is_header = false;
                 }
                 else {
@@ -368,7 +378,7 @@ public:
 
     }
 //
-//    void print_all_paths() {
+//    void check_all_paths() {
 //        for (auto v: _hot_paths) {
 //            string callee = v[0]->called_function()->name();
 //            printf("%s", callee.c_str());
@@ -387,7 +397,7 @@ public:
         std::set<string> contexts;
 
         // for (auto v: _all_paths) {
-        //     if (1) {                
+        //     if (1) {
         //         string context;
         //         for (auto I: v->path) {
         //             char buf[128];
@@ -402,12 +412,12 @@ public:
         //             contexts.insert(context);
         //             distinct_set.push_back(v);
         //         }
-                
+
         //     }
         // }
 
         for (auto v: _all_paths) {
-            if (v->hotness == 1) {                
+            if (v->hotness == 1) {
                 string context;
                 for (auto I: v->path) {
                     char buf[128];
@@ -416,18 +426,18 @@ public:
                 }
 
                 if (contexts.find(context) != contexts.end()) {
-                    zpd(v->hotness);
+
                 }
                 else {
                     contexts.insert(context);
                     distinct_set.push_back(v);
                 }
-                
+
             }
         }
 
         for (auto v: _all_paths) {
-            if (v->hotness == 0) {                
+            if (v->hotness == 0) {
                 string context;
                 for (auto I: v->path) {
                     char buf[128];
@@ -436,17 +446,17 @@ public:
                 }
 
                 if (contexts.find(context) != contexts.end()) {
-                    zpd(v->hotness);
+
                 }
                 else {
                     contexts.insert(context);
                     distinct_set.push_back(v);
                 }
-                
+
             }
         }
-        
-        
+
+
         _all_paths = distinct_set;
     }
 
@@ -476,7 +486,7 @@ public:
             int pos2 = bt_symbol.find('+');
             _caller = bt_symbol.substr(1, pos2-1);
             string offset = bt_symbol.substr(pos2+1);
-            
+
             if (Alias* alias = SysDict::module()->get_alias(_caller)) {
                 _caller = dynamic_cast<Function*>(alias->aliasee())->name();
             }
@@ -509,9 +519,6 @@ public:
         }
         else {
             ret = approximately_match(file, line_num);
-        }
-        if (_callee == "gen_adddi3") {
-            zpl("kkk: %s", _caller.c_str());
         }
         _callee = _caller;
 
@@ -573,8 +580,6 @@ public:
             }
         }
 
-
-        
         if (final) {
             _caller = final->function()->name();
             //zpl("alloc caller: %s, %p", _caller.c_str(), SysDict::module()->get_alias(_caller))
@@ -634,7 +639,7 @@ public:
                             printf("filename: %s, line: %d, caller: %s\n\n",
                                    filename.c_str(), line, _caller.c_str());
                         }
-                        
+
                         if (SysDict::module()->language() == Module::Language::cpp) {
                             if (loc->function_linkage_name() == _caller) {
                                 users_offsets[ci] = std::abs(line-loc->line());
@@ -792,13 +797,17 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         get_distinct_all_paths();
-        print_all_paths();
+
+        if (PathCheck)
+            check_all_paths();
         int round = 0;
         while (!_done) {
             do_one();
-            zpl("one clone done.")
+            if (CloneVerbose) {
+                zpl("one clone done.")
+            }
+
             round++;
-            //print_all_paths();
         }
 
         replace_malloc();
@@ -810,11 +819,14 @@ public:
         zps(out.c_str())
         SysDict::module()->print_to_file(out);
 
-        print_all_paths();
+        if (PathCheck) {
+            check_all_paths();
+        }
+
 
         timer.stop();
         std::ofstream stat_ofs;
-        stat_ofs.open(SysDict::filename() + ".timing");
+        stat_ofs.open(out + ".timing");
         stat_ofs << timer.seconds() << " " << _cxt_counter << " " << _all_paths.size() << " " << _cloned;
         stat_ofs.close();
 
@@ -869,21 +881,24 @@ public:
         SysDict::module()->insert_function_after(func, newfunc);
     }
 
-    void print_all_paths() {
+    void check_all_paths(bool do_print=false) {
         for (auto v: _all_paths) {
             string callee = v->path[0]->called_function()->name();
-            printf("%d: %s", v->hotness, callee.c_str());
+            if (do_print)
+                printf("%d: %s", v->hotness, callee.c_str());
             for (auto I: v->path) {
                 guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
-                printf(" <- %p %s(%d, %d)", I, I->function()->name_as_c_str(), I->parent()->get_index_in_function(), I->get_index_in_block());
+                if (do_print)
+                    printf(" <- %p %s(%d, %d)", I, I->function()->name_as_c_str(), I->parent()->get_index_in_function(), I->get_index_in_block());
                 callee = I->function()->name();
                 // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
             }
-            printf("\n");
+            if (do_print)
+                printf("\n");
         }
     }
 
-    void print_path(std::vector<CallInstFamily*>& path) {
+    void check_path(std::vector<CallInstFamily*>& path, bool do_print=false) {
         string callee = path[0]->called_function()->name();
         bool terminate = false;
         string msg;
@@ -891,9 +906,12 @@ public:
             if (I->called_function()->name() != callee) {
                 terminate = true;
                 msg = "I called: " + I->called_function()->name() + " but should call " + callee + " at " + I->function()->name_as_c_str() + ":" + I->get_position_in_function().c_str();
-                zpl("wrong %p called %p: %s", I, I->called_function(), msg.c_str())
+                if (do_print) {
+                    zpl("wrong %p called %p: %s", I, I->called_function(), msg.c_str())
+                }
             }
-            printf("%s <- %s(%p, %s)\n", callee.c_str(), I->function()->name_as_c_str(), I, I->get_position_in_function().c_str());
+            if (do_print)
+                printf("%s <- %s(%p, %s)\n", callee.c_str(), I->function()->name_as_c_str(), I, I->get_position_in_function().c_str());
             callee = I->function()->name();
 
             //zpl("set callee to %s", callee.c_str())
@@ -904,45 +922,9 @@ public:
         if (terminate) {
             guarantee(0, " ");
         }
-        printf("\n");
-    }
 
-    void do_clone(Function* f) {
-        if (TracingVerbose) {
-            printf("inpsect func: %s\n", f->name_as_c_str());
-        }
-
-        // not allow loop in the call graph
-        if (_black.find(f->name()) != _black.end()) {
-            return;
-            guarantee(0, "should not recheck a node: %s", f->name().c_str());
-        }
-        else {
-            _black.insert(f->name());
-        }
-
-        auto& users = f->user_list();
-        auto users_copy = users;
-
-        int num = 0;
-        for (auto it = users_copy.begin(); it != users_copy.end(); ++it, ++num) {
-            CallInstFamily* ci = dynamic_cast<CallInstFamily*>(*it);
-            guarantee(ci, " ");
-            if (num > 0) {
-                _has_overlapped_path = true;  // set the flag to scan again
-                Function* fclone = f->clone();
-                SysDict::module()->append_new_function(fclone);
-
-                if (PrintCloning) {
-                    printf("cloned %s to %s\n", f->name_as_c_str(), fclone->name_as_c_str());
-                }
-                ci->replace_callee(fclone->name());
-            }
-
-            if (_black.find(ci->function()->name()) == _black.end()) {
-                do_clone(ci->function());
-            }
-        }
+        if (do_print)
+            printf("\n");
     }
 
     //bool do_finalization(Module* module);
