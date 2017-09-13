@@ -240,16 +240,23 @@ public:
         for (int i = 1; i < stack.size(); ++i) {
             CallInstFamily* I = stack[i];
             if (I == caller->caller) {
-                zpl("in callinst %p repalce %s to %s", I, I->called_function()->name_as_c_str(), new_callee->name_as_c_str())
+
+
                 I->replace_callee(new_callee->name());
 
                 auto callee_call = stack[i-1];
                 int i_index = callee_call->get_index_in_block();
                 int b_index = callee_call->parent()->get_index_in_function();
-                zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
+
                 auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 stack[i-1] = ci_in_new_callee;
-                zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
+
+                if (CloneVerbose) {
+                    zpl("in callinst %p repalce %s to %s", I, I->called_function()->name_as_c_str(), new_callee->name_as_c_str())
+                    zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
+                    zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
+                }
+
                 check_path(stack);
             }
         }
@@ -267,7 +274,9 @@ public:
                 //zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
                 auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                 stack[stack.size()-1] = ci_in_new_callee;
-                zpl("path pos %d to %s", stack.size()-1, ci_in_new_callee->function()->name_as_c_str())
+                if (CloneVerbose) {
+                    zpl("path pos %d to %s", stack.size() - 1, ci_in_new_callee->function()->name_as_c_str())
+                }
                     //check_path(stack);
                 return;
             }
@@ -277,7 +286,8 @@ public:
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
                     if (!is_replaced) {
-                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        if (CloneVerbose)
+                            zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
                         I->replace_callee(new_callee->name());
                         is_replaced = true;
                     }
@@ -288,7 +298,9 @@ public:
                     //zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
                     auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
                     stack[i-1] = ci_in_new_callee;
-                    zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
+                    if (CloneVerbose) {
+                        zpl("path pos %d to %s", i - 1, ci_in_new_callee->function()->name_as_c_str())
+                    }
                         //check_path(stack);
                 }
             }

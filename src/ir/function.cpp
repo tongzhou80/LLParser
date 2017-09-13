@@ -93,7 +93,7 @@ Function* Function::clone(string new_name) {
     }
     f->rename(new_name);
 
-    zpl("cloned %s to %s", name_as_c_str(), f->name_as_c_str())
+    //zpl("cloned %s to %s", name_as_c_str(), f->name_as_c_str())
 
     /* strip DISubprogram info */
     int dipos = f->raw_text().find("!dbg");
