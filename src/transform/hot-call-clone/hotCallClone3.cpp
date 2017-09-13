@@ -59,10 +59,13 @@ class HotCallClonePass: public Pass {
     int _ben_num;
     int _hot_cxt_counter;
     int _used_hot_cxt;
+    Timer _timer;
 
     //const int FUNC_MAX_LEN = 1024;
 public:
     HotCallClonePass() {
+        _timer.start();
+
         set_is_module_pass();
 
         CloneVerbose = false;
@@ -799,8 +802,6 @@ public:
 
 
     bool run_on_module(Module* module) {
-        Timer timer;
-        timer.start();
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));
             zpd(_min_cxt)
@@ -842,10 +843,10 @@ public:
         }
 
 
-        timer.stop();
+        _timer.stop();
         std::ofstream stat_ofs;
         stat_ofs.open(out + ".timing");
-        stat_ofs << timer.seconds() << " " << _hot_cxt_counter << " " << _used_hot_cxt << " " << _cloned << " " << _ben_num;
+        stat_ofs << _timer.seconds() << " " << _hot_cxt_counter << " " << _used_hot_cxt << " " << _cloned << " " << _ben_num;
         stat_ofs.close();
 
         zpl("======== Summary ======");
