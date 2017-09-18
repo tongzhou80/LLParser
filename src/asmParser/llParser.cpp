@@ -200,6 +200,7 @@ void LLParser::parse_aliases() {
         }
 
         parser_assert(_word == "alias", text(), " ");
+        
         get_word('@'); // skip to @
         get_word();
         alias->set_raw_field("aliasee", _word);

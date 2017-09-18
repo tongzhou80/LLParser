@@ -262,6 +262,11 @@ void InstParser::do_call_family(Instruction* inst) {
     skip_ws();
 
     /* could be either function parameter types or part of ret_ty if ret_ty is function pointer */
+    /* Samples
+     * %12 = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %11, i8* getelementptr inbounds ([34 x i8], [34 x i8]* @.str.9.134, i64 0, i64 0), i32 %0) #14
+     */
+    // void (ty..) is for varargs type check
+    // void (ty..)[*|**] is a return type, which is a function pointer type
     if (_char == '(') {
         string args_sig = jump_to_end_of_scope();
 
@@ -280,12 +285,6 @@ void InstParser::do_call_family(Instruction* inst) {
 
     }
 
-
-    /* Samples
-     * %12 = tail call i32 (%struct._IO_FILE*, i8*, ...) @fprintf(%struct._IO_FILE* %11, i8* getelementptr inbounds ([34 x i8], [34 x i8]* @.str.9.134, i64 0, i64 0), i32 %0) #14
-     */
-    // void (ty..) is for varargs type check
-    // void (ty..)[*|**] is a return type, which is a function pointer type
     // Not deal with this for now, ty might also contain '%' as there are global structs
 
     if (CallInstParsingVerbose) {
@@ -347,6 +346,7 @@ void InstParser::do_call_family(Instruction* inst) {
         //zpl("indirect call: %s", inst->raw_c_str());
         if (ci->parent())
             ci->try_resolve_indirect_call();
+        guarantee(!ci->has_bitcast(), "just check");
     }
     else {
         parser_assert(0, _text, "Expect '%%' or '@', char: |%c|, pos: %d", _char, _intext_pos);
@@ -486,6 +486,12 @@ void InstParser::parse_function_pointer_type() {
 }
 
 
+/**@brief Parse a basic type or a compound type such as function pointer
+ *
+ * Unlike function pointers, a "function type" is not considered a compound type since they are only used in variable length function calls (I believe).
+ *
+ * @return
+ */
 string InstParser::parse_compound_type() {
     /* corner case
      * tail call void bitcast (void (%struct.bContext*, %struct.uiBlock.22475* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)* @uiPupBlock
