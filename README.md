@@ -110,14 +110,33 @@ declare i32 @puts(i8* nocapture) nounwind
     - IRParser: StringParser
       - Base class for parsing LLVM languages
     - LLParser: FileParser, IRParser
-      - Parse a LLVM assembly file
+      - Parses a LLVM assembly file
     - InstParser: StringParser
-      - Parse a single instruction
+      - Parses a single instruction
+    - IRBuilder
+      - Exposes an interface to the pass framework to build functions or instructions
+    - SysDict
+      - System dictionary. Provides thread-safe interfaces such as filename(), module()
+
+- peropheral/
+    - SysArgs
+      - Maintains arguments from command line
+    - ArgsParser: StringParser
+      - Parses arguments from command line
+    - StringParser
+      - Base string parsing class
+    - FileParser: StringParser
+      - Base file parsing class
 
 The reason why instruction parsing is delegated to an InstParser instance instead of as part of a LLParser is
 to build a asynchronous model where the file parsing and instruction parsing could happen simultaneously.
-This model is similar to a parallel scavenging garbage collector. Empirically I found that function parsing
+This model is similar to a parallel scavenging garbage collector(a worker thread fetches one grey object
+at a time from the stack and starts traversing its neighbors).
+Empirically I found that function parsing
 constitute 60% of the parsing job, 30% for debug information, and 10% for other texts.
 So one possible strategy where this model could be beneficial is to delay the instruction parsing to the point
 where debug info parsing starts. Because debug info and instructions operate on two different lists of the
 module, synchronization will be minimized.
+
+While LLVM's `opt` only accepts one input file, `sopt` accepts multiple input files and will do the
+parsing/analyzing/transforming in parallel if `-XX:+ParallelModule` is on.
