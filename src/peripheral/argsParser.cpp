@@ -72,7 +72,7 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
     set_text(args);
 
     while (!_eol) {
-        get_word_until(" =");
+        get_word_of(" =");
         if (Strings::startswith(_word, "-XX:")) {
             int xx_len = strlen("-XX:");
             if (_word[xx_len] == '+') {

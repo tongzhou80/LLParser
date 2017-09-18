@@ -146,7 +146,7 @@ StringParser::operator bool() const {
     return !_fail;
 }
 
-StringParser* StringParser::get_word_until(string delims, bool append_delim, bool skip_delim, bool skip_whitespace) {
+StringParser* StringParser::get_word_of(string delims, bool append_delim, bool skip_delim, bool skip_whitespace) {
     range_check();
 
     _word.clear();

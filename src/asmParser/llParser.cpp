@@ -639,7 +639,7 @@ void LLParser::parse_metadatas(Module *module) {
 
 void LLParser::parse_di_fields(MetaData* data)  {
     while (!_eol) {
-        get_word_until(",)");
+        get_word_of(",)");
         int colon_pos = _word.find(':');
         string key = _word.substr(0, colon_pos);
         string value = _word.substr(colon_pos+2);
@@ -673,7 +673,7 @@ DISubprogram* LLParser::parse_disubprogram() {
 
     DISubprogram* data = new DISubprogram();
     while (!_eol) {
-        get_word_until(",)");
+        get_word_of(",)");
         int colon_pos = _word.find(':');
         string key = _word.substr(0, colon_pos);
         string value = _word.substr(colon_pos+2);

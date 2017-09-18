@@ -312,7 +312,7 @@ void InstParser::do_load(Instruction *inst) {
     li->set_ret_type_str(full_type);
     li->set_pointer_type_str(full_type+'*');
 
-    get_word_until(", ");
+    get_word_of(", ");
     if (_word == "getelementptr") {
         // todo: load from array
     }

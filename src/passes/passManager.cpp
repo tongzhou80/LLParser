@@ -62,21 +62,27 @@ void PassManager::destroy() {
 
 /* for debug, addr2line can't show line numbers in a .so */
 #include <transform/hot-call-clone/hotCallClone3.cpp>
-#include <transform/path-clone/pathClone.cpp>
+#include <transform/call-clone/callClone.cpp>
 #include <transform/call-graph/callGraph.cpp>
 void PassManager::initialize_passes() {
 //    HelloFunction* hello = new HelloFunction();
 //    add_parse_time_pass(hello);
     //add_pass("ATrace");
 
+//    if (DebugRun) {
+//        HotCallClonePass* p = new HotCallClonePass();
+//        p->set_name("HotCallClonePass");
+//        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/milc_all_sites.txt");
+//        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/libquantum_all_sites.txt");
+//        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_r2_all_sites.txt");
+//        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test.txt");
+//        //add_pass(p);
+//    }
+//
     if (DebugRun) {
-        HotCallClonePass* p = new HotCallClonePass();
-        p->set_name("HotCallClonePass");
-        p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/milc_all_sites.txt");
-        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/libquantum_all_sites.txt");
-        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_r2_all_sites.txt");
-        //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test.txt");
-        //add_pass(p);
+        CallClonePass* p = new CallClonePass();
+        p->set_name("CallClonePass");
+        add_pass(p);
     }
 
     for (auto p: SysArgs::passes()) {
