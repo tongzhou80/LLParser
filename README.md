@@ -114,4 +114,10 @@ declare i32 @puts(i8* nocapture) nounwind
     - InstParser: StringParser
       - Parse a single instruction
 
-The reason why instruction parsing is delegated to an InstParser instance instead of as part of
+The reason why instruction parsing is delegated to an InstParser instance instead of as part of a LLParser is
+to build a asynchronous model where the file parsing and instruction parsing could happen simultaneously.
+This model is similar to a parallel scavenging garbage collector. Empirically I found that function parsing
+constitute 60% of the parsing job, 30% for debug information, and 10% for other texts.
+So one possible strategy where this model could be beneficial is to delay the instruction parsing to the point
+where debug info parsing starts. Because debug info and instructions operate on two different lists of the
+module, synchronization will be minimized.
