@@ -101,3 +101,17 @@ starting with ';' is fine.
 ; My custom comment
 declare i32 @puts(i8* nocapture) nounwind
 ```
+
+## Documentation
+
+### Class Architecture
+
+- src/
+  - IRParser: StringParser
+    - Base class for parsing LLVM languages
+  - LLParser: FileParser, IRParser
+    - Parse a LLVM assembly file
+  - InstParser: StringParser
+    - Parse a single instruction
+
+The reason why instruction parsing is delegated to an InstParser instance instead of as part of 
