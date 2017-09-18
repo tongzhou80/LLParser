@@ -13,14 +13,14 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/debug/bin")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/debug/passes/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/passes/")
 
 
 add_library(Hello SHARED src/transform/hello/hello.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
-add_library(CallClone SHARED src/transform/call-clone/callClone.cpp)
+add_library(CallClone SHARED src/transform/call-clone/callClone.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
@@ -72,28 +72,30 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/peripheral/stringParser.cpp src/peripheral/stringParser.h
         src/peripheral/argsParser.cpp src/peripheral/argsParser.h
         src/utilities/systems.cpp src/utilities/systems.h
-        src/ir/di/debugInfo.cpp src/ir/di/debugInfo.h
-        src/ir/di/diFile.cpp src/ir/di/diFile.h
-        src/ir/di/diSubprogram.cpp src/ir/di/diSubprogram.h
-        src/ir/di/diLocation.cpp src/ir/di/diLocation.h
-        src/ir/di/diEssential.h
+        src/di/debugInfo.cpp src/di/debugInfo.h
+        src/di/diFile.cpp src/di/diFile.h
+        src/di/diSubprogram.cpp src/di/diSubprogram.h
+        src/di/diLocation.cpp src/di/diLocation.h
+        src/di/diEssential.h
         src/peripheral/timer.cpp src/peripheral/timer.h
         src/asmParser/irBuilder.cpp src/asmParser/irBuilder.h
         src/ir/type.cpp src/ir/type.h
-        src/ir/di/diScope.cpp src/ir/di/diScope.h
-        src/ir/di/diLexicalBlock.cpp src/ir/di/diLexicalBlock.h
-        src/ir/di/diLexicalBlockFile.cpp src/ir/di/diLexicalBlockFile.h
+        src/di/diScope.cpp src/di/diScope.h
+        src/di/diLexicalBlock.cpp src/di/diLexicalBlock.h
+        src/di/diLexicalBlockFile.cpp src/di/diLexicalBlockFile.h
         src/ir/comdat.cpp src/ir/comdat.h
         src/inst/loadInst.cpp src/inst/loadInst.h
         src/inst/bitcastInst.cpp src/inst/bitcastInst.h
         src/passes/InterModularPass.cpp src/passes/InterModularPass.h
-        src/ir/di/diType.cpp src/ir/di/diType.h
-        src/ir/di/diCompositeType.cpp src/ir/di/diCompositeType.h
+        src/di/diType.cpp src/di/diType.h
+        src/di/diCompositeType.cpp src/di/diCompositeType.h
         src/inst/callInstFamily.cpp src/inst/callInstFamily.h
         src/inst/invokeInst.cpp src/inst/invokeInst.h
         src/peripheral/FileParser.cpp src/peripheral/FileParser.h
         src/utilities/mutex.cpp src/utilities/mutex.h
-        src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h src/ir/alias.cpp src/ir/alias.h src/asmParser/irParser.cpp src/asmParser/irParser.h)
+        src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h
+        src/ir/alias.cpp src/ir/alias.h
+        src/asmParser/irParser.cpp src/asmParser/irParser.h)
 add_executable(sopt ${SOURCE_FILES} )
 install(TARGETS sopt DESTINATION /home/marena/llparser/bin/)
 target_link_libraries(sopt "-ldl") # for dyopen etc.

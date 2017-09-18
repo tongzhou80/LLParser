@@ -5,7 +5,7 @@
 
 #include "irEssential.h"
 #include <inst/instEssential.h>
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 
 string Module::get_header(string key) {
      if (_headers.find(key) == _headers.end()) {

@@ -10,7 +10,7 @@
 #include <peripheral/sysArgs.h>
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 #include <passes/pass.h>
 #include <ir/irEssential.h>
 #include <utilities/strings.h>

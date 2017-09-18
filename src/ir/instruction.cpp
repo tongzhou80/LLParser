@@ -5,7 +5,7 @@
 #include <asmParser/sysDict.h>
 #include <asmParser/instParser.h>
 #include "irEssential.h"
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 
 Instruction::Instruction(): Value() {
     _is_fully_parsed = false;

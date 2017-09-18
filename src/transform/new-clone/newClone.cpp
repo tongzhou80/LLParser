@@ -7,7 +7,7 @@
 #include <utilities/macros.h>
 #include <asmParser/sysDict.h>
 #include <passes/pass.h>
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 #include <ir/irEssential.h>
 #include <utilities/strings.h>
 #include <peripheral/sysArgs.h>

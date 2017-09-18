@@ -121,7 +121,7 @@ declare i32 @puts(i8* nocapture) nounwind
 - ir/
     - Shadow
       - Implements the string-oriented model. All properties of a Value object are stored
-      as key-value pair in a hash map field of Shadow
+      as key-value pairs in a hash map field of Shadow
     - Value: Shadow
       - All IR objects inherit from it. Defines fundamental properties of an IR object
       such as `name`

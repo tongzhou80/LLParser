@@ -8,7 +8,7 @@
 #include <peripheral/sysArgs.h>
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 #include <iomanip>
 #include <asmParser/sysDict.h>
 #include <passes/pass.h>

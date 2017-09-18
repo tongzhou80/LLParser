@@ -58,4 +58,32 @@ typedef std::string string;
   std::printf(#arg ": %d", arg); \
   std::printf("\n");
 
+
+
+template <typename T>
+class Point2D {
+public:
+    T x;
+    T y;
+    Point2D(T xx, T yy): x(xx), y(yy) {}
+    const char* c_str() const {
+        std::string ret = std::to_string(x) + "_" + std::to_string(y);
+        return ret.c_str();
+    }
+    template <typename U>
+    friend std::ostream& operator<<(std::ostream& os, const Point2D<U>& p);
+};
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Point2D<T>& p) {
+    os << p.c_str();
+    return os;
+}
+
+
+
+
+
+
+
 #endif //LLPARSER_MACROS_H

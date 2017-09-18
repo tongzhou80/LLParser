@@ -13,7 +13,7 @@
 #include "instParser.h"
 #include "sysDict.h"
 #include "ir/irEssential.h"
-#include "ir/di/diEssential.h"
+#include "di/diEssential.h"
 #include "inst/instEssential.h"
 #include "passes/passManager.h"
 #include "utilities/flags.h"

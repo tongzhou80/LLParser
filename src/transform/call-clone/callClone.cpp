@@ -5,10 +5,11 @@
 #include <peripheral/sysArgs.h>
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
-#include <ir/di/diEssential.h>
+#include <di/diEssential.h>
 #include <asmParser/sysDict.h>
 #include <passes/pass.h>
 #include <set>
+#include "contextGenerator.h"
 
 class CallClonePass: public Pass {
     bool PrintCloning;
@@ -27,33 +28,35 @@ public:
     }
 
     bool run_on_module(Module* module) {
-        Function* malloc = module->get_function("malloc");
-        if (!malloc) {
-            return false;
-        }
-
-        int cnt = 0;
-
-        do {
-            if (TracingVerbose) {
-                printf("\nround: %d\n", cnt);
-            }
-
-            cnt++;
-            _black.clear();
-            _has_overlapped_path = false;  // always assume this round is the last round
-            auto& malloc_users = malloc->user_list();
-            Function::InstList malloc_users_copy = malloc_users; // user_list might change during the iteration since new functions may be created
-            for (auto uit = malloc_users_copy.begin(); uit != malloc_users_copy.end(); ++uit) {
-                Function* func = (*uit)->function();
-                do_clone(func, module);
-                //auto& users = func->user_list();
-
-            }
-        } while (_has_overlapped_path && cnt < 4);
-
-        string out = SysDict::filename() + name();
-        SysDict::module()->print_to_file(out);
+        ContextGenerator cg;
+        cg.generate(module, "malloc", 1);
+//        Function* malloc = module->get_function("malloc");
+//        if (!malloc) {
+//            return false;
+//        }
+//
+//        int cnt = 0;
+//
+//        do {
+//            if (TracingVerbose) {
+//                printf("\nround: %d\n", cnt);
+//            }
+//
+//            cnt++;
+//            _black.clear();
+//            _has_overlapped_path = false;  // always assume this round is the last round
+//            auto& malloc_users = malloc->user_list();
+//            Function::InstList malloc_users_copy = malloc_users; // user_list might change during the iteration since new functions may be created
+//            for (auto uit = malloc_users_copy.begin(); uit != malloc_users_copy.end(); ++uit) {
+//                Function* func = (*uit)->function();
+//                do_clone(func, module);
+//                //auto& users = func->user_list();
+//
+//            }
+//        } while (_has_overlapped_path && cnt < 4);
+//
+//        string out = SysDict::filename() + name();
+//        SysDict::module()->print_to_file(out);
         return true;
     }
 
