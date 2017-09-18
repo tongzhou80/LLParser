@@ -8,10 +8,11 @@
 #include <ir/irEssential.h>
 #include <utilities/macros.h>
 #include <peripheral/stringParser.h>
+#include "irParser.h"
 
 typedef Instruction* (*inst_parse_routine) (string&, bool);
 
-class InstParser: public StringParser {
+class InstParser: public IRParser {
 
     //static std::map<string, inst_parse_routine> _table;
 public:
@@ -21,9 +22,7 @@ public:
     void parse(Instruction* inst);
     string get_opcode(string& );
     string get_first_word(string& );
-    string parse_basic_type();
-    string parse_compound_type();
-    string parse_complex_structs();
+
     void parse_function_pointer_type();
     void fastforwad_bitcast();
 

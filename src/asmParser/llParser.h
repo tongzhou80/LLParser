@@ -12,6 +12,7 @@
 #include "utilities/symbol.h"
 #include "utilities/macros.h"
 #include "instParser.h"
+#include "irBuilder.h"
 
 class Module;
 class StructType;
@@ -28,7 +29,7 @@ class InstParser;
 
 class SysDict;
 
-class LLParser: public FileParser {
+class LLParser: public FileParser, public IRParser {
     int _major_version;
     float _minor_version;
     int _asm_format;

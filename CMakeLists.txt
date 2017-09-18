@@ -93,7 +93,7 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/inst/invokeInst.cpp src/inst/invokeInst.h
         src/peripheral/FileParser.cpp src/peripheral/FileParser.h
         src/utilities/mutex.cpp src/utilities/mutex.h
-        src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h src/ir/alias.cpp src/ir/alias.h)
+        src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h src/ir/alias.cpp src/ir/alias.h src/asmParser/irParser.cpp src/asmParser/irParser.h)
 add_executable(sopt ${SOURCE_FILES} )
 install(TARGETS sopt DESTINATION /home/marena/llparser/bin/)
 target_link_libraries(sopt "-ldl") # for dyopen etc.
