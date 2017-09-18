@@ -106,7 +106,7 @@ declare i32 @puts(i8* nocapture) nounwind
 
 ### Class Architecture
 
-- src/
+- asmParser/
     - IRParser: StringParser
       - Base class for parsing LLVM languages
     - LLParser: FileParser, IRParser
@@ -117,6 +117,14 @@ declare i32 @puts(i8* nocapture) nounwind
       - Exposes an interface to the pass framework to build functions or instructions
     - SysDict
       - System dictionary. Provides thread-safe interfaces such as filename(), module()
+
+- ir/
+    - Shadow
+      - Implements the string-oriented model. All properties of a Value object are stored
+      as key-value pair in a hash map field of Shadow
+    - Value: Shadow
+      - All IR objects inherit from it. Defines fundamental properties of an IR object
+      such as `name`
 
 - peropheral/
     - SysArgs
