@@ -16,27 +16,6 @@ class Function;
 class Module;
 
 
-class PassList {
-    std::vector<Pass*> _module_passes;
-    std::vector<Pass*> _function_passes;
-    std::vector<Pass*> _basic_block_passes;
-    std::vector<Pass*> _instruction_passes;
-public:
-    PassList();
-    ~PassList();
-    void add_pass(Pass* p);
-    int insert_with_priority(std::vector<Pass*>& list, Pass* p);
-
-    void apply_passes(Module *module);
-    void apply_passes(Function* func);
-    void apply_passes(BasicBlock* bb);
-    void apply_passes(Instruction* inst);
-    void apply_epilogue();
-};
-
-
-
-
 class PassManager {
 //    std::vector<Pass*> _parse_time_passes;
 //    std::vector<Pass*> _custom_passes;
@@ -77,7 +56,7 @@ public:
     static void init();
     static void destroy();
 
-
+    /* deprecated */
     void apply_parse_time_passes(Module* module);
     void apply_parse_time_passes(Function* func);
     void apply_parse_time_passes(BasicBlock* bb);

@@ -30,15 +30,15 @@ void SysArgs::init(SoptInitArgs* initArgs) {
         std::vector<string> benches;
         //benches.push_back("450.soplex");
         //benches.push_back("433.milc");
-        benches.push_back("453.povray");
+        //benches.push_back("453.povray");
         //benches.push_back("401.bzip2");
         //benches.push_back("456.hmmer");
         //benches.push_back("astar");
-        //benches.push_back("mcf");
+        //benches.push_back("429.mcf");
         //benches.push_back("gobmk");
         //benches.push_back("h264ref");
         //benches.push_back("462.libquantum");
-        //benches.push_back("403.gcc");
+        benches.push_back("403.gcc");
         for (int i = 0; i < benches.size(); ++i) {
             string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4) +".ll";
             //parser->parse("../../test/fortran/a.ll");
@@ -78,21 +78,28 @@ void SysArgs::print_help() {
 //              << std::setw(30) << "  -g" << "tell the parser debug info is available, which enables some optimizations;\n"
 //              << std::setw(30) << "  " << "debug info is always parsed if present, even without -g\n"
 
-              << std::setw(30) << "  -load, --load" << "name of the pass loaded. Use ',' or '+' as delimiter for multiple passes\n"
+              << std::setw(30) << "  -load, --load=<PASSNAME>" << "load a set of passes specified by the argument. Use ',' or '+' as delimiter for multiple passes\n"
 
               << std::setw(30) << "  -path, --ld-pass-path" << "specify the path to load passes from. Defaults to the path configured in $HOME/.sopt/config\n"
               << std::setw(30) << "  " << "if $HOME/.sopt/config is not found, the load path defaults to '../passes/'\n"
 
               << std::setw(30) << "  -o, --output" << "specify the output file name. Usually passes need to produce a file after transformation\n"
 
-              << "\nA pass may also accept arguments; the arguments should be appended to the pass name using '?' as the delimiter. \n"
-              << "The current syntax is --load=<pass>?arg1=xxx?arg2=xxx, or -load <pass>?arg1=xxx?arg2=xxx etc.\n\n"
+              << "\nA pass may also accept arguments; the arguments should be appended to the pass name using ':' as the delimiter. \n"
+              << "The current syntax is --load=<pass>:arg1=xxx:arg2=xxx, or -load <pass>:arg1=xxx:arg2=xxx etc.\n\n"
               << "Examples:\n"
               << "  # produces a call graph in dot format for a.ll. The call Graph only contains paths to 'malloc'. The output is a.dot\n"
-              << "  sopt -g --load=callGraph?bottom=malloc a.ll --output=a.dot\n"
+              << "  sopt --load=callGraph?bottom=malloc a.ll --output=a.dot\n"
               << "  # run a HelloWorld pass that prints a hello when each function is examined\n"
-              << "  sopt -g -load hello a.ll\n"
-              << "  # run a pass that replaces every occurrence of malloc call with a custom call\n"
-              << "  sopt -g -load malloc a.ll -o new.ll\n";
+              << "  sopt -load hello input.ll  # or sopt -load /xxx/xxx/pass_dir/libHello.so input.ll\n"
+              << "  \n"
+              << "  # run pass1, pass2, pass3 respectively on input.ll\n"
+              << "  sopt -load pass1,pass2,pass3 input.ll\n"
+              << "  # run pass1, pass2, pass3 respectively on input1.ll, input2.ll\n"
+              << "  sopt -load pass1,pass2,pass3 input1.ll input2.ll  # When -XX:+ParallelModule is on, the input files are parsed/analyzed/transformed in parallel \n"
+
+            ;
+//              << "  # run a pass that replaces every occurrence of malloc call with a custom call\n"
+//              << "  sopt -g -load malloc a.ll -o new.ll\n";
     std::cout << std::endl;
 }

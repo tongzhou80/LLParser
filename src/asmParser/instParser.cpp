@@ -361,7 +361,6 @@ void InstParser::parse_function_pointer_type() {
     inc_intext_pos(2);
 }
 
-
 void InstParser::do_bitcast(Instruction *inst) {
     /* corner case
      *  %1 = bitcast void (...)* bitcast (void (i64*, i32)* @wrf_error_fatal_ to void (...)*) to void (i8*, i64, ...)*

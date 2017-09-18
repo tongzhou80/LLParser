@@ -17,104 +17,9 @@
 #include "../ir/instruction.h"
 
 
-// PassList
-
-PassList::PassList() {
-
-}
-
-PassList::~PassList() {
-
-}
-
-void PassList::add_pass(Pass *p) {
-    if (p->is_module_pass()) {
-        insert_with_priority(_module_passes, p);
-        //_module_passes.push_back(p);
-    }
-
-    if (p->is_function_pass()) {
-        insert_with_priority(_function_passes, p);
-        //_function_passes.push_back(p);
-    }
-
-    if (p->is_basic_block_pass()) {
-        insert_with_priority(_basic_block_passes, p);
-        //_basic_block_passes.push_back(p);
-    }
-
-    if (p->is_instruction_pass()) {
-        insert_with_priority(_instruction_passes, p);
-        //_instruction_passes.push_back(p);
-    }
-}
-
-int PassList::insert_with_priority(std::vector<Pass *>& list, Pass *p) {
-    int i;
-    for (i = 0; i < list.size(); ++i) {
-        if (list[i]->priority() < p->priority()) {
-            break;
-        }
-    }
-    list.insert(list.begin()+i, p);
-}
-
-void PassList::apply_passes(Function *func) {
-    std::vector<Pass*>& passes = _function_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->run_on_function(func);
-    }
-}
-
-void PassList::apply_passes(Instruction *inst) {
-    std::vector<Pass*>& passes = _instruction_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->run_on_instruction(inst);
-    }
-}
-
-void PassList::apply_passes(Module *module) {
-    std::vector<Pass*>& passes = _module_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->run_on_module(module);
-    }
-}
-
-void PassList::apply_passes(BasicBlock *unit) {
-    std::vector<Pass*>& passes = _basic_block_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->run_on_basic_block(unit);
-    }
-}
-
-void PassList::apply_epilogue() {
-    std::vector<Pass*>& passes = _instruction_passes;
-    for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->parse_epilogue();
-    }
-}
-//
-//template <typename T>
-//void PassList::apply_passes(T *unit) {
-//    if (std::is_same<T, Function*>::value) {
-//        std::vector<Pass*>& passes = _function_passes;
-//        for (int i = 0; i < passes.size(); ++i) {
-//            int mutated = passes[i]->run_on_module(unit);
-//        }
-//    }
-//
-//    if (std::is_same<T, Instruction*>::value) {
-//        std::vector<Pass*>& passes = _instruction_passes;
-//        for (int i = 0; i < passes.size(); ++i) {
-//            int mutated = passes[i]->run_on_instruction(unit);
-//        }
-//    }
-//}
-//
 //// Explicit template instantiation to hide the template definition in .cpp
 //template void PassList::apply_passes<Function>(Function*);
 //template void PassList::apply_passes<Instruction>(Instruction*);
-
 
 
 
@@ -195,22 +100,18 @@ void PassManager::add_pass(Pass *p) {
     }
     if (p->is_module_pass()) {
         insert_with_priority(_module_passes, p);
-        //_module_passes.push_back(p);
     }
 
     if (p->is_function_pass()) {
         insert_with_priority(_function_passes, p);
-        //_function_passes.push_back(p);
     }
 
     if (p->is_basic_block_pass()) {
         insert_with_priority(_basic_block_passes, p);
-        //_basic_block_passes.push_back(p);
     }
 
     if (p->is_instruction_pass()) {
         insert_with_priority(_instruction_passes, p);
-        //_instruction_passes.push_back(p);
     }
 }
 
@@ -232,14 +133,11 @@ void PassManager::add_pass(string name) {
 
     /* if pass is an .so file, use its path */
     if (Strings::contains(pass_name, ".so")) {
-        //char cwd[1024];
-        //getcwd(cwd, 1024);
-        //sprintf(path, "%s/%s", cwd, pass_name.c_str());
         sprintf(path, "%s", pass_name.c_str());
         size_t p1 = pass_name.rfind("lib");
         p1 += 3;
         size_t p2 = pass_name.rfind(".so");
-        guarantee(p1 != pass_name.npos && p2 != pass_name.npos, "Not a valid shared library object ");
+        guarantee(p1 != pass_name.npos && p2 != pass_name.npos, "Not a valid shared library object.");
         string classname = pass_name.substr(p1, p2-p1);
         sprintf(loader, "__load_pass_%sPass", classname.c_str());
         sprintf(unloader, "__unload_pass_%sPass", classname.c_str());
@@ -267,7 +165,6 @@ void PassManager::add_pass(string name) {
 
     zpl("load pass from %s", path);
     void *passso = dlopen(path, RTLD_NOW);
-    //zpl("passso %p", passso);
     if (passso) {
         pass_loader ldp = (pass_loader)dlsym(passso, loader);
         pass_unloader unldp = (pass_unloader)dlsym(passso, unloader);

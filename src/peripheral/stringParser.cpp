@@ -45,6 +45,15 @@ bool StringParser::match(string s) {
     return true;
 }
 
+/**@brief Similar to get_word(), except that the state of parser does not change. The result is stored in _lookahead.
+ *
+ * Use jump_ahead() to actually set the states. get_lookahead() + jump_ahead() === get_word().
+ *
+ * @param delim 
+ * @param append_delim
+ * @param skip_delim
+ * @param skip_ws
+ */
 void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim, bool skip_ws) {
     /* save state */
     string word = _word;
@@ -203,7 +212,7 @@ void StringParser::range_check() {
     parser_assert(_char == _text[_intext_pos], text(), "_char: %c, _text[_intext_pos]: %c", _char, _text[_intext_pos]);
 }
 
-/**
+/**@brief Increment the position in text. _intext_pos and _char will change. _eol will possibly be set.
  *
  * When increment out of range, the position pointer stays out of range and eol will be set
  *
@@ -223,7 +232,9 @@ bool StringParser::inc_intext_pos(int steps) {
     }
 }
 
-/// Jump tp the position of lookahead
+/**@brief Jump to the position of lookahead. All relevant parser states will be set.
+ *
+ */
 void StringParser::jump_ahead() {
     parser_assert(_aheadpos >= _intext_pos, text(), "Expect to jump forward");
     if (_aheadpos < _text.size()) {

@@ -685,7 +685,6 @@ DISubprogram* LLParser::parse_disubprogram() {
 
 Module* LLParser::parse(string file) {
     reset_parser();
-    set_done(false);
     _file_name = file;
     return parse();
 }
