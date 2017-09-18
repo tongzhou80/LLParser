@@ -16,10 +16,6 @@
 //int InstParser::MAX_VALUE_LEN = 1024;
 
 InstParser::InstParser() {
-    MAX_VALUE_LEN = 1024;
-    _intext_pos = 0;
-    _char = 0;
-    _eol = false;
 //    _table["alloca"] = InstParser::do_alloca;
 //    _table["call"] = InstParser::do_call;
 }
@@ -69,65 +65,6 @@ string InstParser::get_first_word(string& text) {
     }
 }
 
-
-///* Tedious but still LL(1), thank God */
-//void InstParser::parse_type() {
-//    if (_word[0] == 'v') {
-//        guarantee(_word == "void", " ");
-//    }
-//    else if (_word[0] == 'i') {
-//        if (_word[_word.size()-1] == '*') {
-//            //zpl("int pointer: %s", _word.c_str());
-//        }
-//    }
-//    else if (_word[0] == 'f') {
-//
-//    }
-//    else if (_word[0] == 'd') {
-//
-//    }
-//    else if (_word[0] == 'h') {
-//
-//    }
-//    else if (_word[0] == '<') {
-//        string vec_type = _word.substr(1);
-//        get_word('>');
-//        inc_intext_pos();
-//        vec_type = vec_type + ' ' + _word;
-//        //zpl("vector: %s", _word.c_str());
-//    }
-//    else if (_word[0] == '%'){
-////        guarantee(Strings::startswith(_word, "%union") || Strings::startswith(_word, "%struct"),
-////                  "Bad type start with: %s", word.c_str());
-//    }
-//    else if (_word[0] == '{') {  // %5 = tail call { i64, { float, float }* } @quantum_new_matrix(i32 2, i32 2) #9, !dbg !2700
-//        int braces = 1;
-//        while (braces != 0) {
-//            inc_intext_pos();
-//            if (_char == '{') {
-//                ++braces;
-//            }
-//            else if (_char == '}') {
-//                --braces;
-//            }
-//        }
-//
-//        // _char should be '}' now
-//        guarantee(_char == '}', " ");
-//        inc_intext_pos(2);
-//
-//    }
-//    else if (_word[0] == '[') {
-//        /* an array type like  [5 x float]** */
-//        get_word(']');
-//        while (_char == '*') {
-//            inc_intext_pos();
-//        }
-//    }
-//    else {
-//        guarantee(0, "bad type: %s", _text.c_str());
-//    }
-//}
 
 /*
  * <result> = [tail | musttail | notail ] call [fast-math flags] [cconv] [ret attrs] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]

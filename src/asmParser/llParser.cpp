@@ -42,31 +42,15 @@ LLParser::LLParser(const char* file) {
 }
 
 void LLParser::initialize() {
-    //set_llvm_version("5.0.0");
-    set_llvm_version("3.8.0");
-    _asm_format = 0; // normal file produced by clang -S -emit-llvm
-
-    _has_structs = false;
-    _has_globals = false;
-    _unresolved = 0;
-
-    MAX_LINE_LEN = 4096;
-    MAX_VALUE_LEN = 1024;
-    _line_number = 0;
-
     _module = NULL;
     _inst_parser = new InstParser();
 }
 
-void LLParser::set_done(bool v) {
-    Locks::llparser_done_lock->lock();
-    _done = v;
-    Locks::llparser_done_lock->unlock();
-}
-
 void LLParser::parse_header(Module* module) {
-    assert(_ifs.is_open() && "file not open, can't prase");
+    assert(_ifs.is_open() && "file not open, can't parse");
 
+    MAX_LINE_LEN = 4096;
+    MAX_VALUE_LEN = 1024;
     const char* id_format = "; ModuleID = '%[^']'";
     char* id = new char[MAX_LINE_LEN]();
     int matched = sscanf(line().c_str(), id_format, id);
@@ -155,7 +139,6 @@ void LLParser::parse_comdats() {
 
 void LLParser::parse_globals(Module * module) {
     while (Strings::startswith(line(), "@")) {
-        _has_globals = true;
         GlobalVariable* gv = new GlobalVariable();
         inc_intext_pos();
         get_word('=');

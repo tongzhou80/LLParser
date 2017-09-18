@@ -7,6 +7,10 @@
 StringParser::StringParser() {
     MAX_VALUE_LEN = 1024;
     _aheadpos = 0;
+    _intext_pos = 0;
+    _char = _text[_intext_pos];
+    _eol = false;
+    _fail = false;
 }
 
 void StringParser::set_text(string & text) {

@@ -15,7 +15,6 @@ protected:
     string _lookahead;
     int _aheadpos;
     char _char;
-
     bool _eol;
     bool _fail;
 public:
