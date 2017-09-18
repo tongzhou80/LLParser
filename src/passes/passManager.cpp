@@ -171,7 +171,7 @@ void PassManager::initialize_passes() {
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/libquantum_all_sites.txt");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/gcc_r2_all_sites.txt");
         //p->set_argument("hot_aps_file", "../../src/transform/hot-call-clone/test/test.txt");
-        add_pass(p);
+        //add_pass(p);
     }
 
     for (auto p: SysArgs::passes()) {

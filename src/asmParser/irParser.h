@@ -11,7 +11,7 @@
  * Both LLParser (parse the whole file) and InstParser (parse an instruction) derive from it.
  *
  */
-class IRParser: public StringParser {
+class IRParser: public virtual StringParser {
 public:
     string parse_basic_type();
     string parse_compound_type();

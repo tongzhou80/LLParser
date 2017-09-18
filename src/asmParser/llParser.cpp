@@ -64,13 +64,6 @@ void LLParser::set_done(bool v) {
     Locks::llparser_done_lock->unlock();
 }
 
-bool LLParser::is_done() {
-    Locks::llparser_done_lock->lock();
-    bool ret = _done;
-    Locks::llparser_done_lock->unlock();
-    return ret;
-}
-
 void LLParser::parse_header(Module* module) {
     assert(_ifs.is_open() && "file not open, can't prase");
 
@@ -134,15 +127,11 @@ void LLParser::parse_structs(Module* module) {
             module->add_struct_type(st);
 
             /* get name */
-            inc_inline_pos();
-            /* those starting with %"xxxxx" =  */
-            get_word('=');
-            Strings::strip(_word);
-//            parser_assert(Strings::startswith(_word, "struct") ||
-//                              Strings::startswith(_word, "union") ||
-//                              Strings::startswith(_word, "class"), line(), "Invalid struct: %s", line().c_str());
-            st->set_name(_word);
+            string name = parse_complex_structs();  // name contains '%'
+            st->set_name(name.substr(1));
 
+            get_word();
+            parser_assert(_word == "=", line(), "Invalid struct syntax");
             get_word();
             parser_assert(_word == "type", line(), "Invalid struct syntax");
         }
@@ -200,10 +189,36 @@ void LLParser::parse_aliases() {
         }
 
         parser_assert(_word == "alias", text(), " ");
-        
-        get_word('@'); // skip to @
+        string aliasee_ty = parse_compound_type();
+        parser_assert(_char == ',', line(), "sanity check");
+        inc_intext_pos();
+        get_lookahead();
+        bool has_bitcast = false;
+        if (_lookahead == "bitcast") {
+            has_bitcast = true;
+            jump_ahead();
+            parser_assert(_char == '(', line(), "syntax check, char: %c", _char);
+            inc_intext_pos();
+            string old_ty = parse_compound_type();
+
+        }
+        else {
+            string aliasee_ty_p = parse_compound_type();
+            parser_assert(aliasee_ty_p == aliasee_ty + '*', line(), "sanity check");
+        }
+        inc_intext_pos();
+        parser_assert(_char == '@', line(), "syntax check, char: %c", _char);
+        inc_intext_pos();
         get_word();
         alias->set_raw_field("aliasee", _word);
+        if (has_bitcast) {
+            get_word();
+            parser_assert(_word == "to", line(), "syntax check");
+            parse_compound_type();
+            parser_assert(_char == ')', line(), "syntax check");
+            inc_intext_pos();
+        }
+
         parser_assert(_eol, line(), "should be end of line");
 
         alias->set_raw_text(line());

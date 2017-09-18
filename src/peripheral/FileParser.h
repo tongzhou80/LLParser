@@ -8,7 +8,7 @@
 #include <fstream>
 #include "stringParser.h"
 
-class FileParser: public StringParser {
+class FileParser: public virtual StringParser {
 protected:
     string _file_name;
     std::ifstream _ifs;

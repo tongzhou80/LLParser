@@ -68,7 +68,7 @@ string IRParser::parse_basic_type() {
 
 /**@brief Parse a basic type or a compound type such as function pointer
  *
- * Unlike function pointers, a "function type" is not considered a compound type since they are only used in variable length function calls (I believe).
+ * Like function pointers, a function type (without a '*' at the end) is also considered a compound type.
  *
  * @return
  */
@@ -83,9 +83,9 @@ string IRParser::parse_compound_type() {
     if (_char == '(') {
         ty += ' ';
         ty += jump_to_end_of_scope();
-        guarantee(_char == '*', "Bad function pointer type: %s", _text.c_str());
-        ty += '*';
-        inc_intext_pos();
+//        guarantee(_char == '*', "Bad function pointer type: %s", _text.c_str());
+//        ty += '*';
+//        inc_intext_pos();
 
         // could a pointer to a function pointer, like i8* (i8*, i32, i32)** %bzalloc ...
         while (!_eol && _char == '*') {
