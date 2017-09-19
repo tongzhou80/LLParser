@@ -188,14 +188,14 @@ void BasicBlock::print_to_stream(FILE *fp) {
     }
 }
 
-void BasicBlock::print_to_stream(std::ostream &ofs) {
+void BasicBlock::print_to_stream(std::ostream &os) {
     if (!is_entry())
-        ofs << raw_text() << '\n';
+        os << raw_text() << '\n';
 
     for (auto i: instruction_list()) {
-        i->print_to_stream(ofs);
+        i->print_to_stream(os);
     }
 
     if (!is_exit())
-        ofs << '\n';
+        os << '\n';
 }

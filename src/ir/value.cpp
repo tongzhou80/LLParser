@@ -70,8 +70,8 @@ void Value::print_to_file(string file) {
 //    ofs.close();
 }
 
-void Value::print_to_stream(std::ostream &ofs) {
-    ofs << raw_text() << std::endl;
+void Value::print_to_stream(std::ostream &os) {
+    os << raw_text() << std::endl;
 }
 
 std::ostream& operator<<(std::ostream& os, Value* v) {

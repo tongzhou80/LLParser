@@ -148,28 +148,28 @@ void Module::resolve_aliases() {
     }
 }
 
-void Module::print_to_stream(std::ostream &ofs) {
-    ofs << "; ModuleID = '" << module_id() << "'\n";
+void Module::print_to_stream(std::ostream &os) {
+    os << "; ModuleID = '" << module_id() << "'\n";
     for (auto pair: headers()) {
-        ofs << pair.first << " = \"" << pair.second << "\"\n";
+        os << pair.first << " = \"" << pair.second << "\"\n";
     }
-    ofs << '\n';
+    os << '\n';
 
     if (!module_level_inline_asms().empty()) {
         for (auto s: module_level_inline_asms()) {
-            ofs << s << '\n';
+            os << s << '\n';
         }
-        ofs << '\n';
+        os << '\n';
     }
 
-    for (auto i: struct_list()) { ofs << i; }           ofs << '\n';
-    for (auto i: global_list()) { ofs << i; }           ofs << '\n';
-    for (auto i: comdat_list()) { ofs << i; }           ofs << '\n';
-    for (auto i: alias_map()) { ofs << i.second; }      ofs << '\n';
-    for (auto i: function_list()) { ofs << i; }         ofs << '\n';
-    for (auto i: attribute_list()) { ofs << i; }        ofs << '\n';
-    for (auto i: named_metadata_map()) { ofs << i.second; }        ofs << '\n';
-    for (auto i: unnamed_metadata_list()) { ofs << i; }            ofs << '\n';
+    for (auto i: struct_list()) { os << i; }           os << '\n';
+    for (auto i: global_list()) { os << i; }           os << '\n';
+    for (auto i: comdat_list()) { os << i; }           os << '\n';
+    for (auto i: alias_map()) { os << i.second; }      os << '\n';
+    for (auto i: function_list()) { os << i; }         os << '\n';
+    for (auto i: attribute_list()) { os << i; }        os << '\n';
+    for (auto i: named_metadata_map()) { os << i.second; }        os << '\n';
+    for (auto i: unnamed_metadata_list()) { os << i; }            os << '\n';
 }
 
 void Module::print_to_stream(FILE *fp) {

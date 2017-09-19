@@ -59,8 +59,8 @@ public:
         // C++
         _targets.push_back(new MFunc("_Znam", "ben_malloc", true, true));
         _targets.push_back(new MFunc("_Znwm", "ben_malloc", true, true));
-        _targets.push_back(new MFunc("_ZdaPv", "ben_free", true, true));
-        _targets.push_back(new MFunc("_ZdlPv", "ben_free", true, true));
+        _targets.push_back(new MFunc("_ZdaPv", "ben_free", false, true));
+        _targets.push_back(new MFunc("_ZdlPv", "ben_free", false, true));
 
         // Fortran
         _targets.push_back(new MFunc("f90_alloc", "f90_ben_alloc", true, true));

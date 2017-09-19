@@ -160,16 +160,16 @@ void Function::print_to_stream(FILE *fp) {
     }
 }
 
-void Function::print_to_stream(std::ostream& ofs) {
-    ofs << ";\n";
+void Function::print_to_stream(std::ostream& os) {
+    os << ";\n";
     if (is_external()) {
-        ofs << raw_text() << '\n';
+        os << raw_text() << '\n';
     }
     else {
-        ofs << raw_text() << " {\n";
+        os << raw_text() << " {\n";
         for (auto i: basic_block_list()) {
-            i->print_to_stream(ofs);
+            i->print_to_stream(os);
         }
-        ofs << "}\n";
+        os << "}\n";
     }
 }
