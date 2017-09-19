@@ -48,7 +48,11 @@ void Module::set_as_resolved(Function *f) {
     _function_list.push_back(f);
 }
 
-/// new function mean it is not currently in the map
+/**@brief Insert a new function into the module. Side effects of CallInstFamily will be applied.
+ *
+ * @param pos
+ * @param inserted
+ */
 void Module::insert_new_function(int pos, Function *inserted) {
     // todo: should throw an exception
     guarantee(pos < _function_list.size()+1, "inserted position out of range");
@@ -60,19 +64,12 @@ void Module::insert_new_function(int pos, Function *inserted) {
         throw SymbolRedefinitionError(msg);
     }
 
-    // iterate all the CallInst of the inserted function
+    // iterate all the CallInstFamily of the inserted function
     if (inserted->is_defined()) {
         for (auto bit = inserted->begin(); bit != inserted->end(); ++bit) {
             BasicBlock* bb = *bit;
-            auto& l = bb->callinst_list();
-            for (int i = 0; i < l.size(); ++i) {
-                CallInst* ci = dynamic_cast<CallInst*>(l[i]);
-                guarantee(ci, "Should be of CallInst class");
-                Function* callee = ci->called_function();
-                if (callee) {
-                    callee->append_user(ci);
-                }
-
+            for (auto ci: bb->callinst_list()) {
+                bb->check_insertion_side_effects_on_module(ci);
             }
         }
     }
@@ -80,7 +77,6 @@ void Module::insert_new_function(int pos, Function *inserted) {
     l.insert(l.begin()+pos, inserted);
     inserted->set_parent(this);
     _function_map[inserted->name()] = inserted;
-
 }
 
 void Module::insert_function_before(Function *old, Function *inserted) {

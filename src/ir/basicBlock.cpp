@@ -35,11 +35,24 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
     ins->set_parent(this);
 
     /* side effects */
+    check_insertion_side_effects_on_module(ins);
+}
+
+void BasicBlock::check_insertion_side_effects_on_module(Instruction* ins) {
     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
         _callinst_list.push_back(ci);
         Function* callee = ci->called_function();
         if (callee) {
             callee->append_user(ci);
+        }
+    }
+}
+
+void BasicBlock::check_deletion_side_effects_on_module(Instruction *ins) {
+    if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
+        Function* callee = ci->called_function();
+        if (callee) {
+            callee->remove_user(ci);
         }
     }
 }
@@ -131,14 +144,8 @@ void BasicBlock::replace(iterator iter, Instruction *neu) {
     Instruction* old = *iter;
     *iter = neu;
 
-
-    CallInst* ci = dynamic_cast<CallInst*>(old);
-    if (ci) {
-        Function* callee = ci->called_function();
-        if (callee) {
-            callee->remove_user(ci);
-        }
-    }
+    check_deletion_side_effects_on_module(old);
+    check_insertion_side_effects_on_module(neu);
 
     old->set_parent(NULL);
     //delete old;
@@ -158,11 +165,11 @@ void BasicBlock::replace(Instruction *old, Instruction *neu) {
     replace(it, neu);
 }
 
-/**@brief clones everything but replacing each instruction with a clone of this instruction
+/**@brief Returns a clone of this block.
+ * Each instruction will be a new object instead of pointing to the old object.
  *
  * @return
  */
-//BasicBlock* BasicBlock::clone(bool update_call_graph) {
 BasicBlock* BasicBlock::clone() {
     // callinst_list and inst_list need deep copy
     BasicBlock* bb = new BasicBlock(*this);
@@ -171,7 +178,7 @@ BasicBlock* BasicBlock::clone() {
         Instruction* neu = (*it)->clone();
         *it = neu;
 
-        /* if instruction is CallInst, it changes the call graph */
+        /* if instruction is CallInst, it changes the call graph upon insertion */
         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(neu)) {
             bb->callinst_list().push_back(ci);
         }

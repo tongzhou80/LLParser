@@ -39,6 +39,8 @@ public:
 
     void append_instruction(Instruction* ins);
     void insert_instruction(int pos, Instruction* inst);
+    void check_insertion_side_effects_on_module(Instruction* ins);
+    void check_deletion_side_effects_on_module(Instruction* ins);
     bool insert_instruction_before(Instruction* old, Instruction* neu);
     bool insert_instruction_after(Instruction* old, Instruction* neu);
     bool insert_instruction_after(Instruction* old, InstList& neus);

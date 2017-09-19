@@ -387,7 +387,6 @@ void LLParser::parse_function_definition() {
     Function* func = parse_function_header();
 
     get_real_line();
-    bool first_bb = true;
     /* parse basic blocks */
     while (1) {
         BasicBlock* bb = func->create_basic_block();
