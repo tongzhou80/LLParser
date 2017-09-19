@@ -38,10 +38,10 @@ public:
     int insert_with_priority(std::vector<Pass*>& list, Pass* p);
 
     void apply_global_passes();
-    void apply_passes(Module* module);
-    void apply_passes(Function* func);
-    void apply_passes(BasicBlock* bb);
-    void apply_passes(Instruction* inst);
+    void apply_module_passes(Module* module);
+    void apply_function_passes(Function* func);
+    void apply_basic_block_passes(BasicBlock* bb);
+    void apply_instruction_passes(Instruction* inst);
 
     void apply_initializations();
     void apply_finalization();

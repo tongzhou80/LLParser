@@ -726,15 +726,15 @@ Module* LLParser::parse() {
 
     Locks::pass_manager_lock->lock();
     PassManager* pm = PassManager::pass_manager;
-    pm->apply_passes(module());
+    pm->apply_module_passes(module());
 
     pm->apply_initializations(module());
 
     for (auto F: module()->function_list()) {
         for (auto B: F->basic_block_list()) {
-            pm->apply_passes(B);
+            pm->apply_basic_block_passes(B);
         }
-        pm->apply_passes(F);
+        pm->apply_function_passes(F);
     }
 
     pm->apply_finalization(module());

@@ -203,28 +203,28 @@ void PassManager::apply_global_passes() {
     }
 }
 
-void PassManager::apply_passes(Module *module) {
+void PassManager::apply_module_passes(Module *module) {
     std::vector<Pass*>& passes = _module_passes;
     for (int i = 0; i < passes.size(); ++i) {
         int mutated = passes[i]->run_on_module(module);
     }
 }
 
-void PassManager::apply_passes(Function *func) {
+void PassManager::apply_function_passes(Function *func) {
     std::vector<Pass*>& passes = _function_passes;
     for (int i = 0; i < passes.size(); ++i) {
         int mutated = passes[i]->run_on_function(func);
     }
 }
 
-void PassManager::apply_passes(Instruction *inst) {
+void PassManager::apply_instruction_passes(Instruction *inst) {
     std::vector<Pass*>& passes = _instruction_passes;
     for (int i = 0; i < passes.size(); ++i) {
         int mutated = passes[i]->run_on_instruction(inst);
     }
 }
 
-void PassManager::apply_passes(BasicBlock *bb) {
+void PassManager::apply_basic_block_passes(BasicBlock *bb) {
     std::vector<Pass*>& passes = _basic_block_passes;
     for (int i = 0; i < passes.size(); ++i) {
         int mutated = passes[i]->run_on_basic_block(bb);
