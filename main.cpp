@@ -27,6 +27,9 @@ void* llparser_start(string* filename) {
 
 
 int main(int argc, char** argv) {
+    Timer gtimer;
+    gtimer.start();
+
     Flags::init();
     SysDict::init();
     Errors::init();
@@ -76,5 +79,7 @@ int main(int argc, char** argv) {
     SysDict::destroy();
     PassManager::destroy();
 
+    gtimer.stop();
+    zpl("global time: %.3f seconds", gtimer.seconds());
     return 0;
 }

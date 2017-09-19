@@ -12,6 +12,8 @@ class SplitModulePass: public Pass {
 public:
     SplitModulePass() {
         set_is_module_pass();
+
+        _output_dir = ".";
     }
 
     bool run_on_module(Module* module) {
