@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
             pthread_join(tids[i], NULL);
     }
 
+
     PassManager::pass_manager->apply_global_passes();
 
 

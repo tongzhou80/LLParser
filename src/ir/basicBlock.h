@@ -16,6 +16,7 @@ class BasicBlock: public Value {
     std::vector<Instruction*> _instruction_list;
     Function* _parent;
     bool _is_entry;
+    bool _is_exit;
     std::vector<BasicBlock*> _preds;
     std::vector<string> _pred_labels;
     std::vector<BasicBlock*> _successors;
@@ -54,6 +55,9 @@ public:
     bool is_entry()                                       { return _is_entry; }
     bool set_is_entry(bool v=1)                           { _is_entry = v; }
 
+    bool is_exit()                                       { return _is_exit; }
+    bool set_is_exit(bool v=1)                           { _is_exit = v; }
+
     void append_pred(string label)                        { _pred_labels.push_back(label); }
 
     /**@ Return a list of CallInsts in this block, original order not guaranteed
@@ -69,6 +73,7 @@ public:
     BasicBlock* clone();
 
     void print_to_stream(FILE* fp);
+    void print_to_stream(std::ostream& ofs);
 };
 
 #endif //LLPARSER_BASICBLOCK_H

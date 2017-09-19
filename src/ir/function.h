@@ -60,6 +60,7 @@ public:
 
     int get_basic_block_index(BasicBlock* bb);
     Instruction* get_instruction(int bi, int ii);
+    std::size_t instruction_count();
 
     std::vector<CallInstFamily*> caller_list();
 
@@ -67,6 +68,7 @@ public:
     void rename(string name);
 
     void print_to_stream(FILE* fp);
+    void print_to_stream(std::ostream& ofs);
 
     bool is_copy()                                         { return _is_copy; }
     bool set_is_copy(bool v=1)                             { _is_copy = 1; }

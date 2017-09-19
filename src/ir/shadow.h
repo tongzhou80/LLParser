@@ -35,7 +35,6 @@ public:
     void set_fully_parsed(bool fully)   { _fully_parsed = fully; }
 
 
-
     virtual void dump()                 { std::cout << raw_text() << std::endl; }
 };
 

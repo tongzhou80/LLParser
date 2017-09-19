@@ -8,6 +8,7 @@
 #include <string>
 #include <cstdio>
 #include <map>
+#include <utilities/macros.h>
 
 class Module;
 class Function;

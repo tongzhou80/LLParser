@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <type_traits>
+#include <ir/module.h>
 #include "../ir/instruction.h"
 
 class Pass;
@@ -42,6 +43,8 @@ public:
     void apply_function_passes(Function* func);
     void apply_basic_block_passes(BasicBlock* bb);
     void apply_instruction_passes(Instruction* inst);
+
+    void apply_passes(Module* module);
 
     void apply_initializations();
     void apply_finalization();

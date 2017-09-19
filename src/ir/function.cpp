@@ -54,6 +54,14 @@ std::vector<CallInstFamily*> Function::caller_list() {
     return callers;
 }
 
+std::size_t Function::instruction_count() {
+    std::size_t cnt = 0;
+    for (auto B: basic_block_list()) {
+        cnt += B->instruction_list().size();
+    }
+    return cnt;
+}
+
 /**@brief the copy is exactly the same as "this", except that
  * 1. it has no parent (not in the module yet)
  * 2. it has no users
@@ -149,5 +157,19 @@ void Function::print_to_stream(FILE *fp) {
             }
         }
         fprintf(fp, "}\n");
+    }
+}
+
+void Function::print_to_stream(std::ostream& ofs) {
+    ofs << ";\n";
+    if (is_external()) {
+        ofs << raw_text() << '\n';
+    }
+    else {
+        ofs << raw_text() << " {\n";
+        for (auto i: basic_block_list()) {
+            i->print_to_stream(ofs);
+        }
+        ofs << "}\n";
     }
 }

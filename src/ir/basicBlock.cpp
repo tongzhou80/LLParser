@@ -9,7 +9,8 @@ BasicBlock::BasicBlock(): Value() {
     // _instruction_list.reserve()
     _parent = NULL;
     _is_entry = false;
-    //_instruction_list.reserve(5);
+    _is_exit = false;
+    _instruction_list.reserve(16);
 }
 
 void BasicBlock::append_instruction(Instruction *ins) {
@@ -178,13 +179,23 @@ BasicBlock* BasicBlock::clone() {
 }
 
 void BasicBlock::print_to_stream(FILE *fp) {
-#ifdef PRODUCTION
-    if (!raw_text().empty())
-#endif
-    fprintf(fp, "%s\n", raw_text().c_str());
+    if (!is_entry())
+        fprintf(fp, "%s\n", raw_text().c_str());
 
     auto& l = _instruction_list;
     for (auto i = l.begin(); i != l.end(); ++i) {
         (*i)->print_to_stream(fp);
     }
+}
+
+void BasicBlock::print_to_stream(std::ostream &ofs) {
+    if (!is_entry())
+        ofs << raw_text() << '\n';
+
+    for (auto i: instruction_list()) {
+        i->print_to_stream(ofs);
+    }
+
+    if (!is_exit())
+        ofs << '\n';
 }

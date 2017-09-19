@@ -45,13 +45,49 @@ private:
     std::map<string, MetaData*> _named_metadata_map;
     std::vector<MetaData*> _unnamed_metadata_list;
 public:
+
     Module(): _lang(Language::c) {}
 
     Module::Language language()                            { return _lang; }
     void set_language(Language l)                          { _lang = l; }
+
+    std::map<string, string> &headers() {
+        return _headers;
+    }
+
+    void set_headers(const std::map<string, string> &_headers) {
+        Module::_headers = _headers;
+    }
+
+    std::vector<string> &module_level_inline_asms() {
+        return _module_level_inline_asms;
+    }
+
+    void set_module_level_inline_asms(const std::vector<string> &_module_level_inline_asms) {
+        Module::_module_level_inline_asms = _module_level_inline_asms;
+    }
+
+    std::vector<StructType *> &struct_list() {
+        return _struct_list;
+    }
+
+    void set_struct_list(const std::vector<StructType *> &_struct_list) {
+        Module::_struct_list = _struct_list;
+    }
+
+    std::vector<Comdat *> &comdat_list() {
+        return _comdat_list;
+    }
+
+    void set_comdat_list(const std::vector<Comdat *> &_comdat_list) {
+        Module::_comdat_list = _comdat_list;
+    }
+
     std::vector<GlobalVariable*>& global_list()            { return _global_list; }
     std::map<string, Alias*>& alias_map()                  { return _alias_map; }
     std::vector<Function*>& function_list()                { return _function_list; }
+    std::vector<Attribute*>& attribute_list()              { return _attribute_list; }
+    std::map<string, MetaData*>& named_metadata_map()      { return _named_metadata_map; };
     std::vector<MetaData*>& unnamed_metadata_list()        { return _unnamed_metadata_list; }
 
     string module_id()                                     { return _module_id; }
@@ -84,7 +120,7 @@ public:
 
     void set_as_resolved(Function* f);
 
-    //void print_to_stream(std::ofstream& ofs);
+    void print_to_stream(std::ostream& ofs);
     void print_to_stream(FILE* fp);
 
     // check

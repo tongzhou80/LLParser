@@ -54,8 +54,9 @@ public:
 
     virtual void print_to_file(const char* file);
     virtual void print_to_file(string file);
-    virtual void print_to_stream(std::ofstream& ofs);
+    virtual void print_to_stream(std::ostream& ofs);
     virtual void print_to_stream(FILE* fp);
+    friend std::ostream& operator<<(std::ostream&, Value*);
 };
 
 #endif //LLPARSER_VALUE_H

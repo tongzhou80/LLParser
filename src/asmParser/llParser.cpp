@@ -405,6 +405,7 @@ void LLParser::parse_function_definition() {
         }
 
         if (Strings::startswith(line(), "}")) {
+            bb->set_is_exit();
             break;
         }
     }
@@ -724,21 +725,8 @@ Module* LLParser::parse() {
     /* perform post check */
     SysDict::module()->check_after_parse();
 
-    Locks::pass_manager_lock->lock();
     PassManager* pm = PassManager::pass_manager;
-    pm->apply_module_passes(module());
-
-    pm->apply_initializations(module());
-
-    for (auto F: module()->function_list()) {
-        for (auto B: F->basic_block_list()) {
-            pm->apply_basic_block_passes(B);
-        }
-        pm->apply_function_passes(F);
-    }
-
-    pm->apply_finalization(module());
-    Locks::pass_manager_lock->unlock();
+    pm->apply_passes(module());
 
     return module();
 }

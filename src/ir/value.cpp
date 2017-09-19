@@ -66,11 +66,16 @@ void Value::print_to_file(string file) {
 //    ofs.close();
 }
 
-void Value::print_to_stream(std::ofstream &ofs) {
-    //ofs << "Value.print_to_stream called, are you sure this should be called?\n";
+void Value::print_to_stream(std::ostream &ofs) {
+    ofs << raw_text() << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& os, Value* v) {
+    v->print_to_stream(os);  // virtual
+    return os;
 }
 
 void Value::print_to_stream(FILE *fp) {
     fprintf(fp, "%s\n", raw_text().c_str());
-    //fprintf(fp, "Value.print_to_stream called, are you sure this should be called?\n");
+    //fprintf(fp, "Value::print_to_stream called, are you sure this should be called?\n");
 }

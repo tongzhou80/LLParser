@@ -65,6 +65,8 @@ void PassManager::destroy() {
 #include <transform/call-clone/callClone.cpp>
 #include <transform/call-clone/contextGenerator.cpp>
 #include <transform/call-graph/callGraph.cpp>
+#include <utilities/mutex.h>
+
 void PassManager::initialize_passes() {
 //    HelloFunction* hello = new HelloFunction();
 //    add_parse_time_pass(hello);
@@ -83,7 +85,7 @@ void PassManager::initialize_passes() {
     if (DebugRun) {
         CallClonePass* p = new CallClonePass();
         p->set_name("CallClonePass");
-        add_pass(p);
+        //add_pass(p);
     }
 
     for (auto p: SysArgs::passes()) {
@@ -195,6 +197,24 @@ void PassManager::add_pass(string name) {
 
 
 // apply passes
+
+void PassManager::apply_passes(Module *module) {
+    Locks::pass_manager_lock->lock();
+
+    apply_module_passes(module);
+
+    apply_initializations(module);
+
+    for (auto F: module->function_list()) {
+        for (auto B: F->basic_block_list()) {
+            apply_basic_block_passes(B);
+        }
+        apply_function_passes(F);
+    }
+
+    apply_finalization(module);
+    Locks::pass_manager_lock->unlock();
+}
 
 void PassManager::apply_global_passes() {
     std::vector<Pass*>& passes = _global_passes;

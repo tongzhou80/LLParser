@@ -148,25 +148,43 @@ void Module::resolve_aliases() {
     }
 }
 
+void Module::print_to_stream(std::ostream &ofs) {
+    ofs << "; ModuleID = '" << module_id() << "'\n";
+    for (auto pair: headers()) {
+        ofs << pair.first << " = \"" << pair.second << "\"\n";
+    }
+    ofs << '\n';
+
+    for (auto s: module_level_inline_asms()) {
+        ofs << s << '\n';
+    }
+    ofs << '\n';
+
+    for (auto i: struct_list()) { ofs << i; }           ofs << '\n';
+    for (auto i: global_list()) { ofs << i; }           ofs << '\n';
+    for (auto i: comdat_list()) { ofs << i; }           ofs << '\n';
+    for (auto i: alias_map()) { ofs << i.second; }      ofs << '\n';
+    for (auto i: function_list()) { ofs << i; }         ofs << '\n';
+    for (auto i: attribute_list()) { ofs << i; }        ofs << '\n';
+    for (auto i: named_metadata_map()) { ofs << i.second; }        ofs << '\n';
+    for (auto i: unnamed_metadata_list()) { ofs << i; }            ofs << '\n';
+}
+
 void Module::print_to_stream(FILE *fp) {
     fprintf(fp, "; ModuleID = '%s'\n", module_id().c_str());
 
-    auto& m = _headers;
-    for (auto it = m.begin(); it != m.end(); ++it) {
-        fprintf(fp, "%s = \"%s\"\n", it->first.c_str(), it->second.c_str());
-    }
-    fprintf(fp, "\n"); fflush(fp);
-
-    auto& l1a = _module_level_inline_asms;
-    for (auto it = l1a.begin(); it != l1a.end(); ++it) {
-        fprintf(fp, "%s\n", (*it).c_str());
+    for (auto pair: headers()) {
+        fprintf(fp, "%s = \"%s\"\n", pair.first.c_str(), pair.second.c_str());
     }
     fprintf(fp, "\n");
 
+    for (auto s: module_level_inline_asms()) {
+        fprintf(fp, "%s\n", s.c_str());
+    }
+    fprintf(fp, "\n");
 
-    auto& l1 = _struct_list;
-    for (auto it = l1.begin(); it != l1.end(); ++it) {
-        (*it)->print_to_stream(fp);
+    for (auto st: struct_list()) {
+        st->print_to_stream(fp);
     }
     fprintf(fp, "\n");
 
