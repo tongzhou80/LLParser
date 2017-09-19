@@ -155,10 +155,12 @@ void Module::print_to_stream(std::ostream &ofs) {
     }
     ofs << '\n';
 
-    for (auto s: module_level_inline_asms()) {
-        ofs << s << '\n';
+    if (!module_level_inline_asms().empty()) {
+        for (auto s: module_level_inline_asms()) {
+            ofs << s << '\n';
+        }
+        ofs << '\n';
     }
-    ofs << '\n';
 
     for (auto i: struct_list()) { ofs << i; }           ofs << '\n';
     for (auto i: global_list()) { ofs << i; }           ofs << '\n';

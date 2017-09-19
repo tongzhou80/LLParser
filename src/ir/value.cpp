@@ -50,13 +50,17 @@ void Value::remove_user(Instruction *user) {
 }
 
 void Value::print_to_file(const char *file) {
-    FILE* fp = fopen(file, "w");
-    if (fp == NULL) {
-        fprintf(stderr, "open file %s failed", file);
-        return;
-    }
-    print_to_stream(fp);
-    fclose(fp);
+    std::ofstream ofs;
+    ofs.open(file);
+    ofs << this;
+    ofs.close();
+//    FILE* fp = fopen(file, "w");
+//    if (fp == NULL) {
+//        fprintf(stderr, "open file %s failed", file);
+//        return;
+//    }
+//    print_to_stream(fp);
+//    fclose(fp);
 }
 
 void Value::print_to_file(string file) {
