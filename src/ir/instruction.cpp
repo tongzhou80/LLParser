@@ -14,6 +14,7 @@ Instruction::Instruction(): Value() {
     _has_assignment = false;
     _parent = NULL;
     _dbg_id = -1;
+    _debug_loc = NULL;
 }
 
 Function* Instruction::function() {
@@ -42,14 +43,12 @@ void Instruction::copy_metadata_from(Instruction *i) {
 }
 
 DILocation* Instruction::debug_loc() {
-    if (_dbg_id < 0 ) {
-        return NULL;
-    }
-    else {
+    if (!_debug_loc) {
         MetaData* md = SysDict::module()->get_debug_info(_dbg_id);
-        DILocation* diloc = dynamic_cast<DILocation*>(md);
-        return diloc;
+        _debug_loc = dynamic_cast<DILocation*>(md);
     }
+
+    return _debug_loc;
 }
 
 Instruction* Instruction::clone() {

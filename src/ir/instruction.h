@@ -6,6 +6,7 @@
 #define LLPARSER_INSTRUCTION_H
 
 #include <peripheral/timer.h>
+#include <di/diLocation.h>
 #include "value.h"
 
 class BasicBlock;
@@ -33,8 +34,8 @@ protected:
     BasicBlock* _parent;
     bool _has_assignment;
     int _dbg_id;
+    DILocation* _debug_loc;
     string _owner;  // mainly for debug
-
 public:
     Instruction();
 

@@ -98,7 +98,6 @@ void InstParser::do_call_family(Instruction* inst) {
 
     string ret_ty, fnty;
 
-
     get_lookahead();
     if (InstFlags::in_tails(_lookahead)) {
         ci->set_raw_field("tail", _lookahead);
@@ -108,8 +107,6 @@ void InstParser::do_call_family(Instruction* inst) {
     get_word();
     parser_assert(_word == "call" || _word == "invoke", text(), "Bad call inst, _word: |%s| is not |call|", _word.c_str());
 
-
-    //zpl("word: %s, in: %d", _word.c_str(), InstFlags::in_param_attrs(_word));
     get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
         if (InstFlags::in_fastmaths(_lookahead)) {
@@ -199,6 +196,7 @@ void InstParser::do_call_family(Instruction* inst) {
         if (ci->has_bitcast()) {
             get_word();
             fn_name = _word;
+            ci->set_raw_field("fnptrval", fn_name);
             get_word();
             parser_assert(_word == "to", text(), " ");
             parse_compound_type();
@@ -210,7 +208,7 @@ void InstParser::do_call_family(Instruction* inst) {
             fn_name = _word;
         }
 
-        ci->resolve_callee_symbol(fn_name);
+        //ci->resolve_callee_symbol(fn_name);
     }
     else if (_char == '%') {
         // todo: indirect calls
@@ -219,9 +217,10 @@ void InstParser::do_call_family(Instruction* inst) {
         string label = _word;
         ci->set_is_indirect_call();
         ci->set_called_label(label);
-        //zpl("indirect call: %s", inst->raw_c_str());
-        if (ci->parent())
-            ci->try_resolve_indirect_call();
+        ci->set_raw_field("fnptrval", label);
+//
+//        if (ci->parent())
+//            ci->try_resolve_indirect_call();
         guarantee(!ci->has_bitcast(), "just check");
     }
     else {

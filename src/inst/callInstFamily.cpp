@@ -23,6 +23,18 @@ void CallInstFamily::init_raw_field() {
     set_raw_field("args", "");
 }
 
+Function* CallInstFamily::called_function() {
+    if (!_called) {
+        if (!is_indirect_call()) {
+            resolve_direct_call();
+        }
+        else {
+            try_resolve_indirect_call();
+        }
+    }
+
+    return _called;
+}
 
 /** @brief Replace the called function.
  * This function does not create a function declaration for the
@@ -58,6 +70,12 @@ void CallInstFamily::replace_args(string newargs) {
     set_raw_field("args", newargs);
 }
 
+void CallInstFamily::resolve_direct_call() {
+    guarantee(!is_indirect_call(), "just check");
+    string fn_name = get_raw_field("fnptrval");
+    resolve_callee_symbol(fn_name);
+}
+
 void CallInstFamily::resolve_callee_symbol(string fn_name) {
     if (Alias* alias = SysDict::module()->get_alias(fn_name)) {
         string aliasee = alias->get_raw_field("aliasee");
@@ -72,16 +90,15 @@ void CallInstFamily::resolve_callee_symbol(string fn_name) {
     set_called_function(callee);
     callee->append_user(this);
 
-    // now this instruction is considered fully parsed;
-    // Type info is always ignored for now
-    set_is_fully_parsed();
-
     if (CallInstParsingVerbose) {
         printf( "  name: |%s|\n",
                 fn_name.c_str());
     }
 }
 
+/**@brief Try to infer the caller based on data flow. Success not guaranteed.
+ *
+ */
 void CallInstFamily::try_resolve_indirect_call() {
     guarantee(parent() != NULL, "Parent must not be NULL when resolving indirect calls");
 

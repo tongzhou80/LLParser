@@ -21,7 +21,7 @@ public:
     CallInstFamily();
 
     virtual void init_raw_field();
-    Function* called_function()                       { return _called; }
+    Function* called_function();
     void set_called_function(Function* f)             { _called = f; }
 
     bool is_indirect_call() const {
@@ -68,8 +68,8 @@ public:
     void replace_args(string newargs);
 
     void try_resolve_indirect_call();
+    void resolve_direct_call();
     void resolve_callee_symbol(string fn_name);
-
 };
 
 #endif //LLPARSER_CallInstFamily_H

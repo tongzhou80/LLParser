@@ -16,7 +16,7 @@ BasicBlock::BasicBlock(): Value() {
 void BasicBlock::append_instruction(Instruction *ins) {
     _instruction_list.push_back(ins);
     ins->set_parent(this);
-
+    
     if (ins->type() == Instruction::CallInstType) {
         _callinst_list.push_back(ins);
     }
