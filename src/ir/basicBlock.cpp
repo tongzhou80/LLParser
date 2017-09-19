@@ -16,21 +16,26 @@ BasicBlock::BasicBlock(): Value() {
 void BasicBlock::append_instruction(Instruction *ins) {
     _instruction_list.push_back(ins);
     ins->set_parent(this);
-    
-    if (ins->type() == Instruction::CallInstType) {
-        _callinst_list.push_back(ins);
+
+    if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
+        _callinst_list.push_back(ci);
     }
 }
 
-void BasicBlock::insert_instruction(int pos, Instruction *inst) {
+/**@brief During parsing instructions are appended to their parent using append_instruction.
+ * This function is usually used to insert new generated instructions.
+ *
+ * @param pos
+ * @param ins
+ */
+void BasicBlock::insert_instruction(int pos, Instruction *ins) {
     guarantee(pos <= _instruction_list.size(), "insertion point out of range");
     auto& l = _instruction_list;
-    l.insert(l.begin()+pos, inst);
-    inst->set_parent(this);
+    l.insert(l.begin()+pos, ins);
+    ins->set_parent(this);
 
     /* side effects */
-    CallInst* ci = dynamic_cast<CallInst*>(inst);
-    if (ci) {
+    if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
         _callinst_list.push_back(ci);
         Function* callee = ci->called_function();
         if (callee) {
@@ -167,10 +172,8 @@ BasicBlock* BasicBlock::clone() {
         *it = neu;
 
         /* if instruction is CallInst, it changes the call graph */
-        //zpl("is call: %d, %d", neu->type(), dynamic_cast<CallInst*>(neu)==NULL);
-        CallInst* ci = dynamic_cast<CallInst*>(neu);
-        if (ci) {
-            bb->callinst_list().push_back(neu);
+        if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(neu)) {
+            bb->callinst_list().push_back(ci);
         }
         neu->set_parent(bb);
     }

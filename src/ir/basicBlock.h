@@ -6,6 +6,7 @@
 #define LLPARSER_BASICBLOCK_H
 
 #include <vector>
+#include <inst/callInstFamily.h>
 #include "value.h"
 #include "irEssential.h"
 
@@ -20,7 +21,7 @@ class BasicBlock: public Value {
     std::vector<BasicBlock*> _preds;
     std::vector<string> _pred_labels;
     std::vector<BasicBlock*> _successors;
-    std::vector<Instruction*> _callinst_list;  // The functions called by this function
+    std::vector<CallInstFamily*> _callinst_list;  // The functions called by this function
 public:
     typedef std::vector<Instruction*> InstList;
     typedef InstList::iterator inst_iterator;
@@ -55,16 +56,16 @@ public:
     bool is_entry()                                       { return _is_entry; }
     bool set_is_entry(bool v=1)                           { _is_entry = v; }
 
-    bool is_exit()                                       { return _is_exit; }
-    bool set_is_exit(bool v=1)                           { _is_exit = v; }
+    bool is_exit()                                        { return _is_exit; }
+    bool set_is_exit(bool v=1)                            { _is_exit = v; }
 
     void append_pred(string label)                        { _pred_labels.push_back(label); }
 
-    /**@ Return a list of CallInsts in this block, original order not guaranteed
+    /**@ Return a list of CallInstFamily* in this block, original order not guaranteed
      *
      * @return
      */
-    InstList& callinst_list()                              { return _callinst_list; }
+    std::vector<CallInstFamily*> callinst_list()          { return _callinst_list; }
 
     /**@brief return a clone of this basic block, except the parent of the copy if NULL
      *
