@@ -7,6 +7,7 @@
 #include <set>
 #include "contextGenerator.h"
 
+
 void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     Function* malloc = module->get_function(alloc);
     if (!malloc) {
@@ -16,24 +17,52 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     std::ofstream ofs;
     ofs.open(SysDict::filepath() + "contexts.txt");
 
-    std::vector<CallInstFamily*> roots = malloc->caller_list();
+    for (auto ci: malloc->caller_list()) {
+        XPath* path = new XPath;
+        path->hotness = 0;
+        path->path.push_back(ci);
+        _paths.push_back(path);
+    }
 
     while (--nlevel) {
-        std::vector<CallInstFamily*> new_roots;
-
-        for (auto ci: roots) {
-            Function* f = ci->function();
-            new_roots.insert(new_roots.end(), f->caller_list().begin(), f->caller_list().end());
+        std::vector<XPath*> new_paths;
+        for (auto xpath: _paths) {
+            auto& context = xpath->path;
+            auto tos = context[context.size()-1];
+            for (auto ci: tos->function()->caller_list()) {
+                XPath* nxp = new XPath();
+                nxp->hotness = xpath->hotness;
+                nxp->path = context;
+                nxp->path.push_back(ci);
+                new_paths.push_back(nxp);
+            }
         }
-        roots = new_roots;
+        _paths = new_paths;
     }
 
     int id = 0;
-    for (auto ci: roots) {
-        DILocation* loc = ci->debug_loc();
+    for (auto xpath: _paths) {
         ofs << id++ << " 0x0 " << alloc << std::endl;
-        ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") " << loc->filename() << ':' << loc->line() << "\n\n";
+        for (auto ci: xpath->path) {
+            DILocation* loc = ci->debug_loc();
+            ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
+                << loc->filename() << ':' << loc->line() << std::endl;
+        }
+        ofs << std::endl;
     }
 
     ofs.close();
+}
+
+void ContextGenerator::traverse() {
+    auto tos = _stack[_stack.size()-1];
+    for (auto ci: tos->function()->caller_list()) {
+        _stack.push_back(ci);
+        if (_stack.size() < 3) {
+            traverse();
+        }
+        else {
+
+        }
+    }
 }

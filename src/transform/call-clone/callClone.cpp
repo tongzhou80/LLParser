@@ -29,7 +29,7 @@ public:
 
     bool run_on_module(Module* module) {
         ContextGenerator cg;
-        cg.generate(module, "malloc", 1);
+        cg.generate(module, "malloc", 3);
 //        Function* malloc = module->get_function("malloc");
 //        if (!malloc) {
 //            return false;

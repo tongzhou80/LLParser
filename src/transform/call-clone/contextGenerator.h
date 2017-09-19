@@ -7,9 +7,17 @@
 
 #include <ir/module.h>
 
+struct XPath {
+    std::vector<CallInstFamily*> path;
+    int hotness;
+};
+
 class ContextGenerator {
+    std::vector<XPath*> _paths;
+    std::vector<CallInstFamily*> _stack;
 public:
     void generate(Module* module, string alloc="malloc", int nlevel=1);
+    void traverse();
 };
 
 #endif //LLPARSER_CONTEXTGENERATOR_H
