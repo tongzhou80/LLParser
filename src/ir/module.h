@@ -31,6 +31,7 @@ public:
     };
 private:
     Language _lang;
+    string _input_file;
     string _module_id;
     std::map<string, string> _headers;
     std::vector<string> _module_level_inline_asms;
@@ -50,6 +51,14 @@ public:
 
     Module::Language language()                            { return _lang; }
     void set_language(Language l)                          { _lang = l; }
+
+    const string &input_file() const {
+        return _input_file;
+    }
+
+    void set_input_file(const string &_input_file) {
+        Module::_input_file = _input_file;
+    }
 
     std::map<string, string> &headers() {
         return _headers;

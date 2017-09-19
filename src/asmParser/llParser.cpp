@@ -701,8 +701,8 @@ Module* LLParser::parse() {
         return NULL;
     }
 
-
     _module = new Module();
+    _module->set_input_file(filename());
     SysDict::add_module(this);
 
     getline_nonempty();

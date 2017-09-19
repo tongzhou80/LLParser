@@ -15,7 +15,7 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     }
 
     std::ofstream ofs;
-    ofs.open(SysDict::filepath() + "contexts.txt");
+    ofs.open(SysDict::filedir() + "contexts.txt");
 
     for (auto ci: malloc->caller_list()) {
         XPath* path = new XPath;

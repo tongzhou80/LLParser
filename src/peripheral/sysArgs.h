@@ -32,6 +32,7 @@ public:
     static bool get_next_file();
     static string& filename();
     static std::vector<string>& filenames()                       { return _filenames; }
+    static void use_split_files();
 
     static std::vector<string>& passes()                          { return _passes; }
 

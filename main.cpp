@@ -40,13 +40,18 @@ int main(int argc, char** argv) {
      * callinst_list could be std::set, which is more error-resistent
      * structs and globals need more parsing
      */
+    if (UseSplitModule) {
+        if (SysArgs::filenames().size() != 1) {
+            fprintf(stderr, "UseSplitModule only accepts exactly one filename");
+            exit(1);
+        }
+    }
 
     pthread_t* tids = NULL;
     int file_num = SysArgs::filenames().size();
     if (ParallelModule) {
         tids = new pthread_t[file_num];
     }
-
 
     for (int i = 0; i < file_num; ++i) {
         string file = SysArgs::filenames()[i];

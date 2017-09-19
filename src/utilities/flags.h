@@ -30,6 +30,8 @@
          "")                                              \
   develop(bool, ParallelModule, 0,                        \
          "")                                              \
+  develop(bool, UseSplitModule, 0,                        \
+         "")                                              \
   develop(bool, ParallelInstruction, 0,                   \
          "")                                              \
   develop(bool, PrintParsedLine, 0,                       \

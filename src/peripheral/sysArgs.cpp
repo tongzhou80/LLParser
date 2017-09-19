@@ -54,6 +54,10 @@ void SysArgs::add_target_file(string name) {
     _filenames.push_back(name);
 }
 
+void SysArgs::use_split_files() {
+    string dir = SysDict::filedir() + "split-module/";
+}
+
 string SysArgs::get_option(string key) {
     if (_options.find(key) == _options.end()) {
         return "";

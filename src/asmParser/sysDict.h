@@ -31,9 +31,10 @@ public:
     static LLParser* llparser();
     static Module* module();
     static const string& filename();
-    static const string filepath();
+    static const string filedir();
 
     static std::map<pthread_t , LLParser*> thread_table;
+    //static std::map<string, Module*> module_table;
     static std::vector<Module*> modules;
     static LLParser* parser;
 
