@@ -79,7 +79,7 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
                 Flags::set_flag(_word.substr(xx_len+1), true);
             }
             else if (_word[xx_len] == '-') {
-                Flags::set_flag(_text.substr(xx_len+1), false);
+                Flags::set_flag(_word.substr(xx_len+1), false);
             }
             else {
                 guarantee(0, "Bad formatted option: %s (miss a '+' or '-'?)", _text.c_str());

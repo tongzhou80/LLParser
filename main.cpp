@@ -41,10 +41,10 @@ int main(int argc, char** argv) {
      * structs and globals need more parsing
      */
     if (UseSplitModule) {
-        if (SysArgs::filenames().size() != 1) {
-            fprintf(stderr, "UseSplitModule only accepts exactly one filename");
-            exit(1);
-        }
+//        if (SysArgs::filenames().size() != 1) {
+//            fprintf(stderr, "UseSplitModule only accepts exactly one filename");
+//            exit(1);
+//        }
     }
 
     pthread_t* tids = NULL;

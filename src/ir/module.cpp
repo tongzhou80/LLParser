@@ -163,8 +163,8 @@ void Module::print_to_stream(std::ostream &os) {
     }
 
     for (auto i: struct_list()) { os << i; }           os << '\n';
-    for (auto i: global_list()) { os << i; }           os << '\n';
     for (auto i: comdat_list()) { os << i; }           os << '\n';
+    for (auto i: global_list()) { os << i; }           os << '\n';
     for (auto i: alias_map()) { os << i.second; }      os << '\n';
     for (auto i: function_list()) { os << i; }         os << '\n';
     for (auto i: attribute_list()) { os << i; }        os << '\n';
@@ -190,14 +190,14 @@ void Module::print_to_stream(FILE *fp) {
     }
     fprintf(fp, "\n");
 
-    auto& l2 = _global_list;
-    for (auto it = l2.begin(); it != l2.end(); ++it) {
+    auto& l2a = _comdat_list;
+    for (auto it = l2a.begin(); it != l2a.end(); ++it) {
         (*it)->print_to_stream(fp);
     }
     fprintf(fp, "\n");
 
-    auto& l2a = _comdat_list;
-    for (auto it = l2a.begin(); it != l2a.end(); ++it) {
+    auto& l2 = _global_list;
+    for (auto it = l2.begin(); it != l2.end(); ++it) {
         (*it)->print_to_stream(fp);
     }
     fprintf(fp, "\n");

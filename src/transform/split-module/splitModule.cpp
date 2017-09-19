@@ -8,6 +8,7 @@
 #include <thread>
 
 class SplitModulePass: public Pass {
+    string _output_dir;
 public:
     SplitModulePass() {
         set_is_module_pass();
@@ -20,14 +21,17 @@ public:
             exit(1);
         }
 
+        if (has_argument("dir")) {
+            _output_dir = get_argument("dir");
+        }
+
         print_other_data(module);
         print_functions(module);
         print_debug_info(module);
     }
 
     void print_other_data(Module* m) {
-        string out = SysDict::filename();
-        std::ofstream ofs(out+".h0");
+        std::ofstream ofs(_output_dir+"/head");
 
         ofs << "; ModuleID = '" << m->module_id() << "'\n";
         for (auto pair: m->headers()) {
@@ -43,8 +47,8 @@ public:
         }
 
         for (auto i: m->struct_list()) { ofs << i; }           ofs << '\n';
-        for (auto i: m->global_list()) { ofs << i; }           ofs << '\n';
         for (auto i: m->comdat_list()) { ofs << i; }           ofs << '\n';
+        for (auto i: m->global_list()) { ofs << i; }           ofs << '\n';
         for (auto i: m->alias_map()) { ofs << i.second; }      ofs << '\n';
 
         for (auto i: m->attribute_list()) { ofs << i; }        ofs << '\n';
@@ -71,7 +75,14 @@ public:
                 if (ofs.is_open()) {
                     ofs.close();
                 }
-                ofs.open(SysDict::filename()+".f"+std::to_string(i/nfunc_per_file));
+                ofs.open(_output_dir+"/func"+std::to_string(i/nfunc_per_file));
+
+                ofs << "; ModuleID = '" << m->module_id() << "'\n";
+                for (auto pair: m->headers()) {
+                    ofs << pair.first << " = \"" << pair.second << "\"\n";
+                }
+                ofs << '\n';
+
             }
             ofs << m->function_list()[i];
         }
@@ -95,7 +106,13 @@ public:
                 if (ofs.is_open()) {
                     ofs.close();
                 }
-                ofs.open(SysDict::filename()+".d"+std::to_string(i/nfunc_per_file));
+                ofs.open(_output_dir+"/debug"+std::to_string(i/nfunc_per_file));
+
+                ofs << "; ModuleID = '" << m->module_id() << "'\n";
+                for (auto pair: m->headers()) {
+                    ofs << pair.first << " = \"" << pair.second << "\"\n";
+                }
+                ofs << '\n';
             }
             ofs << m->unnamed_metadata_list()[i];
         }

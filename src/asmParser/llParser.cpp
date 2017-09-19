@@ -634,7 +634,7 @@ void LLParser::parse_metadatas(Module *module) {
         get_real_line();
     }
 
-    guarantee(_ifs.eof(), "should be end of file");
+    guarantee(_ifs.eof(), "should be end of file, line: %d", line_numer());
     //zpl("Module %s: end of file, total: %d", module->name_as_c_str(), _line_number);
 }
 
@@ -715,6 +715,10 @@ Module* LLParser::parse() {
     parse_functions();
     parse_attributes(module());
     parse_metadatas(module());
+
+    if (UseSplitModule) {
+        return module();
+    }
 
 
     // DILocation is slightly more complicated, so resolve some data in advance
