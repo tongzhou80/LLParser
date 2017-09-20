@@ -140,6 +140,7 @@ public:
     void check_after_parse();
     void check_after_pass();
 
+    void resolve_callinsts();
     void resolve_debug_info();
     void resolve_aliases();
 };

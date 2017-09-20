@@ -140,6 +140,21 @@ void Module::resolve_debug_info() {
     }
 }
 
+void Module::resolve_callinsts() {
+    for (auto F: function_list()) {
+        for (auto B: F->basic_block_list()) {
+            for (auto I: B->callinst_list()) {
+                if (I->is_indirect_call()) {
+                    I->try_resolve_indirect_call();
+                }
+                else {
+                    I->resolve_direct_call();
+                }
+            }
+        }
+    }
+}
+
 void Module::resolve_aliases() {
     for (auto it: _alias_map) {
         Alias* a = it.second;
@@ -235,7 +250,7 @@ void Module::check_after_parse() {
     if (_function_map.size() != _function_list.size()) {
         printf("map size: %d, list size: %d\n", _function_map.size(), _function_list.size());
     }
-    bool all_resolved = 1;
+
     auto& m = _function_map;
     for (auto it = m.begin(); it != m.end(); ++it) {
         Function* f = it->second;
@@ -243,11 +258,6 @@ void Module::check_after_parse() {
             printf("unresolved function: %s\n", f->name().c_str());
         }
     }
-//
-//    auto& l3 = _function_list;
-//    for (auto f = l3.begin(); f != l3.end(); ++f) {
-//        (*f)->dump();
-//    }
 }
 
 void Module::check_after_pass() {

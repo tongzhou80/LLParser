@@ -270,17 +270,16 @@ Function* LLParser::parse_function_name_and_args() {
     Function* func = SysDict::module()->get_function(name);
 
     if (func != NULL) {
-        //module->append_function(func);
-        SysDict::module()->set_as_resolved(func);
-        guarantee(!func->is_external(), "redeclare function %s\nline %d: %s", name.c_str(), _line_number, line().c_str());
-        guarantee(!func->is_defined(), "redefine function %s\nline %d: %s", name.c_str(), _line_number, line().c_str());
+        guarantee(0, " ");
+//        //module->append_function(func);
+//        SysDict::module()->set_as_resolved(func);
+//        guarantee(!func->is_external(), "redeclare function %s\nline %d: %s", name.c_str(), _line_number, line().c_str());
+//        guarantee(!func->is_defined(), "redefine function %s\nline %d: %s", name.c_str(), _line_number, line().c_str());
     }
     else {
         //func = SysDict::module()->create_child_function(name);
         func = new Function();
         func->set_name(name);
-
-        guarantee(func != NULL, "no");
     }
 
     if (dbg > -1) {
@@ -721,12 +720,13 @@ Module* LLParser::parse() {
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
-    SysDict::module()->resolve_debug_info();
-    SysDict::module()->resolve_aliases();
+    module()->resolve_callinsts();
+    module()->resolve_debug_info();
+    module()->resolve_aliases();
 
 #ifndef PRODUCTION
     /* perform post check */
-    SysDict::module()->check_after_parse();
+    //SysDict::module()->check_after_parse();
 #endif
     PassManager* pm = PassManager::pass_manager;
     pm->apply_passes(module());

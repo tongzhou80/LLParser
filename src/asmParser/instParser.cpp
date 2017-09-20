@@ -196,7 +196,6 @@ void InstParser::do_call_family(Instruction* inst) {
         if (ci->has_bitcast()) {
             get_word();
             fn_name = _word;
-            ci->set_raw_field("fnptrval", fn_name);
             get_word();
             parser_assert(_word == "to", text(), " ");
             parse_compound_type();
@@ -208,6 +207,7 @@ void InstParser::do_call_family(Instruction* inst) {
             fn_name = _word;
         }
 
+        ci->set_raw_field("fnptrval", fn_name);
         //ci->resolve_callee_symbol(fn_name);
     }
     else if (_char == '%') {
