@@ -109,8 +109,9 @@ void CallInstFamily::try_resolve_indirect_call() {
         //zpl("name: |%s|   label: |%s|", I->name().c_str(), ('%'+called_label()).c_str());
         if (I->name() == '%' + called_label()) {
             set_target_inst(I);
-            if (I->type() == Instruction::BitCastInstType) {
-                string value = ((BitCastInst*)I)->value_str();
+
+            if (BitCastInst* bi = dynamic_cast<BitCastInst*>(I)) {
+                string value = bi->value_str();
                 if (value[0] == '@') {
                     //zpl("resolved indirect call target to %s (%s)", value.c_str(), raw_c_str());
                     resolve_callee_symbol(&value[1]);

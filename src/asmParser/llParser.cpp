@@ -702,6 +702,8 @@ Module* LLParser::parse() {
     _module->set_input_file(filename());
     SysDict::add_module(this);
 
+    Timer t;
+    t.start();
     getline_nonempty();
     parse_header(module());
     parse_module_level_asms();
@@ -716,13 +718,18 @@ Module* LLParser::parse() {
     if (UseSplitModule) {
         return module();
     }
-
+    t.stop();
+    zpl("%.2f seconds", t.seconds())
+    t.resume();
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     module()->resolve_callinsts();
     module()->resolve_debug_info();
     module()->resolve_aliases();
+
+    t.stop();
+    zpl("%.2f seconds", t.seconds())
 
 #ifndef PRODUCTION
     /* perform post check */
