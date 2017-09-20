@@ -153,7 +153,7 @@ public:
             for (auto c: candidates) {
                 Function* alloc = SysDict::module()->get_function(c);
                 if (alloc) {
-                    for (auto I: alloc->user_list()) {
+                    for (auto I: alloc->user_set()) {
                         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                             DILocation *loc = ci->debug_loc();
                             guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -237,7 +237,7 @@ public:
         Function* calleef = SysDict::module()->get_function(_callee);
         Instruction* final = NULL;
         guarantee(calleef, " ");
-        auto users = calleef->user_list();
+        auto users = calleef->user_set();
 
         // level 0
         if (users.size() == 1) {
@@ -248,7 +248,7 @@ public:
         std::map<Instruction*, int> users_offsets;
         std::vector<Instruction*> other_callers;
         if (!final) {
-            for (auto I: calleef->user_list()) {
+            for (auto I: calleef->user_set()) {
                 if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -432,7 +432,7 @@ public:
 
     void update_top_caller(string new_name, std::vector<Instruction*>& stack) {
         Function* caller = stack[stack.size()-1]->function();
-        auto users = caller->user_list();
+        auto users = caller->user_set();
         for (auto I: users) {
             if (CallInst* ci = dynamic_cast<CallInst*>(I)) {
                 if (std::find(stack.begin(), stack.end(), ci) == stack.end()) {

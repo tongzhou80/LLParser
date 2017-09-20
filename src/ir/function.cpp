@@ -46,7 +46,7 @@ Instruction* Function::get_instruction(int bi, int ii) {
 
 std::vector<CallInstFamily*> Function::caller_list() {
     std::vector<CallInstFamily*> callers;
-    for (auto I: user_list()) {
+    for (auto I: user_set()) {
         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
             callers.push_back(ci);
         }
@@ -84,7 +84,7 @@ std::size_t Function::instruction_count() {
 Function* Function::clone(string new_name) {
     Function* f = new Function(*this);
     f->set_parent(NULL);
-    f->user_list().clear();
+    f->user_set().clear();
     if (is_defined()) {
         for (iterator it = f->begin(); it != f->end(); ++it) {
             // don't delete the old basic block, it is still used by the original function

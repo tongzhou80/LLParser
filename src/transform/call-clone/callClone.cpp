@@ -45,12 +45,12 @@ public:
 //            cnt++;
 //            _black.clear();
 //            _has_overlapped_path = false;  // always assume this round is the last round
-//            auto& malloc_users = malloc->user_list();
-//            Function::InstList malloc_users_copy = malloc_users; // user_list might change during the iteration since new functions may be created
+//            auto& malloc_users = malloc->user_set();
+//            Function::InstList malloc_users_copy = malloc_users; // user_set might change during the iteration since new functions may be created
 //            for (auto uit = malloc_users_copy.begin(); uit != malloc_users_copy.end(); ++uit) {
 //                Function* func = (*uit)->function();
 //                do_clone(func, module);
-//                //auto& users = func->user_list();
+//                //auto& users = func->user_set();
 //
 //            }
 //        } while (_has_overlapped_path && cnt < 4);
@@ -74,8 +74,8 @@ public:
             _black.insert(f->name());
         }
 
-        auto& users = f->user_list();
-        Function::InstList users_copy = users;
+        auto& users = f->user_set();
+        Function::InstSet users_copy = users;
 //    if (users_copy.size() > 1) {
 //        if (f->name() == "BZ2_bzReadOpen") {
 //            zpl("%s is called in ", f->name().c_str());

@@ -24,7 +24,6 @@ add_library(CallClone SHARED src/transform/call-clone/callClone.cpp src/transfor
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
-add_library(PathClone SHARED src/transform/path-clone/pathClone.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
 add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
 add_library(SplitModule SHARED src/transform/split-module/splitModule.cpp)
@@ -39,7 +38,6 @@ install(TARGETS
         Callgraph
         ATrace
         HotCallClone
-        PathClone
         NewClone
         PrintCaller
         DESTINATION /home/marena/llparser/passes/)

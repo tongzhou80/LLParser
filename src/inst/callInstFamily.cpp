@@ -59,7 +59,7 @@ void CallInstFamily::replace_callee(string callee) {
     Function* old_callee = SysDict::module()->get_function(old);
     guarantee(old_callee, "callee %s not found", old.c_str());
     old_callee->remove_user(this);
-//    auto& vec = old_callee->user_list();
+//    auto& vec = old_callee->user_set();
 //    auto newend = std::remove(vec.begin(), vec.end(), this);
 //    vec.erase(newend, vec.end());
 }

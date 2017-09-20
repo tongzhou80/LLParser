@@ -25,9 +25,6 @@ void DILocation::resolve() {
 }
 
 void DILocation::second_resolve() {
-    if (_number == 42531) {
-        zpl("42531")
-    }
     /* resolve indirect symbols */
     for (_inline_root = inlinedAt(); _inline_root; ) {
         // todo: verify that the referenced inlined location should already be parsed at this point

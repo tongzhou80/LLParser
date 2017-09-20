@@ -58,12 +58,12 @@ bool CallgraphPass::run_on_module(Module *module) {
                 continue;
             }
 
-            if (F->user_list().empty()) {
+            if (F->user_set().empty()) {
                 continue;
             }
 
-            _caller_ofs << std::left << std::setw(50) << F->name() << F->user_list().size() << std::endl;
-            for (auto I: F->user_list()) {
+            _caller_ofs << std::left << std::setw(50) << F->name() << F->user_set().size() << std::endl;
+            for (auto I: F->user_set()) {
                 if (CallInstFamily* cif = dynamic_cast<CallInstFamily*>(I)) {
                     print_dot_line(I->function()->name(), F->name());
                     _caller_ofs << "  - " << I->function()->name() << std::endl;
@@ -106,8 +106,7 @@ void CallgraphPass::traverse(Function *F, Module* module) {
     guarantee(F, "function %s not found", F->name_as_c_str());
 
     _visited.insert(F->name());
-    for (auto ui = F->user_begin(); ui != F->user_end(); ++ui) {
-        Instruction* I = *ui;
+    for (auto I: F->user_set()) {
         string caller_name = I->function()->name();
         print_dot_line(caller_name, F->name());
         //_dot_ofs << '"' << caller_name << "\" -> \"" << F->name() << "\";\n";

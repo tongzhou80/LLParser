@@ -446,7 +446,7 @@ public:
             for (auto c: candidates) {
                 Function* alloc = SysDict::module()->get_function(c);
                 if (alloc) {
-                    for (auto I: alloc->user_list()) {
+                    for (auto I: alloc->user_set()) {
                         if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                             DILocation *loc = ci->debug_loc();
                             guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -519,7 +519,7 @@ public:
         std::map<CallInstFamily*, int> users_offsets;
         std::vector<CallInstFamily*> other_callers;
         if (!final) {
-            for (auto I: calleef->user_list()) {
+            for (auto I: calleef->user_set()) {
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -724,8 +724,8 @@ public:
             _black.clear();
             _has_overlapped_path = false;  // always assume this round is the last round
             //auto& users = _callers[malloc];
-            auto& users = malloc->user_list();
-            auto users_copy = users; // user_list might change during the iteration since new functions may be created
+            auto& users = malloc->user_set();
+            auto users_copy = users; // user_set might change during the iteration since new functions may be created
             for (auto uit = users_copy.begin(); uit != users_copy.end(); ++uit) {
                 Function* func = (*uit)->function();
                 do_clone(func);
@@ -750,7 +750,7 @@ public:
             _black.insert(f->name());
         }
 
-        auto& users = f->user_list();
+        auto& users = f->user_set();
         auto users_copy = users;
 
         int num = 0;

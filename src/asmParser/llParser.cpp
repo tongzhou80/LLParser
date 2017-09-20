@@ -724,9 +724,10 @@ Module* LLParser::parse() {
     SysDict::module()->resolve_debug_info();
     SysDict::module()->resolve_aliases();
 
+#ifndef PRODUCTION
     /* perform post check */
     SysDict::module()->check_after_parse();
-
+#endif
     PassManager* pm = PassManager::pass_manager;
     pm->apply_passes(module());
 

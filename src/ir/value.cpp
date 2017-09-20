@@ -43,8 +43,13 @@ string Value::prototype_name() {
     return orig->name();
 }
 
+void Value::append_user(Instruction *user) {
+    guarantee(_users.find(user) == _users.end(), "A value is used twice by instruction %p", user);
+    _users.insert(user);
+}
+
 void Value::remove_user(Instruction *user) {
-    auto& vec = user_list();
+    auto& vec = user_set();
     auto newend = std::remove(vec.begin(), vec.end(), user);
     vec.erase(newend, vec.end());
 }

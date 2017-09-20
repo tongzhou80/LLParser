@@ -115,7 +115,7 @@ public:
             Function* target = SysDict::module()->get_function(mf->old_name);
 
             if (target) {
-                Function::InstList users_copy = target->user_list();
+                auto users_copy = target->user_set();
                 for (auto it = users_copy.begin(); it != users_copy.end(); ++it) {
                     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(*it)) {
                         BasicBlock* parent = ci->parent();

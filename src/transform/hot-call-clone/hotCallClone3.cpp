@@ -558,7 +558,7 @@ public:
         std::vector<string> candidates = {"malloc", "calloc", "realloc"};
         for (auto c: candidates) {
             if (Function* alloc = SysDict::module()->get_function(c)) {
-                for (auto I: alloc->user_list()) {
+                for (auto I: alloc->user_set()) {
                     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                         DILocation *loc = ci->debug_loc();
                         guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -650,7 +650,7 @@ public:
         std::map<CallInstFamily*, int> users_offsets;
         std::vector<CallInstFamily*> other_callers;
         if (!final) {
-            for (auto I: calleef->user_list()) {
+            for (auto I: calleef->user_set()) {
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");

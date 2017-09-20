@@ -6,18 +6,23 @@
 #define LLPARSER_VALUE_H
 
 #include <map>
+#include <set>
 #include "shadow.h"
 #include "../utilities/macros.h"
 
 class Instruction;
 
 class Value: public Shadow {
+public:
+    typedef std::vector<Instruction*> InstList;
+    typedef InstList::iterator inst_iterator;
+    typedef std::set<Instruction*> InstSet;
 protected:
     string _name;
     //std::map<string, string> _properties;
     int _copy_cnt;
     Value* _copy_prototype;
-    std::vector<Instruction*> _users; 
+    InstSet _users;
 public:
     Value();
     virtual string name()                                { return _name; }
@@ -38,12 +43,9 @@ public:
     string prototype_name();
 
     /* caller/user interfaces */
-    void append_user(Instruction* user)                    { _users.push_back(user); }
-    typedef std::vector<Instruction*> InstList;
-    typedef InstList::iterator inst_iterator;
-    InstList& user_list()                                  { return _users; }
-    inst_iterator user_begin()                             { return _users.begin(); }
-    inst_iterator user_end()                               { return _users.end(); }
+    void append_user(Instruction* user);
+
+    InstSet& user_set()                                   { return _users; }
     void remove_user(Instruction* user);
 
 
