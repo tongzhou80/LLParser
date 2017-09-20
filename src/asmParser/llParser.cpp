@@ -305,10 +305,6 @@ Function* LLParser::parse_function_name_and_args() {
  */
 Function* LLParser::parse_function_header() {
     Function* func = create_function(line());
-
-    if (func->parent() == NULL) {
-        SysDict::module()->append_new_function(func);
-    }
     return func;
 }
 
@@ -408,6 +404,8 @@ void LLParser::parse_function_definition() {
             break;
         }
     }
+
+    SysDict::module()->append_new_function(func);
 }
 
 void LLParser::parse_basic_block_header(BasicBlock *bb) {
@@ -560,6 +558,7 @@ Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
 
 void LLParser::parse_function_declaration() {
     Function* func = parse_function_header();
+    SysDict::module()->append_new_function(func);
 }
 
 void LLParser::parse_attributes(Module *module) {

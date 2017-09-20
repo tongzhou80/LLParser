@@ -33,6 +33,7 @@ private:
     Language _lang;
     string _input_file;
     string _module_id;
+    bool _is_fully_resolved;
     std::map<string, string> _headers;
     std::vector<string> _module_level_inline_asms;
     std::vector<StructType*> _struct_list;
@@ -47,7 +48,7 @@ private:
     std::vector<MetaData*> _unnamed_metadata_list;
 public:
 
-    Module(): _lang(Language::c) {}
+    Module(): _lang(Language::c), _is_fully_resolved(false) {}
 
     Module::Language language()                            { return _lang; }
     void set_language(Language l)                          { _lang = l; }
@@ -67,6 +68,9 @@ public:
     void set_headers(const std::map<string, string> &_headers) {
         Module::_headers = _headers;
     }
+
+    bool is_fully_resolved()                                   { return _is_fully_resolved; }
+    void set_is_fully_resolved(bool v=1)                       { _is_fully_resolved = v; }
 
     std::vector<string> &module_level_inline_asms() {
         return _module_level_inline_asms;

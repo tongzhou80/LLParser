@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "irEssential.h"
 #include <inst/instEssential.h>
+#include <asmParser/sysDict.h>
 
 BasicBlock::BasicBlock(): Value() {
     // _instruction_list.reserve()
@@ -14,16 +15,12 @@ BasicBlock::BasicBlock(): Value() {
 }
 
 void BasicBlock::append_instruction(Instruction *ins) {
-    _instruction_list.push_back(ins);
-    ins->set_parent(this);
-
-    if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
-        _callinst_list.push_back(ci);
-    }
+    insert_instruction(instruction_list().size(), ins);
 }
 
-/**@brief During parsing instructions are appended to their parent using append_instruction.
- * This function is usually used to insert new generated instructions.
+/**@brief This function will be called both during parsing and during executing passes.
+ * The difference is that at parsing time, the current module's is_full_resolved is not
+ * set while this flag will be set after parsing and resolving is done.
  *
  * @param pos
  * @param ins
@@ -34,8 +31,15 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
     l.insert(l.begin()+pos, ins);
     ins->set_parent(this);
 
-    /* side effects */
-    check_insertion_side_effects_on_module(ins);
+    if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
+        _callinst_list.push_back(ci);
+    }
+
+    /* side effects, check current module first */
+    /* during parsing, this block's parent won't be inserted until the function body is parsed */
+    if (SysDict::module()->is_fully_resolved()) {
+        check_insertion_side_effects_on_module(ins);
+    }
 }
 
 void BasicBlock::check_insertion_side_effects_on_module(Instruction* ins) {
@@ -144,6 +148,7 @@ void BasicBlock::replace(iterator iter, Instruction *neu) {
     Instruction* old = *iter;
     *iter = neu;
 
+    /* assume the module should be fully resolved */
     check_deletion_side_effects_on_module(old);
     check_insertion_side_effects_on_module(neu);
 

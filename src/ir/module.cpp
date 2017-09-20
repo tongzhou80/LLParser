@@ -48,7 +48,9 @@ void Module::set_as_resolved(Function *f) {
     _function_list.push_back(f);
 }
 
-/**@brief Insert a new function into the module. Side effects of CallInstFamily will be applied.
+/**@brief This function will be called both during parsing and during executing passes.
+ * The difference is that at parsing time, the current module's is_full_resolved is not
+ * set while this flag will be set after parsing and resolving is done.
  *
  * @param pos
  * @param inserted
@@ -65,14 +67,17 @@ void Module::insert_new_function(int pos, Function *inserted) {
     }
 
     // iterate all the CallInstFamily of the inserted function
-    if (inserted->is_defined()) {
-        for (auto bit = inserted->begin(); bit != inserted->end(); ++bit) {
-            BasicBlock* bb = *bit;
-            for (auto ci: bb->callinst_list()) {
-                bb->check_insertion_side_effects_on_module(ci);
+    if (is_fully_resolved()) {
+        if (inserted->is_defined()) {
+            for (auto bit = inserted->begin(); bit != inserted->end(); ++bit) {
+                BasicBlock* bb = *bit;
+                for (auto ci: bb->callinst_list()) {
+                    bb->check_insertion_side_effects_on_module(ci);
+                }
             }
         }
     }
+
     auto& l = _function_list;
     l.insert(l.begin()+pos, inserted);
     inserted->set_parent(this);
