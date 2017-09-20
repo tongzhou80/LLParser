@@ -10,8 +10,8 @@
 #include "instParser.h"
 #include "llParser.h"
 
-std::vector<Module*> SysDict::modules;
-std::map<pthread_t, LLParser*> SysDict::thread_table;  // only used when ParallelModule is on
+std::map<pthread_t , Module*> SysDict::_thread_module_table;  // use pthread id to index
+std::map<string, Module*> SysDict::_module_table;  // use input file name to index
 LLParser* SysDict::parser = NULL;
 std::vector<Instruction*> SysDict::_inst_stack;
 //InstParser* SysDict::instParser = NULL;
@@ -32,7 +32,7 @@ void SysDict::destroy() {
 //    }
 
     if (ParallelModule) {
-        for (auto it: thread_table) {
+        for (auto it: thread_module_table()) {
             delete it.second;
         }
     }
@@ -66,13 +66,8 @@ bool SysDict::inst_stack_is_empty() {
     return ret;
 }
 
-Module* SysDict::module() {
-    guarantee(modules.size() > 0, " ");
-    return llparser()->module();
-}
-
 const string& SysDict::filename() {
-    return llparser()->filename();
+    return module()->input_file();
 }
 
 const string SysDict::filedir() {
@@ -85,38 +80,37 @@ const string SysDict::filedir() {
     }
 }
 
-/**
+/**@brief Register a module.
  *
- * ThreadLocal data is also initilized here
+ * ThreadLocal data is also initilized here.
+ * Hopefully the lock/unlock won't have much overhead in case of single thread.
  *
  * @param module
  */
-void SysDict::add_module(LLParser* parser) {
+void SysDict::add_module(Module* m) {
     Locks::module_list_lock->lock();
-    modules.push_back(parser->module());
+    module_table()[m->input_file()] = m;
     Locks::module_list_lock->unlock();
 
-    if (ParallelModule) {
-        Locks::thread_table_lock->lock();
-        thread_table[pthread_self()] = parser;
-        Locks::thread_table_lock->unlock();
-    }
+    Locks::thread_table_lock->lock();
+    thread_module_table()[pthread_self()] = m;
+    Locks::thread_table_lock->unlock();
 }
 
-LLParser* SysDict::llparser() {
-    if (ParallelModule) {
-        pthread_t id = pthread_self();
-        LLParser* lp;
+/**@brief Returns the current module.
+ * This method uses pthread_self() to do the lookup even if there is just one thread (with SysDict::parser).
+ *
+ * @return
+ */
+Module* SysDict::module() {
+    pthread_t id = pthread_self();
+    Module* m;
 
-        Locks::thread_table_lock->lock();
-        guarantee(thread_table.find(id) != thread_table.end(), " ");
-        lp = thread_table[id];
-        Locks::thread_table_lock->unlock();
-        return lp;
-    }
-    else {
-        return SysDict::parser;
-    }
+    Locks::thread_table_lock->lock();
+    guarantee(thread_module_table().find(id) != thread_module_table().end(), " ");
+    m = thread_module_table()[id];
+    Locks::thread_table_lock->unlock();
+    return m;
 }
 //
 //Module* SysDict::get_module(string name) {

@@ -13,12 +13,11 @@ class InstParser;
 
 class SysDict {
 public:
-    typedef std::map<pthread_t , Module*> ModuleTableType;
 private:
     static std::vector<Instruction*> _inst_stack;
-    static std::map<pthread_t , Module*> _module_table;
-    //static std::map<string, Module*> module_table;
-    static std::vector<Module*> _modules;
+    static std::map<pthread_t , Module*> _thread_module_table;
+    static std::map<string, Module*> _module_table;
+    //static std::vector<Module*> _modules;
 public:
 
     static void init();
@@ -32,7 +31,7 @@ public:
     static bool inst_stack_is_empty();
 
     /* thread specific */
-    static void add_module(LLParser* );
+    static void add_module(Module*);
     static LLParser* llparser();
     static Module* module();
     static const string& filename();
@@ -41,7 +40,8 @@ public:
     /* for UseSplitModule */
     static void merge_modules();
 
-
+    static std::map<pthread_t , Module*>& thread_module_table()                { return _thread_module_table; }
+    static std::map<string, Module*>& module_table()                           { return _module_table; }
 
     static LLParser* parser;
 

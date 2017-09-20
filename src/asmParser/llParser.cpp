@@ -700,7 +700,7 @@ Module* LLParser::parse() {
 
     _module = new Module();
     _module->set_input_file(filename());
-    SysDict::add_module(this);
+    SysDict::add_module(module());
 
     Timer t;
     t.start();

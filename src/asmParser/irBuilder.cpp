@@ -118,7 +118,6 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
         else {
             SysDict::llparser()->inst_parser()->parse(inst);
         }
-
     }
 
 //    if (sync) {
