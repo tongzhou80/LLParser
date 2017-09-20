@@ -416,7 +416,7 @@ public:
         std::vector<string> candidates = {"malloc", "calloc", "realloc", "_Znam", "_Znwm", "_ZdaPv", "_ZdlPv"};
         for (auto c: candidates) {
             if (Function* alloc = SysDict::module()->get_function(c)) {
-                for (auto I: alloc->user_set()) {
+                for (auto I: alloc->caller_list()) {
                     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                         DILocation *loc = ci->debug_loc();
                         guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -501,7 +501,7 @@ public:
         std::map<CallInstFamily*, int> users_offsets;
         std::vector<CallInstFamily*> other_callers;
         if (!final) {
-            for (auto I: calleef->user_set()) {
+            for (auto I: calleef->caller_list()) {
                 if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(I)) {
                     DILocation *loc = ci->debug_loc();
                     guarantee(loc, "This pass needs full debug info, please compile with -g");
@@ -735,7 +735,7 @@ public:
             _black.insert(f->name());
         }
 
-        auto& users = f->user_set();
+        auto& users = f->caller_list();
         auto users_copy = users;
 
         int num = 0;

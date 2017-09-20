@@ -50,8 +50,7 @@ void Value::append_user(Instruction *user) {
 
 void Value::remove_user(Instruction *user) {
     auto& vec = user_set();
-    auto newend = std::remove(vec.begin(), vec.end(), user);
-    vec.erase(newend, vec.end());
+    vec.erase(user);  // remove from set is simpler than remove from vector
 }
 
 void Value::print_to_file(const char *file) {
