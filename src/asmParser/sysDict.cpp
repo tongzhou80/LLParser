@@ -129,3 +129,10 @@ LLParser* SysDict::llparser() {
 //        return modules[name];
 //    }
 //}
+
+/**@brief Merge SysDict::modules into one module which is stored in SysDict::module()
+ *
+ */
+void SysDict::merge_modules() {
+
+}

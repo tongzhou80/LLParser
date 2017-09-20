@@ -43,12 +43,6 @@ int main(int argc, char** argv) {
      * callinst_list could be std::set, which is more error-resistent
      * structs and globals need more parsing
      */
-    if (UseSplitModule) {
-//        if (SysArgs::filenames().size() != 1) {
-//            fprintf(stderr, "UseSplitModule only accepts exactly one filename");
-//            exit(1);
-//        }
-    }
 
     pthread_t* tids = NULL;
     int file_num = SysArgs::filenames().size();
@@ -71,6 +65,10 @@ int main(int argc, char** argv) {
             pthread_join(tids[i], NULL);
     }
 
+    /* merge all modules into one */
+    if (UseSplitModule) {
+
+    }
 
     PassManager::pass_manager->apply_global_passes();
 

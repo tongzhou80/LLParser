@@ -33,6 +33,9 @@ public:
     static const string& filename();
     static const string filedir();
 
+    /* for UseSplitModule */
+    static void merge_modules();
+
     static std::map<pthread_t , LLParser*> thread_table;
     //static std::map<string, Module*> module_table;
     static std::vector<Module*> modules;

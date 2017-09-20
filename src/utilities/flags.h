@@ -20,34 +20,34 @@
 /* Use short name (develop, etc) instead of the long macro name */
 // #define GENERATE_RUNTIME_FLAGS(develop, product)
 #define GENERATE_RUNTIME_FLAGS(develop) \
-  develop(bool, DebugRun, 0,                              \
-         "")                                              \
-  develop(bool, ArgParsingVerbose, 0,                     \
-         "")                                              \
-  develop(bool, LazyParsing, 1,                           \
-         "")                                              \
-  develop(bool, UseLabelComments, 1,                      \
-         "")                                              \
-  develop(bool, ParallelModule, 0,                        \
-         "")                                              \
-  develop(bool, UseSplitModule, 0,                        \
-         "")                                              \
-  develop(bool, ParallelInstruction, 0,                   \
-         "")                                              \
-  develop(bool, PrintParsedLine, 0,                       \
-         "")                                              \
-  develop(bool, BasicBlockParsingVerbose, 0,              \
-         "")                                              \
-  develop(bool, FunctionParsingVerbose, 0,                \
-         "")                                              \
-  develop(bool, CallInstParsingVerbose, 0,                \
-         "")                                              \
-  develop(bool, InstructionParsingVerbose, 0,             \
-         "")                                              \
-  develop(bool, UseParseTimePasses, 0,                    \
-         "")                                              \
-  develop(bool, IgnoreIntrinsicCalls, 0,                  \
-         "")                                              \
+  develop(bool, DebugRun, 0,                                                              \
+         "")                                                                              \
+  develop(bool, ArgParsingVerbose, 0,                                                     \
+         "")                                                                              \
+  develop(bool, LazyParsing, 1,                                                           \
+         "")                                                                              \
+  develop(bool, UseLabelComments, 1,                                                      \
+         "")                                                                              \
+  develop(bool, ParallelModule, 0,                                                        \
+         "Parse all inputs in parallel")                                                  \
+  develop(bool, UseSplitModule, 0,                                                        \
+         "Load sliced sub-modules and merge all inputs into one module.")                 \
+  develop(bool, ParallelInstruction, 0,                                                   \
+         "")                                                                              \
+  develop(bool, PrintParsedLine, 0,                                                       \
+         "")                                                                              \
+  develop(bool, BasicBlockParsingVerbose, 0,                                              \
+         "")                                                                              \
+  develop(bool, FunctionParsingVerbose, 0,                                                \
+         "")                                                                              \
+  develop(bool, CallInstParsingVerbose, 0,                                                \
+         "")                                                                              \
+  develop(bool, InstructionParsingVerbose, 0,                                             \
+         "")                                                                              \
+  develop(bool, UseParseTimePasses, 0,                                                    \
+         "")                                                                              \
+  develop(bool, IgnoreIntrinsicCalls, 0,                                                  \
+         "")                                                                              \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG)
