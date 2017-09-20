@@ -28,7 +28,7 @@ Specifically, the following recipe gives you an idea of creating a new function 
 Below is an incomplete list of advantages LLParser could have over LLVM's library:
 
 - Construct data structures directly from strings.
-- No need to compile LLVM from source and study its enormous core libraries, which are not necessarily consistent across versions.
+- No need to compile LLVM from source and study its enormous APIs, which are not necessarily consistent between versions.
 - LLParser is much more light-weight, manageable and highly flexible.
 - Especially good for simple transformations such as inserting an instruction, adding an argument, etc.
 - No complex data structures, mostly raw STL, which is easy to handle.
@@ -51,39 +51,39 @@ Running `make` makes a `debug` directory where binaries and libraries are placed
 ## Run A Pass
 
 ```bash
-$ cd debug/bin
+$ cd build/bin
 $ ./sopt -load ../pass/libHello.so yourIR.ll
 ```
 
 ## Overview
 
 LLParser operates on LLVM assembly level and leverages existing standard LLVM tool chain. Any inputs
-need to be compiled to assembly form first using
-`clang -S -emit-llvm sourcefile.c`. If you have multiple source files, you might also want to link them
-using `llvm-link -S source1.ll source2.ll source3.ll -o linked.ll`
-
-LLParser scans the assembly file for one pass.
+need to be compiled to LLVM language form first using
+`clang -S -emit-llvm sourcefile.c`.
 
 
 ## Status
 
-LLParser is a young project and is in constant change. It should support LLVM 3.4+. LLVM 3.4's metadata format is different from later
-versions, so right now all of its metadata will be ignored. There are a few example passes in directory 
-`src/transform`, which implement transformations like:
+LLParser is a young project and is in constant change.
+It has been tested with the C/C++ benchmarks in [CPU2006](https://www.spec.org/cpu2006/) and should support LLVM 3.4+.
+LLVM 3.4's metadata format is different from later versions,
+so right now all of its metadata will be ignored.
+There are a few example passes in directory `src/transform`, which implement transformations like:
 
 - Function call replacement
-- Create call instruction
-- Output a call graph to a dot file. You can also only output call graphs for some specific functions
+- Create and insert call instruction/function
+- Output a call graph to a dot file
 
 Basically LLParser provides interfaces like 
 - Get a function by name from the input module
 - Get a list of all functions in the module
 - Get a list of all basic blocks in a function
+- Get a list of all instructions in a basic block
 - Get users of each function
 
-Which is similar to what `opt` does. A pass is also written in a similar way as the LLVM pass, such as defining your routine to run on each function, etc. 
+Sopt does what is similar to what `opt` does.
+A LLParser pass is also written in a similar way as the LLVM pass.
 
-TODO: add official programming guide for LLParser.
 
 Doxygen is hosted on [CodeDocs](https://codedocs.xyz/GentlyGuitar/LLParser/classes.html).
 
@@ -135,6 +135,9 @@ declare i32 @puts(i8* nocapture) nounwind
       - Base string parsing class
     - FileParser: StringParser
       - Base file parsing class
+
+
+### Parallelize Parsing
 
 The reason why instruction parsing is delegated to an InstParser instance instead of as part of a LLParser is
 to build a asynchronous model where the file parsing and instruction parsing could happen simultaneously.
