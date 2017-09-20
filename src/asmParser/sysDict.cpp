@@ -25,9 +25,8 @@ void SysDict::init() {
 }
 
 void SysDict::destroy() {
-    if (parser) {
-        delete parser;
-    }
+    delete parser;
+
 //    if (instParser) {
 //        delete instParser;
 //    }
