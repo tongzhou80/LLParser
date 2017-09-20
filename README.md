@@ -1,7 +1,7 @@
 ## LLParser
 
 LLParser is a light-weight LLVM assembly parser that is not dependent on LLVM libraries. It is designed
-for quick & dirty text-oriented manipulation of the LLVM assemblies.
+for quick & dirty text-oriented manipulation of LLVM assembly files.
 
 
 ## Build
@@ -9,17 +9,18 @@ for quick & dirty text-oriented manipulation of the LLVM assemblies.
 LLParser uses `CMake`. A typical build process starts with first creating a build directory in the project's root directory.
 
 ```bash
-$ mkdir build
-$ cd build
+$ mkdir cmake-build
+$ cd cmake-build
 $ cmake ..  # require at least cmake 3.5
 $ make
 ```
 
-Running `make` makes a `debug` directory where binaries and libraries are placed. 
+Running `make` makes a `build` directory where binaries and libraries are placed.
 
 ## Run A Pass
 
 ```bash
+# in project root directory
 $ cd build/bin
 $ ./sopt -load ../pass/libHello.so yourIR.ll
 ```
@@ -27,7 +28,7 @@ $ ./sopt -load ../pass/libHello.so yourIR.ll
 ## Overview
 
 The most prominent distinction between LLParser and LLVM's libraries is that LLParser
-is string-oriented, meaning it mainly operates on string, while LLVM's API is
+is string-oriented, meaning it mainly operates on string, while LLVM's API is highly
 object-oriented. For example, using LLVM's library, to create a call to a new function, you'd
 first need to create the function, to create which you first need to create the return type
 and a list of arguments. To create arguments you'd first need to create their corresponding types, etc.
