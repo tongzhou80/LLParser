@@ -143,6 +143,9 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParse
 }
 
 Function* IRBuilder::create_function_declaration(string &text, LLParser* llparser) {
+    if (llparser == NULL) {
+        llparser = SysDict::parser;
+    }
     Function* f = llparser->create_function(text);
     f->set_is_external();
     return f;

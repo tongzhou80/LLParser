@@ -67,6 +67,9 @@ int main(int argc, char** argv) {
     /* merge all modules into one */
     if (UseSplitModule) {
         SysDict::merge_modules();
+        SysDict::module()->resolve_after_parse();
+        PassManager* pm = PassManager::pass_manager;
+        pm->apply_passes(SysDict::module());
     }
 
     PassManager::pass_manager->apply_global_passes();
