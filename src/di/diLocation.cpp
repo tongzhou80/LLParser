@@ -14,14 +14,16 @@ DILocation::DILocation() {
     _inlinedAt = NULL;
 }
 
-void DILocation::resolve() {
+void DILocation::resolve_non_refs() {
     /* resolve direct symbols */
     DI_SET_INT_FIELD(line);
     DI_SET_INT_FIELD(column);
+
+}
+
+void DILocation::resolve_refs() {
     DI_SET_REF_FIELD(scope, DIScope);
     DI_SET_REF_FIELD(inlinedAt, DILocation);
-
-    set_is_resolved();
 }
 
 void DILocation::second_resolve() {

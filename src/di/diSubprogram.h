@@ -40,7 +40,8 @@ public:
         DISubprogram::_linkageName = _linkageName;
     }
 
-    void resolve() override ;
+    void resolve_non_refs();
+    void resolve_refs();
 };
 
 #endif //LLPARSER_DISUBPROGRAM_H

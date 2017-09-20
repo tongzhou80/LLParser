@@ -128,14 +128,14 @@ MetaData* Module::get_debug_info(int i) {
 void Module::resolve_debug_info() {
     std::vector<DILocation*> more;
     for (auto i: unnamed_metadata_list()) {
-        i->resolve();
+        i->resolve_refs();
         if (DILocation* loc = dynamic_cast<DILocation*>(i)) {
             more.push_back(loc);
         }
     }
 
-    for (auto it = more.begin(); it != more.end(); ++it) {
-        (*it)->second_resolve();
+    for (auto i: more) {
+        i->second_resolve();
     }
 
 //    for (auto i: unnamed_metadata_list()) {

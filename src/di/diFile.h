@@ -19,7 +19,7 @@ public:
     string directory()                         { return _directory; }
     void set_directory(string d)               { _directory = d; }
 
-    void resolve();
+    void resolve_non_refs();
 };
 
 #endif //LLPARSER_DIFILE_H

@@ -5,9 +5,12 @@
 #include "diLexicalBlock.h"
 #include "diFile.h"
 
-void DILexicalBlock::resolve() {
-    DI_SET_REF_FIELD(scope, DIScope);
-    DI_SET_REF_FIELD(file, DIFile);
+void DILexicalBlock::resolve_non_refs() {
     DI_SET_INT_FIELD(line);
     DI_SET_INT_FIELD(column);
+}
+
+void DILexicalBlock::resolve_refs() {
+    DI_SET_REF_FIELD(scope, DIScope);
+    DI_SET_REF_FIELD(file, DIFile);
 }

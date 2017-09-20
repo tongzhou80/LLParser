@@ -23,7 +23,8 @@ public:
     int discriminator()                                        { return _discriminator; }
     void set_discriminator(int l)                              { _discriminator = l; }
 
-    void resolve();
+    void resolve_non_refs();
+    void resolve_refs();
 
     string function();
     string dump(bool newline=true);

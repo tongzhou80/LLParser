@@ -629,6 +629,7 @@ void LLParser::parse_metadatas(Module *module) {
 
         data->set_raw_text(line());
         data->set_parent(module);
+        data->resolve_non_refs();
         get_real_line();
     }
 

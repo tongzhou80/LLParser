@@ -4,7 +4,7 @@
 
 #include "diFile.h"
 
-void DIFile::resolve() {
+void DIFile::resolve_non_refs() {
     DI_SET_STR_FIELD(filename);
     DI_SET_STR_FIELD(directory);
 }

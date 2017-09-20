@@ -37,7 +37,8 @@ public:
     string function_linkage_name();
     string dump(bool newline=true);
 
-    void resolve();
+    void resolve_non_refs();
+    void resolve_refs();
     void second_resolve();
 };
 

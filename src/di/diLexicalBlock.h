@@ -28,7 +28,8 @@ public:
     int column()                                      { return _column; }
     void set_column(int c)                            { _column = c; }
 
-    void resolve();
+    void resolve_non_refs();
+    void resolve_refs();
 
     string function();
     string dump(bool newline=true);
