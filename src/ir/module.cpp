@@ -259,9 +259,3 @@ void Module::check_after_parse() {
         }
     }
 }
-
-void Module::check_after_pass() {
-    for (auto F: function_list()) {
-
-    }
-}

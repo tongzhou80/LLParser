@@ -112,19 +112,50 @@ Module* SysDict::module() {
     Locks::thread_table_lock->unlock();
     return m;
 }
-//
-//Module* SysDict::get_module(string name) {
-//    if (modules.find(name) == modules.end()) {
-//        return NULL;
-//    }
-//    else {
-//        return modules[name];
-//    }
-//}
 
-/**@brief Merge SysDict::modules into one module which is stored in SysDict::module()
+Module* SysDict::get_module(string name) {
+    if (module_table().find(name) == module_table().end()) {
+        return NULL;
+    }
+    else {
+        return module_table()[name];
+    }
+}
+
+/**@brief Merge SysDict::module_table into one module. This method should be called in the main thread.
  *
+ * The main thread merges modules parsed by all worker threads, and register the new module.
+ * The merging is specific to the naming of sliced files. This method destroys all old modules.
  */
 void SysDict::merge_modules() {
+    Module* head = get_module("head");
+    for (int i = 0; ; ++i) {
+        Module* piece = get_module("func"+std::to_string(i));
+        if (piece == NULL) {
+            break;
+        }
+        else {
+            auto& l = head->function_list();
+            auto& m = head->function_map();
+            l.insert(l.end(), piece->function_list().begin(), piece->function_list().end());
+            m.insert(piece->function_map().begin(), piece->function_map().end());
+            delete piece;  // won't delete the actual instructions of the deleted module
+        }
+    }
 
+    for (int i = 0; ; ++i) {
+        Module* piece = get_module("debug"+std::to_string(i));
+        if (piece == NULL) {
+            break;
+        }
+        else {
+            auto& l = head->unnamed_metadata_list();
+            l.insert(l.end(), piece->unnamed_metadata_list().begin(), piece->unnamed_metadata_list().end());
+            delete piece;
+        }
+    }
+
+    module_table().clear();
+    thread_module_table().clear();
+    add_module(head);
 }

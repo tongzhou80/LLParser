@@ -16,7 +16,7 @@ public:
         _output_dir = ".";
     }
 
-    bool run_on_module(Module* module) {
+    bool run_on_module(Module* module) override {
         auto ncores = std::thread::hardware_concurrency();
         if (ncores < 4) {
             fprintf(stderr, "The number of cores should at least be 4, but got %d", ncores);

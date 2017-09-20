@@ -23,13 +23,11 @@ public:
     static void init();
     static void destroy();
 
-    //static Module* get_module(string name);
-
-
     static void worker_push_inst(Instruction*);
     static Instruction* worker_fetch_instruction();
     static bool inst_stack_is_empty();
 
+    static Module* get_module(string name);
     /* thread specific */
     static void add_module(Module*);
     static LLParser* llparser();
