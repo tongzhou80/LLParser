@@ -40,7 +40,7 @@ public:
         DISubprogram::_linkageName = _linkageName;
     }
 
-    void resolve();
+    void resolve() override ;
 };
 
 #endif //LLPARSER_DISUBPROGRAM_H
