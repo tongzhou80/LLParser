@@ -18,10 +18,14 @@
  *
  * @param text: the string representing the instruction
  * @param bb: defaults to zero, if specified, the new instruction will be appended to bb
- * @param sync: in the single threaded model, sync = true
+ * @param llparser: specify which llparser to use, defaults to SysDict::parser
  * @return
  */
-Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sync) {
+Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParser* llparser) {
+    if (llparser == NULL) {
+        llparser = SysDict::parser;
+    }
+
     string op;
     string name;
     bool has_assignment = true;
@@ -116,7 +120,7 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
             SysDict::worker_push_inst(inst);
         }
         else {
-            SysDict::llparser()->inst_parser()->parse(inst);
+            llparser->inst_parser()->parse(inst);
         }
     }
 
@@ -138,8 +142,8 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, bool sy
     return inst;
 }
 
-Function* IRBuilder::create_function_declaration(string &text) {
-    Function* f = SysDict::llparser()->create_function(text);
+Function* IRBuilder::create_function_declaration(string &text, LLParser* llparser) {
+    Function* f = llparser->create_function(text);
     f->set_is_external();
     return f;
 }

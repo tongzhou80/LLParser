@@ -535,7 +535,7 @@ void LLParser::parse_debug_info(Instruction* inst) {
 
 Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
     // inst will be appended to bb
-    Instruction* inst = IRBuilder::create_instruction(line(), bb);
+    Instruction* inst = IRBuilder::create_instruction(line(), bb, this);
     if (InstructionParsingVerbose) {
         printf("Inst line raw: %s\n", line().c_str());
     }

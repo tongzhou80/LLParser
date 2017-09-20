@@ -15,7 +15,7 @@ public:
     }
 
     bool run_on_global() {
-        printf("number of modules: %d\n", SysDict::modules.size());
+        printf("number of modules: %lu\n", SysDict::module_table().size());
     }
 };
 

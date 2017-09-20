@@ -8,13 +8,14 @@
 #include <utilities/macros.h>
 #include <ir/basicBlock.h>
 
+class LLParser;
 class Instruction;
 class Function;
 
 class IRBuilder {
 public:
-    static Instruction* create_instruction(string& text, BasicBlock* bb=NULL, bool sync=1);
-    static Function* create_function_declaration(string& text);
+    static Instruction* create_instruction(string& text, BasicBlock* bb=NULL, LLParser* llparser=NULL);
+    static Function* create_function_declaration(string& text, LLParser* llparser=NULL);
 };
 
 #endif //LLPARSER_INSTBUILDER_H
