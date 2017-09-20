@@ -1,39 +1,8 @@
 ## LLParser
 
 LLParser is a light-weight LLVM assembly parser that is not dependent on LLVM libraries. It is designed
-for quick & dirty text-oriented manipulation of the LLVM assemblies. If you need to write a LLVM pass 
-but do not want to use LLVM as a library to avoid complexity, LLParser is for you.
+for quick & dirty text-oriented manipulation of the LLVM assemblies.
 
-The most prominent distinction between LLParser and LLVM's libraries is that LLParser 
-is string-oriented, meaning it mainly operates on string, while LLVM's API is
-object-oriented. For example, using LLVM's library, to create a call to a new function, you'd 
-first need to create the function, to create which you first need to create the return type 
-and a list of arguments. To create arguments you'd first need to create their corresponding types, etc.
-While using LLParser, you can simple write create a function by making a string such as 
-"declare void @myfunction(i32)", and then call `IRBuilder::create_function_declaration` and pass 
-the string as the parameter, which returns a pointer to a data structure that represents the function. 
-Specifically, the following recipe gives you an idea of creating a new function call and inserting it:
-
-- Find the insertion position
-- Create a new instruction by literally writing the text of it in LLVM language
-  - Such as `call void @yourfunction(i32 100)`
-- Pass the text to IRBuilder to automatically build an instruction in memory according to your text
-- Insert the instruction into the basic block
-- Create a new function declaration by writing the text of it in LLVM language
-  - Such as `declare void @yourfunction(i32);`
-- Likewise, create a function in memory from the string
-- Insert the new function declaration into the module
-- Write the modified module back to file
-
-Below is an incomplete list of advantages LLParser could have over LLVM's library:
-
-- Construct data structures directly from strings.
-- No need to compile LLVM from source and study its enormous APIs, which are not necessarily consistent between versions.
-- LLParser is much more light-weight, manageable and highly flexible.
-- Especially good for simple transformations such as inserting an instruction, adding an argument, etc.
-- No complex data structures, mostly raw STL, which is easy to handle.
-
-LLParser also implements hot-pluggable passes, so that your pass can be loaded at run time by specifying in the command line.
 
 ## Build
 
@@ -56,6 +25,37 @@ $ ./sopt -load ../pass/libHello.so yourIR.ll
 ```
 
 ## Overview
+
+The most prominent distinction between LLParser and LLVM's libraries is that LLParser
+is string-oriented, meaning it mainly operates on string, while LLVM's API is
+object-oriented. For example, using LLVM's library, to create a call to a new function, you'd
+first need to create the function, to create which you first need to create the return type
+and a list of arguments. To create arguments you'd first need to create their corresponding types, etc.
+While using LLParser, you can simple write create a function by making a string such as
+"declare void @myfunction(i32)", and then call `IRBuilder::create_function_declaration` and pass
+the string as the parameter, which returns a pointer to a data structure that represents the function.
+Specifically, the following recipe gives you an idea of creating a new function call and inserting it:
+
+- Find the insertion position
+- Create a new instruction by literally writing the text of it in LLVM language
+  - Such as `call void @yourfunction(i32 100)`
+- Pass the text to IRBuilder to automatically build an instruction in memory according to your text
+- Insert the instruction into the basic block
+- Create a new function declaration by writing the text of it in LLVM language
+  - Such as `declare void @yourfunction(i32);`
+- Likewise, create a function in memory from the string
+- Insert the new function declaration into the module
+- Write the modified module back to file
+
+Below is an incomplete list of advantages LLParser could have over LLVM's library:
+
+- Construct data structures directly from strings.
+- No need to compile LLVM from source and study its enormous APIs, which are not necessarily consistent between versions.
+- LLParser is much more light-weight, manageable and highly flexible.
+- Especially good for simple transformations such as inserting an instruction, adding an argument, etc.
+- No complex data structures, mostly raw STL, which is easy to handle.
+
+LLParser also implements hot-pluggable passes, so that your pass can be loaded at run time by specifying in the command line.
 
 LLParser operates on LLVM assembly level and leverages existing standard LLVM tool chain. Any inputs
 need to be compiled to LLVM language form first using
