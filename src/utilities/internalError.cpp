@@ -153,7 +153,7 @@ void Errors::sigsegv_handler(int sig, siginfo_t *info, void *secret) {
     int i, trace_size = 0;
     ucontext_t *uc = (ucontext_t *)secret;
 
-    printf("faulty input file: %s", SysDict::filename().c_str());
+    //printf("faulty input file: %s", SysDict::filename().c_str());
 
     /* Do something useful with siginfo_t */
     if (sig == SIGSEGV)

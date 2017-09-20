@@ -40,7 +40,6 @@ int main(int argc, char** argv) {
     PassManager::init();
 
     /* todo:
-     * callinst_list could be std::set, which is more error-resistent
      * structs and globals need more parsing
      */
 

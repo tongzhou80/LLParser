@@ -628,6 +628,7 @@ void LLParser::parse_metadatas(Module *module) {
         }
 
         data->set_raw_text(line());
+        data->set_parent(module);
         get_real_line();
     }
 
@@ -724,12 +725,10 @@ Module* LLParser::parse() {
 
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
-    module()->resolve_callinsts();
-    module()->resolve_debug_info();
-    module()->resolve_aliases();
-
+    module()->resolve_after_parse();
     t.stop();
     zpl("%.2f seconds", t.seconds())
+    t.resume();
 
 #ifndef PRODUCTION
     /* perform post check */

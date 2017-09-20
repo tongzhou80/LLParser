@@ -2,6 +2,8 @@
 // Created by tlaber on 6/9/17.
 //
 
+#include <libgen.h>
+#include <string.h>
 #include <utilities/mutex.h>
 #include <utilities/flags.h>
 #include <asmParser/llParserTLS.h>
@@ -80,6 +82,7 @@ const string SysDict::filedir() {
     }
 }
 
+
 /**@brief Register a module.
  *
  * ThreadLocal data is also initilized here.
@@ -89,7 +92,8 @@ const string SysDict::filedir() {
  */
 void SysDict::add_module(Module* m) {
     Locks::module_list_lock->lock();
-    module_table()[m->input_file()] = m;
+
+    module_table()[basename(strdup(m->input_file().c_str()))] = m;
     Locks::module_list_lock->unlock();
 
     Locks::thread_table_lock->lock();
@@ -129,6 +133,7 @@ Module* SysDict::get_module(string name) {
  */
 void SysDict::merge_modules() {
     Module* head = get_module("head");
+    guarantee(head, "UseSplitModule cannot find a file called 'head'");
     for (int i = 0; ; ++i) {
         Module* piece = get_module("func"+std::to_string(i));
         if (piece == NULL) {
@@ -157,5 +162,6 @@ void SysDict::merge_modules() {
 
     module_table().clear();
     thread_module_table().clear();
+
     add_module(head);
 }

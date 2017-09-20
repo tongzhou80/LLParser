@@ -30,10 +30,11 @@ public:
     static Module* get_module(string name);
     /* thread specific */
     static void add_module(Module*);
-    static LLParser* llparser();
+    /* all these functions assume thread_module_table has been constructed */
     static Module* module();
     static const string& filename();
     static const string filedir();
+
 
     /* for UseSplitModule */
     static void merge_modules();

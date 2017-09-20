@@ -2,10 +2,11 @@
 // Created by GentlyGuitar on 6/6/2017.
 //
 
-
+#include <thread>
 #include "irEssential.h"
 #include <inst/instEssential.h>
 #include <di/diEssential.h>
+#include <utilities/flags.h>
 
 string Module::get_header(string key) {
      if (_headers.find(key) == _headers.end()) {
@@ -126,11 +127,9 @@ MetaData* Module::get_debug_info(int i) {
 
 void Module::resolve_debug_info() {
     std::vector<DILocation*> more;
-    auto& l = _unnamed_metadata_list;
-    for (auto it = l.begin(); it != l.end(); ++it) {
-        (*it)->resolve();
-        DILocation* loc = dynamic_cast<DILocation*>(*it);
-        if (loc) {
+    for (auto i: unnamed_metadata_list()) {
+        i->resolve();
+        if (DILocation* loc = dynamic_cast<DILocation*>(i)) {
             more.push_back(loc);
         }
     }
@@ -138,6 +137,16 @@ void Module::resolve_debug_info() {
     for (auto it = more.begin(); it != more.end(); ++it) {
         (*it)->second_resolve();
     }
+
+//    for (auto i: unnamed_metadata_list()) {
+//        i->resolve();
+//    }
+//
+//    for (auto i: unnamed_metadata_list()) {
+//        if (DILocation* loc = dynamic_cast<DILocation*>(i)) {
+//            loc->second_resolve();
+//        }
+//    }
 }
 
 void Module::resolve_callinsts() {
@@ -161,6 +170,26 @@ void Module::resolve_aliases() {
         Function* f = get_function(a->get_raw_field("aliasee"));
         guarantee(f, " ");
         a->set_aliasee(f);
+    }
+}
+
+void Module::resolve_callinsts_and_aliases() {
+    resolve_callinsts();
+    resolve_aliases();
+}
+
+void Module::resolve_after_parse() {
+    if (ParallelModule) {
+        std::thread t1(&Module::resolve_debug_info, this);
+        //std::thread t1([=] { resolve_debug_info();});
+        resolve_callinsts();
+        resolve_aliases();
+        t1.join();
+    }
+    else {
+        resolve_callinsts();
+        resolve_aliases();
+        resolve_debug_info();
     }
 }
 

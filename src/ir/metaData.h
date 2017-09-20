@@ -11,12 +11,15 @@ class MetaData: public Value {
 protected:
     bool _is_resolved;
     int _number; //  for unnamed metadata
-
+    Module* _parent;
 public:
-    MetaData(): _is_resolved(false), _number(-1) {}
+    MetaData(): _is_resolved(false), _number(-1), _parent(NULL) {}
 
     void set_number(int n)                                       { _number = n; }
     int number()                                                 { return _number; }
+
+    Module* parent()                                             { return _parent; }
+    void set_parent(Module* m)                                   { _parent = m; }
 
     MetaData* get_reference_by_value(string md_id);
     MetaData* get_reference_by_key(string field);

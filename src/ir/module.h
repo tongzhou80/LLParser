@@ -140,11 +140,12 @@ public:
 
     // check
     void check_after_parse();
-    void check_after_pass();
 
+    void resolve_after_parse();
     void resolve_callinsts();
     void resolve_debug_info();
     void resolve_aliases();
+    void resolve_callinsts_and_aliases();  // just for parallel purpose
 };
 
 
