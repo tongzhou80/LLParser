@@ -7,6 +7,8 @@
 
 #include "value.h"
 
+class Module;
+
 class MetaData: public Value {
 protected:
     bool _is_resolved;
