@@ -142,7 +142,11 @@ void SysDict::merge_modules() {
         else {
             auto& l = head->function_list();
             auto& m = head->function_map();
-            l.insert(l.end(), piece->function_list().begin(), piece->function_list().end());
+            //l.insert(l.end(), piece->function_list().begin(), piece->function_list().end());
+            for (auto F: piece->function_list()) {
+                l.push_back(F);
+                F->set_parent(head);
+            }
             m.insert(piece->function_map().begin(), piece->function_map().end());
             delete piece;  // won't delete the actual instructions of the deleted module
         }
@@ -155,7 +159,11 @@ void SysDict::merge_modules() {
         }
         else {
             auto& l = head->unnamed_metadata_list();
-            l.insert(l.end(), piece->unnamed_metadata_list().begin(), piece->unnamed_metadata_list().end());
+            //l.insert(l.end(), piece->unnamed_metadata_list().begin(), piece->unnamed_metadata_list().end());
+            for (auto data: piece->unnamed_metadata_list()) {
+                l.push_back(data);
+                data->set_parent(head);
+            }
             delete piece;
         }
     }
