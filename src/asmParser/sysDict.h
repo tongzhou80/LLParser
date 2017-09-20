@@ -8,12 +8,17 @@
 #include <vector>
 #include <ir/irEssential.h>
 
-
 class LLParser;
 class InstParser;
 
 class SysDict {
+public:
+    typedef std::map<pthread_t , Module*> ModuleTableType;
+private:
     static std::vector<Instruction*> _inst_stack;
+    static std::map<pthread_t , Module*> _module_table;
+    //static std::map<string, Module*> module_table;
+    static std::vector<Module*> _modules;
 public:
 
     static void init();
@@ -36,9 +41,8 @@ public:
     /* for UseSplitModule */
     static void merge_modules();
 
-    static std::map<pthread_t , LLParser*> thread_table;
-    //static std::map<string, Module*> module_table;
-    static std::vector<Module*> modules;
+
+
     static LLParser* parser;
 
     //static InstParser* instParser;

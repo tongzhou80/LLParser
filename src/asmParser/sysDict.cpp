@@ -101,7 +101,6 @@ void SysDict::add_module(LLParser* parser) {
         thread_table[pthread_self()] = parser;
         Locks::thread_table_lock->unlock();
     }
-
 }
 
 LLParser* SysDict::llparser() {
