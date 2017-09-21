@@ -61,7 +61,7 @@ void PassManager::destroy() {
 }
 
 /* for debug, addr2line can't show line numbers in a .so */
-#include <transform/hot-call-clone/hotCallClone3.cpp>
+//#include <transform/hot-call-clone/hotCallClone3.cpp>
 #include <transform/call-clone/callClone.cpp>
 #include <transform/call-clone/contextGenerator.cpp>
 #include <transform/call-graph/callGraph.cpp>
