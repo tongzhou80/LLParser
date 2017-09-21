@@ -43,6 +43,10 @@ void Flags::set_flag(std::string key, bool v) {
     }
     assert(f->type == 'b' && "option type must be bool");
     *(bool*)(f->value) = v;
+
+    if (key == "UseSplitModule") {
+        set_flag("ParallelModule", true);
+    }
 }
 
 void Flags::set_flag(std::string key, int v) {
