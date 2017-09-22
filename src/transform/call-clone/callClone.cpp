@@ -620,7 +620,6 @@ public:
         return false;
     }
 
-
     bool run_on_module(Module* module) {
         ContextGenerator cg;
         cg.generate(module, "malloc", 3); // todo other allocs

@@ -29,22 +29,22 @@ $ ./sopt -load ../pass/libHello.so yourIR.ll
 
 The most prominent distinction between LLParser and LLVM's libraries is that LLParser
 is string-oriented, meaning it mainly operates on string, while LLVM's API is highly
-object-oriented. For example, using LLVM's library, to create a call to a new function, you'd
-first need to create the function, to create which you first need to create the return type
-and a list of arguments. To create arguments you'd first need to create their corresponding types, etc.
-While using LLParser, you can simple write create a function by making a string such as
-"declare void @myfunction(i32)", and then call `IRBuilder::create_function_declaration` and pass
-the string as the parameter, which returns a pointer to a data structure that represents the function.
+object-oriented. For example, using LLVM's library, to create a call to a new function,
+you'd first need to create the function object, to create which you need to create the objects for
+the return type and a list of arguments.
+To create arguments you'd first need to create their corresponding types, etc.
+While using LLParser, you can create a function instance by simply passing a string such as
+`declare void @myfunction(i32)` to `IRBuilder::create_function_declaration`.
+
 Specifically, the following recipe gives you an idea of creating a new function call and inserting it:
 
 - Find the insertion position
-- Create a new instruction by literally writing the text of it in LLVM language
+- Create a new instruction by literally writing it in LLVM language
   - Such as `call void @yourfunction(i32 100)`
 - Pass the text to IRBuilder to automatically build an instruction in memory according to your text
 - Insert the instruction into the basic block
-- Create a new function declaration by writing the text of it in LLVM language
-  - Such as `declare void @yourfunction(i32);`
-- Likewise, create a function in memory from the string
+- Create a new function declaration by writing it in LLVM language, or else `yourfunction` is undefined
+  - Pass string `declare void @yourfunction(i32);` to `IRBuilder::create_function_declaration`
 - Insert the new function declaration into the module
 - Write the modified module back to file
 
@@ -53,7 +53,7 @@ Below is an incomplete list of advantages LLParser could have over LLVM's librar
 - Construct data structures directly from strings.
 - No need to compile LLVM from source and study its enormous APIs, which are not necessarily consistent between versions.
 - LLParser is much more light-weight, manageable and highly flexible.
-- Especially good for simple transformations such as inserting an instruction, adding an argument, etc.
+- Especially handy for simple transformations such as inserting an instruction, adding an argument, etc.
 - No complex data structures, mostly raw STL, which is easy to handle.
 
 LLParser also implements hot-pluggable passes, so that your pass can be loaded at run time by specifying in the command line.
@@ -71,11 +71,11 @@ need to be compiled to LLVM language form first using
 - Create `cmake-build` directory and do `cd cmake-build && cmake .. && make`
 
 The build process of the pass is similar to LLVM's pass or Intel Pin's tool.
-For now each pass's CMakeLists.txt is highly dependent on relative path to
+For now each pass's CMakeLists.txt highly relies on the hard-wired relative path to
 actually place the library in the LLParser' build directory.
 
 Alternatively, you can add the pass as an a target in the root CMakeLists.txt,
-instead of creating a sub-CMakelists.txt in the pass direcotry. 
+instead of creating a sub-CMakelists.txt in the pass directory.
 
 
 ## Status
