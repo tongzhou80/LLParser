@@ -68,11 +68,14 @@ need to be compiled to LLVM language form first using
 - Create a directory under transform which would be the root directory of your customized pass
 - Copy a pass class from `src/transform/examples/examplePasses.cpp` as well as the `src/transform/examples/CMakeLists.txt`
 - Modify the pass source file and the CMakeLists.txt according to your project
-- Create `cmake-build` directory and do `cmake .. && make`
+- Create `cmake-build` directory and do `cd cmake-build && cmake .. && make`
 
 The build process of the pass is similar to LLVM's pass or Intel Pin's tool.
 For now each pass's CMakeLists.txt is highly dependent on relative path to
 actually place the library in the LLParser' build directory.
+
+Alternatively, you can add the pass as an a target in the root CMakeLists.txt,
+instead of creating a sub-CMakelists.txt in the pass direcotry. 
 
 
 ## Status
