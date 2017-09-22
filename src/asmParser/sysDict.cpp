@@ -132,10 +132,10 @@ Module* SysDict::get_module(string name) {
  * The merging is specific to the naming of sliced files. This method destroys all old modules.
  */
 void SysDict::merge_modules() {
-    Module* head = get_module("head");
-    guarantee(head, "UseSplitModule cannot find a file called 'head'");
+    Module* head = get_module("head.sm");
+    guarantee(head, "UseSplitModule cannot find a file called 'head.sm'");
     for (int i = 0; ; ++i) {
-        Module* piece = get_module("func"+std::to_string(i));
+        Module* piece = get_module("func"+std::to_string(i)+".sm");
         if (piece == NULL) {
             break;
         }
@@ -153,7 +153,7 @@ void SysDict::merge_modules() {
     }
 
     for (int i = 0; ; ++i) {
-        Module* piece = get_module("debug"+std::to_string(i));
+        Module* piece = get_module("debug"+std::to_string(i)+".sm");
         if (piece == NULL) {
             break;
         }

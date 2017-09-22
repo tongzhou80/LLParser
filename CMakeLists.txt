@@ -13,11 +13,14 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/bin")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/passes/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build/passes/")
 
+file(GLOB pass_cmakelists
+        "src/transform/*/CMakeLists.txt"
+        )
+# include(${pass_cmakelists})  # uncomment to make each pass a individual project
 
-add_library(Hello SHARED src/transform/hello/hello.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
 add_library(CallClone SHARED src/transform/call-clone/callClone.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
@@ -31,7 +34,6 @@ add_library(SplitModule SHARED src/transform/split-module/splitModule.cpp)
 set_target_properties(NewClone PROPERTIES COMPILE_FLAGS "-g -rdynamic")
 
 install(TARGETS
-        Hello
         GlobalHello
         Malloc
         CallClone

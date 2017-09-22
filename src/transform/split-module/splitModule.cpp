@@ -33,7 +33,7 @@ public:
     }
 
     void print_other_data(Module* m) {
-        std::ofstream ofs(_output_dir+"/head");
+        std::ofstream ofs(_output_dir+"/head.sm");
 
         ofs << "; ModuleID = '" << m->module_id() << "'\n";
         for (auto pair: m->headers()) {
@@ -77,7 +77,7 @@ public:
                 if (ofs.is_open()) {
                     ofs.close();
                 }
-                ofs.open(_output_dir+"/func"+std::to_string(i/nfunc_per_file));
+                ofs.open(_output_dir+"/func"+std::to_string(i/nfunc_per_file)+".sm");
 
                 ofs << "; ModuleID = '" << m->module_id() << "'\n";
                 for (auto pair: m->headers()) {
@@ -108,7 +108,7 @@ public:
                 if (ofs.is_open()) {
                     ofs.close();
                 }
-                ofs.open(_output_dir+"/debug"+std::to_string(i/nfunc_per_file));
+                ofs.open(_output_dir+"/debug"+std::to_string(i/nfunc_per_file)+".sm");
 
                 ofs << "; ModuleID = '" << m->module_id() << "'\n";
                 for (auto pair: m->headers()) {

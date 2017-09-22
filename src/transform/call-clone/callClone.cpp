@@ -229,45 +229,6 @@ public:
         }
 
     }
-//
-    void update_callee_in_path(XPS_Caller* caller, Function* new_callee) {
-        auto& stack = caller->xps_path->path;
-        if (caller->caller == NULL && stack[stack.size()-1]->function() == new_callee->copy_prototype()) {
-            auto callee_call = stack[stack.size()-1];
-            int i_index = callee_call->get_index_in_block();
-            int b_index = callee_call->parent()->get_index_in_function();
-            //zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
-            auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-            stack[stack.size()-1] = ci_in_new_callee;
-            zpl("path pos %d to %s", stack.size()-1, ci_in_new_callee->function()->name_as_c_str())
-            check_path(stack);
-            return;
-        }
-
-        for (int i = 1; i < stack.size(); ++i) {
-            CallInstFamily* I = stack[i];
-            if (I == caller->caller) {
-
-
-                I->replace_callee(new_callee->name());
-
-                auto callee_call = stack[i-1];
-                int i_index = callee_call->get_index_in_block();
-                int b_index = callee_call->parent()->get_index_in_function();
-
-                auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-                stack[i-1] = ci_in_new_callee;
-
-                if (CloneVerbose) {
-                    zpl("in callinst %p repalce %s to %s", I, I->called_function()->name_as_c_str(), new_callee->name_as_c_str())
-                    zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
-                    zpl("path pos %d to %s", i-1, ci_in_new_callee->function()->name_as_c_str())
-                }
-
-                check_path(stack);
-            }
-        }
-    }
 
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
         bool is_replaced = false;
@@ -575,8 +536,6 @@ public:
             }
         }
 
-
-
         if (final) {
             if (!_caller.empty()) {
                 if (Alias* alias = SysDict::module()->get_alias(_caller)) {
@@ -593,8 +552,6 @@ public:
             }
 
         }
-
-
 
         if (MatchVerbose) {
             if (final) {
@@ -665,6 +622,12 @@ public:
 
 
     bool run_on_module(Module* module) {
+        ContextGenerator cg;
+        cg.generate(module, "malloc", 3); // todo other allocs
+        cg.generate(module, "calloc", 3); // todo other allocs
+        cg.generate(module, "realloc", 3); // todo other allocs
+
+
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));
             zpd(_min_cxt)
@@ -681,29 +644,31 @@ public:
         else {
             load_hot_aps_file("contexts.txt");
         }
-//        get_distinct_all_paths();
-//
+        get_distinct_all_paths();
+        check_all_paths();
+
 //        if (PathCheck)
 //            check_all_paths();
-//        int round = 0;
-//        while (!_done) {
-//            do_one();
-//            if (CloneVerbose) {
-//                zpl("one clone done.")
-//            }
+        int round = 0;
+        while (!_done) {
+            do_one();
+            if (CloneVerbose) {
+                zpl("one clone done.")
+            }
+
+            round++;
+        }
 //
-//            round++;
-//        }
-//
-//        replace_malloc();
-//
-//        string out = SysArgs::get_option("output");
-//        if (out.empty()) {
-//            out = SysDict::filename() + '.' + name();
-//        }
-//        zps(out.c_str())
-//        SysDict::module()->print_to_file(out);
-//
+        replace_malloc();
+
+        string out = SysArgs::get_option("output");
+        if (out.empty()) {
+            out = SysDict::filename() + '.' + name();
+        }
+        zps(out.c_str())
+        SysDict::module()->print_to_file(out);
+
+        check_all_paths();
 //        if (PathCheck) {
 //            check_all_paths();
 //        }

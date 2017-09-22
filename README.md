@@ -6,7 +6,7 @@ for quick & dirty text-oriented manipulation of LLVM assembly files.
 
 ## Build
 
-LLParser uses `CMake`. A typical build process starts with first creating a build directory in the project's root directory.
+LLParser uses `CMake` and requires `CMake >= 3.5` and `GCC >= 4.8`. A typical build process starts with first creating a build directory in the project's root directory.
 
 ```bash
 $ mkdir cmake-build
@@ -61,6 +61,18 @@ LLParser also implements hot-pluggable passes, so that your pass can be loaded a
 LLParser operates on LLVM assembly level and leverages existing standard LLVM tool chain. Any inputs
 need to be compiled to LLVM language form first using
 `clang -S -emit-llvm sourcefile.c`.
+
+
+## Write A LLParser Pass
+
+- Create a directory under transform which would be the root directory of your customized pass
+- Copy a pass class from `src/transform/examples/examplePasses.cpp` as well as the `src/transform/examples/CMakeLists.txt`
+- Modify the pass source file and the CMakeLists.txt according to your project
+- Create `cmake-build` directory and do `cmake .. && make`
+
+The build process of the pass is similar to LLVM's pass or Intel Pin's tool.
+For now each pass's CMakeLists.txt is highly dependent on relative path to
+actually place the library in the LLParser' build directory.
 
 
 ## Status
