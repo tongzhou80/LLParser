@@ -526,6 +526,9 @@ void LLParser::set_line_to_full_instruction() {
 }
 
 void LLParser::parse_debug_info(Instruction* inst) {
+    /* there could be some other metadata following the !dbg such as
+     * br label %9, !dbg !313, !llvm.loop !314
+     */
     string head = ", !dbg !";
     guarantee(Strings::startswith(line(), head), "Bad debug info");
     inc_inline_pos(head.size());

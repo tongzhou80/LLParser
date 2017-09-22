@@ -410,13 +410,40 @@ void InstParser::do_bitcast(Instruction *inst) {
 
 }
 
-void InstParser::do_branch(Instruction *inst) {
-    BranchInst* I = dynamic_cast<BranchInst*>(inst);
-    const char* op = "br";
-    guarantee(I, "Not a %s inst", op);
-    get_word('=');
-    get_word();
-    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
+//void InstParser::skip_and_check_opcode(const char* op, Instruction *inst) {
+//    if (inst->has_assignment())
+//        get_word('=');
+//    get_word();
+//    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
+//}
 
-    
+void InstParser::do_branch(Instruction *inst) {
+    /* Corner cases:
+     * 1. br i1 %1352, label %1353, label %1312, !llvm.loop !110422
+     *
+     */
+    BranchInst* I = dynamic_cast<BranchInst*>(inst);
+    get_word(); // should be 'br'
+    get_word();
+
+    // conditional
+    if (_word == "i1") {
+        get_word(',');
+        inst->set_raw_field("cond", _word);
+        get_word();
+        DCHECK(_word == "label", " ");
+        get_word(',');
+        inst->set_raw_field("true-label", _word);
+        get_word();
+        DCHECK(_word == "label", " ");
+        get_word_of(" ,");
+        inst->set_raw_field("false-label", _word);
+    } // unconditional
+    else if (_word == "label") {
+        get_word();
+        inst->set_raw_field("true-label", _word);  // unconditional branches only use 'true-label'
+    }
+    else {
+        guarantee(0, "sanity");
+    }
 }

@@ -26,6 +26,7 @@ public:
     void parse_function_pointer_type();
     void fastforwad_bitcast();
 
+    /* the do_xxx functions will not check dynamic_cast */
     Instruction* do_alloca(bool has_assignment=1);
     void do_branch(Instruction* inst);
     void do_call_family(Instruction* inst);
