@@ -12,6 +12,8 @@
 #include <vector>
 #include "internalError.h"
 
+typedef std::string string;
+
 #define guarantee(condition, args...) \
     do { \
         if (! (condition)) { \
@@ -24,7 +26,13 @@
     } while (false)
 
 
-typedef std::string string;
+#ifndef PRODUCTION
+#define DCHECK(condition, args...) guarantee(condition, ##args)
+#else
+#define DCHECK(condition, args...)
+#endif
+
+
 
 #define parser_assert(condition, line, args...) \
     do { \
@@ -37,9 +45,6 @@ typedef std::string string;
             Errors::semantic_error_handler(); \
         } \
     } while (false)
-
-
-typedef std::string string;
 
 
 

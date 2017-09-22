@@ -4,13 +4,13 @@
 
 #include <cstring>
 #include <cassert>
-#include <utilities/flags.h>
-#include "instParser.h"
-#include <utilities/strings.h>
-#include "sysDict.h"
-#include <inst/instEssential.h>
 #include <algorithm>
-
+#include <utilities/flags.h>
+#include <utilities/strings.h>
+#include <inst/instEssential.h>
+#include <inst/branchInst.h>
+#include "instParser.h"
+#include "sysDict.h"
 
 //std::map<string, inst_parse_routine> InstParser::_table;
 //int InstParser::MAX_VALUE_LEN = 1024;
@@ -25,6 +25,9 @@ void InstParser::parse(Instruction *inst) {
     string text = inst->raw_text();
     set_text(text);
     switch (inst->type()) {
+        case Instruction::BranchInstType: {
+            do_branch(inst); break;
+        }
         case Instruction::CallInstType: {
             do_call_family(inst); break;
         }
@@ -38,6 +41,8 @@ void InstParser::parse(Instruction *inst) {
         case Instruction::BitCastInstType :
             do_bitcast(inst);
             break;
+        default:
+            guarantee(0, "sanity");
     }
 }
 
@@ -270,11 +275,12 @@ void InstParser::do_call_family(Instruction* inst) {
  */
 void InstParser::do_load(Instruction *inst) {
     LoadInst* li = dynamic_cast<LoadInst*>(inst);
-    guarantee(li, "Not a load inst");
+    const char* op = "load";
+    guarantee(li, "Not a %s inst", op);
     get_word('=');
-    //li->set_name(_word);
+    //I->set_name(_word);
     get_word();
-    guarantee(_word == "load", "Not a load instruction: %s", inst->raw_c_str());
+    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
 
     get_lookahead();
     if (_lookahead == "volatile") {
@@ -304,7 +310,7 @@ void InstParser::do_load(Instruction *inst) {
     skip_ws();
 
     bool ret = match(full_type+'*');
-    if (ret == false) {
+    if (!ret) {
         zpl("full type: %s", full_type.c_str());
     }
     guarantee(ret, "Load type not match: %s", _text.c_str());
@@ -402,4 +408,15 @@ void InstParser::do_bitcast(Instruction *inst) {
         //zpl("old type: %s, value: %s, new type: %s", old_ty.c_str(), _word.c_str(), new_ty.c_str());
     }
 
+}
+
+void InstParser::do_branch(Instruction *inst) {
+    BranchInst* I = dynamic_cast<BranchInst*>(inst);
+    const char* op = "br";
+    guarantee(I, "Not a %s inst", op);
+    get_word('=');
+    get_word();
+    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
+
+    
 }

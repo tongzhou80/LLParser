@@ -20,6 +20,7 @@ class Instruction: public Value {
 public:
     enum InstType {
         UnknownInstType,
+        BranchInstType,
         CallInstType,
         InvokeInstType,
         LoadInstType,

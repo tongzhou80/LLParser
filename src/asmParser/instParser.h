@@ -27,7 +27,7 @@ public:
     void fastforwad_bitcast();
 
     Instruction* do_alloca(bool has_assignment=1);
-    void do_call(Instruction* inst);
+    void do_branch(Instruction* inst);
     void do_call_family(Instruction* inst);
     void do_load(Instruction* inst);
     void do_bitcast(Instruction* inst);

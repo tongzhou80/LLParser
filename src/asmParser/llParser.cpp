@@ -9,15 +9,15 @@
 
 #include <peripheral/sysArgs.h>
 #include <utilities/mutex.h>
+#include <ir/irEssential.h>
+#include <di/diEssential.h>
+#include <inst/instEssential.h>
+#include <passes/passManager.h>
+#include <utilities/flags.h>
+#include "irBuilder.h"
 #include "llParser.h"
 #include "instParser.h"
 #include "sysDict.h"
-#include "ir/irEssential.h"
-#include "di/diEssential.h"
-#include "inst/instEssential.h"
-#include "passes/passManager.h"
-#include "utilities/flags.h"
-#include "irBuilder.h"
 
 
 LLParser::LLParser() {

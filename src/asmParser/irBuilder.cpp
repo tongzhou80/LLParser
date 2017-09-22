@@ -9,6 +9,7 @@
 #include <asmParser/llParser.h>
 #include <asmParser/instParser.h>
 #include <utilities/flags.h>
+#include <inst/branchInst.h>
 
 /** Create an instruction from a string
  *
@@ -72,6 +73,9 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParse
         case 'b':
             if (op == "bitcast") {
                 inst = new BitCastInst();
+            }
+            else if (op == "br") {
+                inst = new BranchInst();
             }
             break;
         case 'c': {

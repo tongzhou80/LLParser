@@ -4,7 +4,7 @@ project(LLParser)
 include_directories(src/)
 SET(CMAKE_CXX_FLAGS "-std=c++11 -g -rdynamic")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DGDEBUG -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLLDEBUG -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DPRODUCTION -O3")
 
 find_package(OpenMP)
@@ -96,7 +96,7 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/utilities/mutex.cpp src/utilities/mutex.h
         src/asmParser/llParserTLS.cpp src/asmParser/llParserTLS.h
         src/ir/alias.cpp src/ir/alias.h
-        src/asmParser/irParser.cpp src/asmParser/irParser.h)
+        src/asmParser/irParser.cpp src/asmParser/irParser.h src/inst/branchInst.cpp src/inst/branchInst.h)
 add_executable(sopt ${SOURCE_FILES} )
 install(TARGETS sopt DESTINATION /home/marena/llparser/bin/)
 target_link_libraries(sopt "-ldl") # for dyopen etc.
