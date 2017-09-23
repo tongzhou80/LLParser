@@ -271,6 +271,7 @@ void InstParser::do_load(Instruction *inst) {
     }
 
     string ty = parse_compound_type();
+    if (_char != ',')
     syntax_check(_char == ',');
     inc_intext_pos(2);
     string ty_p = parse_compound_type();
@@ -293,8 +294,6 @@ void InstParser::do_load(Instruction *inst) {
         return;
     }
 
-    syntax_check(_char == ',');
-    inc_intext_pos();
     get_word();
     syntax_check(_word == "align");
     get_word(',');

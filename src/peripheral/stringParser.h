@@ -30,6 +30,7 @@ public:
     void skip_ws();
 
     StringParser* get_word(char delim=' ', bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
+    int parse_integer(bool skip_ws=1);
     void get_lookahead(char delim=' ', bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
     void jump_ahead();
     StringParser* get_word_of(string delims,  bool append_delim=0, bool skip_delim=1, bool skip_ws=1);

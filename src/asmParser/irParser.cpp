@@ -5,6 +5,10 @@
 #include "irParser.h"
 
 
+string IRParser::parse_identifier() {
+    
+}
+
 /* Tedious but still LL(1), thank God */
 string IRParser::parse_basic_type() {
     skip_ws();
@@ -17,8 +21,9 @@ string IRParser::parse_basic_type() {
             break;
         }
         case 'i': {  // i8, i16, i32...
-            get_word();
-            fulltype = _word;
+            inc_intext_pos();
+            int size = parse_integer();
+            fulltype = 'i' + std::to_string(size);
             break;
         }
         case 'f': {  // float

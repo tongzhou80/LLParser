@@ -105,6 +105,28 @@ void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim,
 //    }
 //}
 
+int StringParser::parse_integer(bool skip_whitespace) {
+    range_check();
+
+    if (skip_whitespace) {
+        skip_ws();
+    }
+
+    if (!_eol) {
+        int startp = _intext_pos;
+        int len = 0;
+        while (!_eol && std::isdigit(_char)) {
+            inc_intext_pos();
+            len++;
+        }
+
+        return std::stoi(_text.substr(startp, len));
+    }
+    else {
+        guarantee(0, "end of line");
+    }
+}
+
 StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_delim, bool skip_whitespace) {
     range_check();
 
