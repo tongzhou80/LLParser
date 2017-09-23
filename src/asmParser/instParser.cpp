@@ -35,7 +35,8 @@ void InstParser::parse(Instruction *inst) {
             do_call_family(inst); break;
         }
         case Instruction::LoadInstType: {
-            do_load(inst); break;
+            //do_load(inst);
+            break;
         }
         case Instruction::BitCastInstType :
             do_bitcast(inst);
@@ -85,7 +86,7 @@ void InstParser::do_call_family(Instruction* inst) {
     }
 
     get_word();
-    parser_assert(_word == "call" || _word == "invoke", text(), "Bad call inst, _word: |%s| is not |call|", _word.c_str());
+    parser_assert(_word == "call" || _word == "invoke", "Bad call inst, _word: |%s| is not |call|", _word.c_str());
 
     get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
@@ -129,7 +130,7 @@ void InstParser::do_call_family(Instruction* inst) {
         } // (...) variable args check
         else {
             ci->set_is_varargs();
-            parser_assert(Strings::endswith(args_sig, "...)"), text(), "vararg signature should end with '...)'");
+            parser_assert(Strings::endswith(args_sig, "...)"), "vararg signature should end with '...)'");
             ci->set_raw_field("fnty", args_sig);
             inc_intext_pos();
         }
@@ -162,7 +163,7 @@ void InstParser::do_call_family(Instruction* inst) {
         //parse_function_pointer_type();
         parse_compound_type();
         skip_ws();
-        parser_assert(_char == '%' || _char == '@', text(), " ");
+        parser_assert(_char == '%' || _char == '@', " ");
     }
 
     //
@@ -176,8 +177,7 @@ void InstParser::do_call_family(Instruction* inst) {
         if (ci->has_bitcast()) {
             get_word();
             fn_name = _word;
-            get_word();
-            parser_assert(_word == "to", text(), " ");
+            match("to");
             parse_compound_type();
             inc_intext_pos();
             guarantee(_char == '(', " ");  // args start here
@@ -204,7 +204,7 @@ void InstParser::do_call_family(Instruction* inst) {
         guarantee(!ci->has_bitcast(), "just check");
     }
     else {
-        parser_assert(0, _text, "Expect '%%' or '@', char: |%c|, pos: %d", _char, _intext_pos);
+        parser_assert(0, "Expect '%%' or '@', char: |%c|, pos: %d", _char, _intext_pos);
     }
 
     string args = jump_to_end_of_scope();
@@ -262,13 +262,17 @@ void InstParser::do_load(Instruction *inst) {
     guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
 
     get_lookahead();
+    if (_lookahead == "atomic") {
+        li->set_raw_field("atomic", "");
+        jump_ahead();
+        get_lookahead();
+    }
+
     if (_lookahead == "volatile") {
         li->set_raw_field("volatile", "");
-        guarantee(0, "check if this is possible");
+        jump_ahead();
     }
-    else if (_lookahead == "atomic") {
-        guarantee(0, "check if this is possible");
-    }
+
 
     string ty = parse_compound_type();
     if (_char != ',')
@@ -277,14 +281,24 @@ void InstParser::do_load(Instruction *inst) {
     string ty_p = parse_compound_type();
     syntax_check(ty_p == ty + '*');
 
-    get_word(',');
+    get_word_of(" ,");
+
     if (_word == "getelementptr") {
         // todo: load from array
+        get_lookahead();
+        if (_lookahead == "inbounds") {
+            jump_ahead();
+        }
+        skip_ws();
+        syntax_check(_char == '(');
+        jump_to_end_of_scope();
+        match(',');
     }
     else if (_word == "bitcast") {
         BitCastInst* bci = parse_inline_bitcast();
         li->set_raw_field("pointer", bci->get_raw_field("value"));
         syntax_check(bci->get_raw_field("ty2") == ty_p);
+        match(',');
     }
     else {
         li->set_raw_field("pointer", _word);  // might do some syntax check on pointer
@@ -294,8 +308,7 @@ void InstParser::do_load(Instruction *inst) {
         return;
     }
 
-    get_word();
-    syntax_check(_word == "align");
+    match("align", true);
     get_word(',');
     li->set_raw_field("alignment", _word);
     if (_eol) {
@@ -312,7 +325,7 @@ void InstParser::do_load(Instruction *inst) {
  * @return
  */
 BitCastInst* InstParser::parse_inline_bitcast() {
-    syntax_check(_char == '(');
+    match('(');
     BitCastInst* bci = new BitCastInst();
     string old_ty = parse_compound_type();
     bci->set_raw_field("ty", old_ty);
@@ -323,8 +336,7 @@ BitCastInst* InstParser::parse_inline_bitcast() {
     guarantee(_word == "to", "syntax check");
     string new_ty = parse_compound_type();
     bci->set_raw_field("ty2", new_ty);
-    syntax_check(_char == ')');
-    inc_intext_pos();
+    match(')');
     return bci;
 }
 
@@ -379,23 +391,21 @@ void InstParser::do_bitcast(Instruction *inst) {
     get_word();
 
     if (_word == "bitcast") {
-        parser_assert(_char == '(', text(), "bitcast should be followed by a ' ('");
+        parser_assert(_char == '(', "bitcast should be followed by a ' ('");
         inc_intext_pos();
         string old_old_ty = parse_compound_type();
         get_word();
 
         I->set_value_str(_word);
         I->set_raw_field("value", _word);
-        get_word();
-        parser_assert(_word == "to", text(), "expect 'to', got: %s", _word.c_str());
+        match("to");
 
         //todo: the rest of it is not parsed
     }
     else {
         I->set_value_str(_word);
         I->set_raw_field("value", _word);
-        get_word();
-        parser_assert(_word == "to", text(), "expect 'to', got: %s", _word.c_str());
+        match("to");
 
         string new_ty = parse_compound_type();
         I->set_raw_field("ty2", new_ty);

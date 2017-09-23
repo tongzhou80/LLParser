@@ -114,10 +114,8 @@ void LLParser::parse_structs(Module* module) {
             string name = parse_complex_structs();  // name contains '%'
             st->set_name(name.substr(1));
 
-            get_word();
-            parser_assert(_word == "=", line(), "Invalid struct syntax");
-            get_word();
-            parser_assert(_word == "type", line(), "Invalid struct syntax");
+            match('=', true);
+            match("type", true);
         }
         else {
             break;
@@ -171,38 +169,33 @@ void LLParser::parse_aliases() {
             alias->set_raw_field("linkage", _word);
         }
 
-        parser_assert(_word == "alias", text(), " ");
+        parser_assert(_word == "alias", " ");
         string aliasee_ty = parse_compound_type();
-        parser_assert(_char == ',', line(), "sanity check");
-        inc_intext_pos();
+        match(',');
         get_lookahead();
         bool has_bitcast = false;
         if (_lookahead == "bitcast") {
             has_bitcast = true;
             jump_ahead();
-            parser_assert(_char == '(', line(), "syntax check, char: %c", _char);
-            inc_intext_pos();
+            match('(');
             string old_ty = parse_compound_type();
 
         }
         else {
             string aliasee_ty_p = parse_compound_type();
-            parser_assert(aliasee_ty_p == aliasee_ty + '*', line(), "sanity check");
+            parser_assert(aliasee_ty_p == aliasee_ty + '*', "sanity check");
         }
         inc_intext_pos();
-        parser_assert(_char == '@', line(), "syntax check, char: %c", _char);
-        inc_intext_pos();
+        match('@');
         get_word();
         alias->set_raw_field("aliasee", _word);
         if (has_bitcast) {
-            get_word();
-            parser_assert(_word == "to", line(), "syntax check");
+            match("to");
             parse_compound_type();
-            parser_assert(_char == ')', line(), "syntax check");
-            inc_intext_pos();
+            match(')');
         }
 
-        parser_assert(_eol, line(), "should be end of line");
+        parser_assert(_eol, "should be end of line");
 
         alias->set_raw_text(line());
         SysDict::module()->add_alias(alias->name(), alias);
@@ -447,7 +440,7 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
         //zpl("line: |%s|", line().c_str())
             //if (Strings::startswith(line(), "}")) break;
         
-        parser_assert(!Strings::startswith(line(), "}"), line(), "Not a block");
+        parser_assert(!Strings::startswith(line(), "}"), "Not a block");
         
 
         /* parse header first */
@@ -520,7 +513,7 @@ void LLParser::set_line_to_full_instruction() {
     else if (Strings::contains(line(), " invoke ")) {
         full += '\n';
         get_real_line();
-        parser_assert(Strings::startswith(line(), "to"), line(), "invalid invoke inst");
+        parser_assert(Strings::startswith(line(), "to"), "invalid invoke inst");
         full += line();
     }
     set_line(full);

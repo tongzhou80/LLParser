@@ -32,17 +32,29 @@ void StringParser::set_intext_pos(int p) {
     _char = _text[_intext_pos];
 }
 
-bool StringParser::match(const string& s) {
+void StringParser::match(char c, bool skip_whitspace) {
+    if (skip_whitspace)
+        skip_ws();
+
+    parser_assert(c == _char, "match |%c| but get |%c|", c, _char);
+    inc_intext_pos();
+}
+
+void StringParser::match(const string& s, bool skip_whitspace) {
+    if (skip_whitspace) skip_ws();
+
+    int startp = _intext_pos;
+    int len = 0;
     for (int i = 0; i < s.size(); ++i) {
         if (!_eol && s[i] == _char) {
             inc_intext_pos();
+            len++;
             continue;
         }
         else {
-            return false;
+            parser_assert(0, "match |%s| but get |%s|", s.c_str(), text().substr(startp, len).c_str());
         }
     }
-    return true;
 }
 
 /**@brief Similar to get_word(), except that the state of parser does not change. The result is stored in _lookahead.
@@ -230,8 +242,8 @@ StringParser* StringParser::get_word_of(string delims, bool append_delim, bool s
 //}
 
 void StringParser::range_check() {
-    parser_assert(_intext_pos < _text.size(), text(), "intext pointer out of range");
-    parser_assert(_char == _text[_intext_pos], text(), "_char: %c, _text[_intext_pos]: %c", _char, _text[_intext_pos]);
+    parser_assert(_intext_pos < _text.size(), "intext pointer out of range");
+    parser_assert(_char == _text[_intext_pos], "_char: %c, _text[_intext_pos]: %c", _char, _text[_intext_pos]);
 }
 
 /**@brief Increment the position in text. _intext_pos and _char will change. _eol will possibly be set.
@@ -258,7 +270,7 @@ bool StringParser::inc_intext_pos(int steps) {
  *
  */
 void StringParser::jump_ahead() {
-    parser_assert(_aheadpos >= _intext_pos, text(), "Expect to jump forward");
+    parser_assert(_aheadpos >= _intext_pos, "Expect to jump forward");
     if (_aheadpos < _text.size()) {
         inc_intext_pos(_aheadpos-_intext_pos);
     }

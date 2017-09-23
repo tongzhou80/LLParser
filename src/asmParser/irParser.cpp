@@ -67,7 +67,7 @@ string IRParser::match_identifier() {
     }
     else {
         string p1 = match_xalpha();
-        parser_assert(!p1.empty(), text(), "The identifier does not start with [-a-zA-Z$._]: %c", _char);
+        parser_assert(!p1.empty(), "The identifier does not start with [-a-zA-Z$._]: %c", _char);
         string p2 = match_xalphanumeric();
 
         return p1 + p2;
@@ -82,7 +82,7 @@ string IRParser::parse_basic_type() {
     switch (_char) {
         case 'v': {
             fulltype = "void";
-            guarantee(match(fulltype), " ");
+            match(fulltype);
             break;
         }
         case 'i': {  // i8, i16, i32...
@@ -93,17 +93,17 @@ string IRParser::parse_basic_type() {
         }
         case 'f': {  // float
             fulltype = "float";
-            guarantee(match(fulltype), " ");
+            match(fulltype);
             break;
         }
         case 'd': {  // double
             fulltype = "double";
-            guarantee(match(fulltype), " ");
+            match(fulltype);
             break;
         }
         case 'h': {  // half
             fulltype = "half";
-            guarantee(match(fulltype), " ");
+            match(fulltype);
             break;
         }
         case '<': {  // vector
@@ -123,7 +123,7 @@ string IRParser::parse_basic_type() {
             break;
         }
         default: {
-            parser_assert(0, text(), "bad type!");
+            parser_assert(0, "bad type!");
         }
     }
 
@@ -178,9 +178,9 @@ string IRParser::parse_compound_type() {
  * @return
  */
 string IRParser::parse_complex_structs() {
-    syntax_check(_char == '%');
+    match('%');
 
     string name = match_identifier();
-    parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', text(), "sanity");
+    parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', "sanity");
     return '%' + name;
 }

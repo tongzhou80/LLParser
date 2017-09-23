@@ -34,19 +34,19 @@ typedef std::string string;
 
 
 
-#define parser_assert(condition, line, args...) \
+#define parser_assert(condition, args...) \
     do { \
         if (! (condition)) { \
             fflush(stdout); \
             fprintf(stderr, "Assertion `" #condition "` failed in %s:%d: ", __FILE__, __LINE__); \
             fprintf(stderr, ##args); \
             fprintf(stderr, "\n"); \
-            fprintf(stderr, "problematic line: %s\n", line.c_str()); \
+            fprintf(stderr, "problematic line: %s\n", text().c_str()); \
             Errors::semantic_error_handler(); \
         } \
     } while (false)
 
-#define syntax_check(condition) parser_assert(condition, text(), "syntax check")
+#define syntax_check(condition) parser_assert(condition, "syntax check")
 
 #define zpp(fmt, args...) \
   std::printf(fmt, ##args);
@@ -61,6 +61,10 @@ typedef std::string string;
 
 #define zpd(arg) \
   std::printf(#arg ": %d", arg); \
+  std::printf("\n");
+
+#define zpw() \
+  std::printf("word: %s", _word.c_str()); \
   std::printf("\n");
 
 
