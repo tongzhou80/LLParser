@@ -32,7 +32,7 @@ public:
     void do_load(Instruction* inst);
     void do_bitcast(Instruction* inst);
 
-    void parse_inline_bitcast();
+    BitCastInst* parse_inline_bitcast();
 
     static Instruction* create(string& text);
 

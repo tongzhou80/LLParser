@@ -308,6 +308,28 @@ void InstParser::do_load(Instruction *inst) {
     /* TODO: debug info */
 }
 
+/**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
+ *
+ * It starts parsing from the '(' following 'bitcast'
+ *
+ * @return
+ */
+BitCastInst* InstParser::parse_inline_bitcast() {
+    guarantee(_char == '(', "syntax check");
+    BitCastInst* bci = new BitCastInst();
+    string old_ty = parse_compound_type();
+    bci->set_raw_field("ty", old_ty);
+    get_word();
+    guarantee(_word != "bitcast", "Should not contain more than one inline bitcasts");
+    bci->set_raw_field("value", _word);
+    get_word();
+    guarantee(_word == "to", "syntax check");
+    string new_ty = parse_compound_type();
+    bci->set_raw_field("ty2", new_ty);
+    guarantee(_char == ')', "syntax check");
+    return bci;
+}
+
 void InstParser::parse_function_pointer_type() {
     /* corner case
      * tail call void bitcast (void (%struct.bContext*, %struct.uiBlock.22475* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)* @uiPupBlock
