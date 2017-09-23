@@ -35,38 +35,13 @@ void InstParser::parse(Instruction *inst) {
             do_call_family(inst); break;
         }
         case Instruction::LoadInstType: {
-            break;
-            //do_load(inst); break;
+            do_load(inst); break;
         }
         case Instruction::BitCastInstType :
             do_bitcast(inst);
             break;
         default:
             guarantee(0, "sanity");
-    }
-}
-
-
-// Get first word of the right hand side
-string InstParser::get_first_word(string& text) {
-    if (Strings::startswith(text, "%")) {
-        const char* fm1 = "  %%%[^ ] = %[^ ]";
-        char var_name[1024];
-        char opcode1[128];
-        int matched = sscanf(text.c_str(), fm1, var_name, opcode1);
-
-        /* !! needs to change as more fields are parsed in the instruction line */
-        guarantee(matched == 2, "Bad instruction: %s", text.c_str());
-        zpl("match: %d, id: %s, op: %s", matched, var_name, opcode1);
-        return opcode1;
-    }
-    else {
-        const char* fm2 = "  %[^ ]";
-        char opcode2[128];
-        int matched = sscanf(text.c_str(), fm2, opcode2);
-        guarantee(matched == 1, "Bad instruction: %s", text.c_str());
-        zpl("match: %d, op: %s", matched, opcode2);
-        return opcode2;
     }
 }
 
@@ -324,7 +299,7 @@ void InstParser::do_load(Instruction *inst) {
     else {
         li->set_addr_str(_word);
         get_word();
-        guarantee(_word == "align", " ");
+        parser_assert(_word == "align", text(), " ");
         get_word(',');
         li->set_alignment(std::stoi(_word));
         li->set_is_fully_parsed();

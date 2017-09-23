@@ -55,8 +55,8 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParse
         has_assignment = false;
     }
 
-
-    zps(op.c_str())
+    
+    //zps(op.c_str())
     // only deal with CallInst for now
     // determine the opcode by the first word
     Instruction* inst = NULL;

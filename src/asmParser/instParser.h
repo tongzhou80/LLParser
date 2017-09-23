@@ -21,7 +21,6 @@ public:
     Instruction* parse(string& );
     void parse(Instruction* inst);
     string get_opcode(string& );
-    string get_first_word(string& );
 
     void parse_function_pointer_type();
     void fastforwad_bitcast();
@@ -32,6 +31,8 @@ public:
     void do_call_family(Instruction* inst);
     void do_load(Instruction* inst);
     void do_bitcast(Instruction* inst);
+
+    void parse_inline_bitcast();
 
     static Instruction* create(string& text);
 

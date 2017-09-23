@@ -444,8 +444,11 @@ void LLParser::remove_tail_comments() {
 
 void LLParser::parse_basic_block(BasicBlock* bb) {
     while (1) {
-        zpl("|%s|", line().c_str())
+        //zpl("line: |%s|", line().c_str())
+            //if (Strings::startswith(line(), "}")) break;
+        
         parser_assert(!Strings::startswith(line(), "}"), line(), "Not a block");
+        
 
         /* parse header first */
         if (Strings::startswith(line(), "; <label>:")) {
@@ -473,24 +476,24 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
         }
 
 
-//        int dbg_pos = line().find(", !dbg");
-//        string dbg_text;
-//        if (dbg_pos != string::npos) {
-//            dbg_text = line().substr(dbg_pos);
-//            set_line(line().substr(0, dbg_pos));
-//        }
+       int dbg_pos = line().find(", !dbg");
+       string dbg_text;
+       if (dbg_pos != string::npos) {
+           dbg_text = line().substr(dbg_pos);
+           set_line(line().substr(0, dbg_pos));
+       }
 
         Instruction* inst = parse_instruction_line(bb);
 
-//        if (dbg_pos != string::npos) {
-//            set_line(dbg_text);
-//            parse_debug_info(inst);
-//            inst->append_raw_text(dbg_text);
-//        }
+       if (dbg_pos != string::npos) {
+           set_line(dbg_text);
+           parse_debug_info(inst);
+           inst->append_raw_text(dbg_text);
+       }
 
         string opcode = inst->opstr();
 
-        zpl("opcode: %s", opcode.c_str())
+        //zpl("opcode: %s", opcode.c_str())
         if (InstFlags::in_terminator_insts(opcode)) {
             break;
         }
