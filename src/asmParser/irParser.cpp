@@ -4,12 +4,77 @@
 
 #include "irParser.h"
 
+/**@brief Match extended alphabetic ([-a-zA-Z$._]) strings until the current char is not a match
+ * The state of the parser changes as the matching goes
+ * @return The matched string
+ */
+string IRParser::match_xalpha() {
+    int startp = _intext_pos;
+    int len = 0;
+    while (!_eol) {
+        if (std::isalpha(_char)) {
+            inc_intext_pos();
+        }
+        else if (_char == '-' || _char == '$' || _char == '.' || _char == '_') {
+            inc_intext_pos();
+        }
+        else {
+            break;
+        }
+        len++;
+    }
 
-string IRParser::parse_identifier() {
-    
+    return _text.substr(startp, len);
 }
 
-/* Tedious but still LL(1), thank God */
+/**@brief Match extended alphanumeric ([-a-zA-Z$._0-9]) strings until the current char is not a match
+ * The state of the parser changes as the matching goes
+ * @return The matched string
+ */
+string IRParser::match_xalphanumeric() {
+    int startp = _intext_pos;
+    int len = 0;
+    while (!_eol) {
+        if (std::isalnum(_char)) {
+            inc_intext_pos();
+        }
+        else if (_char == '-' || _char == '$' || _char == '.' || _char == '_') {
+            inc_intext_pos();
+        }
+        else {
+            break;
+        }
+        len++;
+    }
+
+    return _text.substr(startp, len);
+}
+
+/**@brief Match an identifier, which could be the name of variables, functions, structs, etc.
+ * The actual regular expression used is '[%@][-a-zA-Z$._][-a-zA-Z$._0-9]*'.
+ * Identifiers that require other characters in their names can be surrounded with quotes.
+ *
+ * @return The matched string
+ */
+string IRParser::match_identifier() {
+    /* not including the starting % or @ */
+    range_check();
+
+    if (_char == '"') {
+        inc_intext_pos();
+        get_word('"');
+        return '"' + _word + '"';
+    }
+    else {
+        string p1 = match_xalpha();
+        parser_assert(!p1.empty(), text(), "The identifier does not start with [-a-zA-Z$._]: %c", _char);
+        string p2 = match_xalphanumeric();
+
+        return p1 + p2;
+    }
+}
+
+
 string IRParser::parse_basic_type() {
     skip_ws();
 
@@ -102,6 +167,7 @@ string IRParser::parse_compound_type() {
 }
 
 /**@brief parse structs of the following form: (not parsing the * at the end, if any)
+ * Parsing starts with '%'
  *
  * %struct.name
  * %class.name
@@ -112,22 +178,9 @@ string IRParser::parse_compound_type() {
  * @return
  */
 string IRParser::parse_complex_structs() {
-    string ty = "%";
-    if (_char == '%') {
-        inc_intext_pos();
-    }
+    syntax_check(_char == '%');
 
-    if (_char == 's' || _char == 'c' || _char == 'u') {
-        get_word();
-        ty += _word;
-    }
-    else if (_char == '"') {
-        inc_intext_pos();
-        get_word('"');
-        ty +=  '"' + _word + '"';
-    }
-    else {
-        parser_assert(0, text(), " ");
-    }
-    return ty;
+    string name = match_identifier();
+    parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', text(), "sanity");
+    return '%' + name;
 }

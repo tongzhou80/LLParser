@@ -13,7 +13,9 @@
  */
 class IRParser: public virtual StringParser {
 public:
-    string parse_identifier();
+    string match_identifier();
+    string match_xalpha();
+    string match_xalphanumeric();
     string parse_basic_type();
     string parse_compound_type();
     string parse_complex_structs();
