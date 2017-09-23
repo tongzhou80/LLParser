@@ -12,6 +12,8 @@
 
 typedef Instruction* (*inst_parse_routine) (string&, bool);
 
+class BitCastInst;
+
 class InstParser: public IRParser {
 
     //static std::map<string, inst_parse_routine> _table;

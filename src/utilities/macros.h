@@ -46,7 +46,7 @@ typedef std::string string;
         } \
     } while (false)
 
-
+#define syntax_check(condition) parser_assert(condition, text(), "syntax check")
 
 #define zpp(fmt, args...) \
   std::printf(fmt, ##args);

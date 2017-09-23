@@ -32,7 +32,7 @@ void StringParser::set_intext_pos(int p) {
     _char = _text[_intext_pos];
 }
 
-bool StringParser::match(string s) {
+bool StringParser::match(const string& s) {
     for (int i = 0; i < s.size(); ++i) {
         if (!_eol && s[i] == _char) {
             inc_intext_pos();

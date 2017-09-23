@@ -249,6 +249,10 @@ void InstParser::do_call_family(Instruction* inst) {
  * @param inst
  */
 void InstParser::do_load(Instruction *inst) {
+    /* corner case:
+     *    %9 = load i8* (i8*, i32, i32)*, i8* (i8*, i32, i32)** %8, align 8, !dbg !4557, !tbaa !4559
+     *    %14 = load void (%class.Base*)**, void (%class.Base*)*** %13, align 8
+     */
     LoadInst* li = dynamic_cast<LoadInst*>(inst);
     const char* op = "load";
     guarantee(li, "Not a %s inst", op);
@@ -259,53 +263,47 @@ void InstParser::do_load(Instruction *inst) {
 
     get_lookahead();
     if (_lookahead == "volatile") {
+        li->set_raw_field("volatile", "");
+        guarantee(0, "check if this is possible");
+    }
+    else if (_lookahead == "atomic") {
         guarantee(0, "check if this is possible");
     }
 
-    /* corner case:
-     *    %9 = load i8* (i8*, i32, i32)*, i8* (i8*, i32, i32)** %8, align 8, !dbg !4557, !tbaa !4559
-     *    %14 = load void (%class.Base*)**, void (%class.Base*)*** %13, align 8
-     */
+    string ty = parse_compound_type();
+    syntax_check(_char == ',');
+    inc_intext_pos(2);
+    string ty_p = parse_compound_type();
+    syntax_check(ty_p == ty + '*');
+
     get_word(',');
-    string full_type = _word;
-    // could be function pointer type
-    int open_paren_count = std::count(full_type.begin(), full_type.end(), '(');
-    int close_paren_count = std::count(full_type.begin(), full_type.end(), ')');
-
-    guarantee(open_paren_count-close_paren_count == 1 || open_paren_count-close_paren_count == 0, "assumption");
-
-    if (open_paren_count-close_paren_count == 1) {
-        string first_half = _word + ", ";
-        get_word(')');
-        guarantee(_char == '*', "Should be function pointer type");
-        full_type = first_half + _word + ")*";
-        inc_intext_pos(2);
-    }
-
-    skip_ws();
-
-    bool ret = match(full_type+'*');
-    if (!ret) {
-        zpl("full type: %s", full_type.c_str());
-    }
-    guarantee(ret, "Load type not match: %s", _text.c_str());
-    li->set_ret_type_str(full_type);
-    li->set_pointer_type_str(full_type+'*');
-
-    get_word_of(", ");
     if (_word == "getelementptr") {
         // todo: load from array
     }
+    else if (_word == "bitcast") {
+        BitCastInst* bci = parse_inline_bitcast();
+        li->set_raw_field("pointer", bci->get_raw_field("value"));
+        syntax_check(bci->get_raw_field("ty2") == ty_p);
+    }
     else {
-        li->set_addr_str(_word);
-        get_word();
-        parser_assert(_word == "align", text(), " ");
-        get_word(',');
-        li->set_alignment(std::stoi(_word));
-        li->set_is_fully_parsed();
+        li->set_raw_field("pointer", _word);  // might do some syntax check on pointer
     }
 
-    /* TODO: debug info */
+    if (_eol) {
+        return;
+    }
+
+    syntax_check(_char == ',');
+    inc_intext_pos();
+    get_word();
+    syntax_check(_word == "align");
+    get_word(',');
+    li->set_raw_field("alignment", _word);
+    if (_eol) {
+        return;
+    }
+
+    /* TODO: more field */
 }
 
 /**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
@@ -315,7 +313,7 @@ void InstParser::do_load(Instruction *inst) {
  * @return
  */
 BitCastInst* InstParser::parse_inline_bitcast() {
-    guarantee(_char == '(', "syntax check");
+    syntax_check(_char == '(');
     BitCastInst* bci = new BitCastInst();
     string old_ty = parse_compound_type();
     bci->set_raw_field("ty", old_ty);
@@ -326,7 +324,8 @@ BitCastInst* InstParser::parse_inline_bitcast() {
     guarantee(_word == "to", "syntax check");
     string new_ty = parse_compound_type();
     bci->set_raw_field("ty2", new_ty);
-    guarantee(_char == ')', "syntax check");
+    syntax_check(_char == ')');
+    inc_intext_pos();
     return bci;
 }
 

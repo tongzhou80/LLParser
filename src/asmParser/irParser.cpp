@@ -12,9 +12,8 @@ string IRParser::parse_basic_type() {
     string fulltype;
     switch (_char) {
         case 'v': {
-            get_word();
-            fulltype = _word;
-            guarantee(_word == "void", " ");
+            fulltype = "void";
+            guarantee(match(fulltype), " ");
             break;
         }
         case 'i': {  // i8, i16, i32...
@@ -23,18 +22,18 @@ string IRParser::parse_basic_type() {
             break;
         }
         case 'f': {  // float
-            get_word();
-            fulltype = _word;
+            fulltype = "float";
+            guarantee(match(fulltype), " ");
             break;
         }
         case 'd': {  // double
-            get_word();
-            fulltype = _word;
+            fulltype = "double";
+            guarantee(match(fulltype), " ");
             break;
         }
         case 'h': {  // half
-            get_word();
-            fulltype = _word;
+            fulltype = "half";
+            guarantee(match(fulltype), " ");
             break;
         }
         case '<': {  // vector
