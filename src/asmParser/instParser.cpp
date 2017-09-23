@@ -26,13 +26,16 @@ void InstParser::parse(Instruction *inst) {
     set_text(text);
     switch (inst->type()) {
         case Instruction::BranchInstType: {
-            do_branch(inst); break;
+            do_branch(inst);
+            break;
         }
         case Instruction::CallInstType: {
-            do_call_family(inst); break;
+            do_call_family(inst);
+            break;
         }
         case Instruction::InvokeInstType: {
-            do_call_family(inst); break;
+            do_call_family(inst);
+            break;
         }
         case Instruction::LoadInstType: {
             //do_load(inst);

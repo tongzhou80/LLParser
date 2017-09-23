@@ -187,7 +187,7 @@ void Module::resolve_after_parse() {
         t1.join();
     }
     else {
-        //resolve_callinsts();
+        resolve_callinsts();
         resolve_aliases();
         resolve_debug_info();
     }

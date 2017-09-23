@@ -14,7 +14,7 @@ class Function;
 
 class IRBuilder {
 public:
-    static Instruction* create_instruction(string& text, BasicBlock* bb=NULL, LLParser* llparser=NULL);
+    static Instruction* create_instruction(string& text, LLParser* llparser=NULL);
     static Function* create_function_declaration(string& text, LLParser* llparser=NULL);
 };
 

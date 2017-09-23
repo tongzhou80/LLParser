@@ -22,10 +22,13 @@
  * @param llparser: specify which llparser to use, defaults to SysDict::parser
  * @return
  */
-Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParser* llparser) {
+Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
     if (llparser == NULL) {
         llparser = SysDict::parser;
     }
+
+    /* for -XX:-ParallelInst pass the entire text to the instParser */
+
 
     string op;
     string name;
@@ -113,11 +116,6 @@ Instruction* IRBuilder::create_instruction(string &text, BasicBlock* bb, LLParse
         inst->set_name(name);
     }
     inst->set_raw_text(text);
-
-    if (bb) {
-        bb->append_instruction(inst);
-        inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes
-    }
 
 
     if (inst->type() != Instruction::UnknownInstType) {
