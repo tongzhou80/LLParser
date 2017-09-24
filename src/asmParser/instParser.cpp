@@ -388,7 +388,7 @@ void InstParser::do_load(Instruction *inst) {
 
 /**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
  *
- * It starts parsing from the '(' following 'bitcast'
+ * It starts parsing from the '(' after the 'bitcast'
  *
  * @return
  */
@@ -453,6 +453,8 @@ void InstParser::do_bitcast(Instruction *inst) {
     get_word();
 
     if (_word == "bitcast") {
+        BitCastInst* bci = parse_inline_bitcast();
+        
         parser_assert(_char == '(', "bitcast should be followed by a ' ('");
         inc_intext_pos();
         string old_old_ty = parse_compound_type();

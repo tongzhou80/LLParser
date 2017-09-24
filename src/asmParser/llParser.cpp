@@ -531,6 +531,7 @@ void LLParser::parse_debug_info(Instruction* inst) {
 
 Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
     // inst will be appended to bb
+    parser_assert(!Strings::contains(line(), ", !"), "");
     Instruction* inst = IRBuilder::create_instruction(line(), this);
     bb->append_instruction(inst);  // now parsing the instruction shouldn't need bb's info (data flow)
     inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes
