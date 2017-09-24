@@ -469,22 +469,22 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
         }
 
 
-       int dbg_pos = line().find(", !dbg");
-       string dbg_text;
-       if (dbg_pos != string::npos) {
-           dbg_text = line().substr(dbg_pos);
-           set_line(line().substr(0, dbg_pos));
-       }
+        int dbg_pos = line().find(", !dbg");
+        string dbg_text;
+        if (dbg_pos != string::npos) {
+            dbg_text = line().substr(dbg_pos);
+            set_line(line().substr(0, dbg_pos));
+        }
 
         Instruction* inst = parse_instruction_line(bb);
 
-       if (dbg_pos != string::npos) {
-           set_line(dbg_text);
-           parse_debug_info(inst);
-           inst->append_raw_text(dbg_text);
-       }
+        if (dbg_pos != string::npos) {
+            set_line(dbg_text);
+            parse_debug_info(inst);
+            inst->append_raw_text(dbg_text);
+        }
 
-        string opcode = inst->opstr();
+        string opcode = inst->opcode();
 
         //zpl("opcode: %s", opcode.c_str())
         if (InstFlags::in_terminator_insts(opcode)) {
@@ -492,7 +492,6 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
         }
 
         get_real_line();
-        //getline_nonempty();
     }
 }
 

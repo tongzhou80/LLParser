@@ -31,7 +31,7 @@ protected:
     bool _is_fully_parsed;
     InstParser* _parser;
     InstType _type;
-    string _opstr;
+    string _opcode;
     BasicBlock* _parent;
     bool _has_assignment;
     int _dbg_id;
@@ -40,11 +40,11 @@ protected:
 public:
     Instruction();
 
-    string opstr()                            { return _opstr; }
-    void set_opstr(string op)                 { _opstr = op; }
+    string opcode()                           { return _opcode; }
+    void set_opcode(string op)                { _opcode = op; }
 
     string owner()                            { return _owner; }
-    void set_owner(string owner)             { _owner = owner; }
+    void set_owner(string owner)              { _owner = owner; }
 
     bool is_fully_parsed()                    { return _is_fully_parsed; }
     void set_is_fully_parsed(bool v=1)        { _is_fully_parsed = v; }

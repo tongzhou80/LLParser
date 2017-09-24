@@ -38,7 +38,7 @@ Instruction* InstParser::create_instruction(string &text) {
     Instruction* inst = NULL;
     void (InstParser::*parse_routine) (Instruction*) = NULL;
 
-    if (op == "call" || op == "tail" || op == "musttail" || op == "notail") {
+    if (op == "tail" || op == "musttail" || op == "notail") {
         op = "call";
     }
 
@@ -74,7 +74,7 @@ Instruction* InstParser::create_instruction(string &text) {
         case 'l': {
             if (op == "load") {
                 inst = new LoadInst();
-                //parse_routine = &InstParser::do_load;
+                parse_routine = &InstParser::do_load;
             }
         }
         default: {
@@ -86,7 +86,7 @@ Instruction* InstParser::create_instruction(string &text) {
         inst = new Instruction();
     }
 
-    inst->set_opstr(op);
+    inst->set_opcode(op);
     inst->set_has_assignment(has_assignment); // have to repeat this for every inst
     if (has_assignment) {
         inst->set_name(name);
@@ -94,7 +94,6 @@ Instruction* InstParser::create_instruction(string &text) {
     inst->set_raw_text(text);
 
     if (parse_routine) {
-        set_text(text);
         (this->*parse_routine)(inst);
         //parse(inst);
     }
@@ -153,24 +152,15 @@ void InstParser::do_call_family(Instruction* inst) {
      * %6 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* dereferenceable(272) %4, i8* %5)
      */
     CallInstFamily* ci = dynamic_cast<CallInstFamily*>(inst);
-    if (ci->has_assignment()) {
-        get_word('=');
-//        get_word();
-//        parser_assert(_word[0] == '%', text(), "bad assignment start");
-//        inc_intext_pos(2);
-    }
-
 
     string ret_ty, fnty;
 
-    get_lookahead();
-    if (InstFlags::in_tails(_lookahead)) {
-        ci->set_raw_field("tail", _lookahead);
-        jump_ahead();
+    if (InstFlags::in_tails(_word)) {
+        ci->set_raw_field("tail", _word);
+        get_word();
     }
 
-    get_word();
-    parser_assert(_word == "call" || _word == "invoke", "Bad call inst, _word: |%s| is not |call|", _word.c_str());
+    syntax_check(_word == "call" || _word == "invoke");
 
     get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
@@ -338,12 +328,6 @@ void InstParser::do_load(Instruction *inst) {
      *    %14 = load void (%class.Base*)**, void (%class.Base*)*** %13, align 8
      */
     LoadInst* li = dynamic_cast<LoadInst*>(inst);
-    const char* op = "load";
-    guarantee(li, "Not a %s inst", op);
-    get_word('=');
-    //I->set_name(_word);
-    get_word();
-    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
 
     get_lookahead();
     if (_lookahead == "atomic") {
@@ -462,12 +446,6 @@ void InstParser::do_bitcast(Instruction *inst) {
      *  %1 = bitcast void (...)* bitcast (void (i64*, i32)* @wrf_error_fatal_ to void (...)*) to void (i8*, i64, ...)*
      */
     BitCastInst* I = dynamic_cast<BitCastInst*>(inst);
-    const char* op = "bitcast";
-    guarantee(I, "Not a %s inst", op);
-    get_word('=');
-    //I->set_name(_word);
-    get_word();
-    guarantee(_word == string(op), "Not a %s instruction: %s", op, inst->raw_c_str());
 
     string old_ty = parse_compound_type();
     I->set_ty_str(old_ty);
@@ -511,8 +489,6 @@ void InstParser::do_branch(Instruction *inst) {
      * 1. br i1 %1352, label %1353, label %1312, !llvm.loop !110422
      *
      */
-    BranchInst* I = dynamic_cast<BranchInst*>(inst);
-    get_word(); // should be 'br'
     get_word();
 
     // conditional

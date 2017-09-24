@@ -139,7 +139,7 @@ Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
 //    }
 
     if (InstFlags::in_terminator_insts(op)) {
-        inst->set_opstr(op);
+        inst->set_opcode(op);
     }
     inst->set_raw_text(text);
     return inst;
