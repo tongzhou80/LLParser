@@ -56,7 +56,7 @@ typedef std::string string;
   std::printf("\n");
 
 #define zps(arg) \
-  std::printf(#arg ": %s", arg); \
+  std::printf(#arg ": %s", arg.c_str()); \
   std::printf("\n");
 
 #define zpd(arg) \

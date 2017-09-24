@@ -33,6 +33,7 @@ public:
     void do_call_family(Instruction* inst);
     void do_load(Instruction* inst);
     void do_bitcast(Instruction* inst, bool is_embedded=false);
+    void do_getelementptr(Instruction* inst, bool is_embedded=false);
 
 
     //static void parse_instruction(Instruction** ip);

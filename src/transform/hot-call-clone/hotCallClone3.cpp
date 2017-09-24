@@ -836,7 +836,7 @@ public:
         if (out.empty()) {
             out = SysDict::filename() + '.' + name();
         }
-        zps(out.c_str())
+
         SysDict::module()->print_to_file(out);
 
         if (PathCheck) {

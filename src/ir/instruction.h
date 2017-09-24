@@ -25,6 +25,7 @@ public:
         InvokeInstType,
         LoadInstType,
         BitCastInstType,
+        GetElementPtrInstType,
     };
 
 protected:

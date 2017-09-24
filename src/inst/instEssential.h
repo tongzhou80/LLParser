@@ -10,5 +10,6 @@
 #include "invokeInst.h"
 #include "loadInst.h"
 #include "bitcastInst.h"
+#include "getelementptrInst.h"
 
 #endif //LLPARSER_INSTESSENTIAL_H

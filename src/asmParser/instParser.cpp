@@ -321,7 +321,7 @@ void InstParser::do_call_family(Instruction* inst) {
 
 
 /**
- *
+ * Assume always have "align"
  * Syntax
  * <result> = load [volatile] <ty>, <ty>* <pointer>[, align <alignment>][, !nontemporal !<index>][, !invariant.load !<index>][, !invariant.group !<index>][, !nonnull !<index>][, !dereferenceable !<deref_bytes_node>][, !dereferenceable_or_null !<deref_bytes_node>][, !align !<align_node>]
    <result> = load atomic [volatile] <ty>, <ty>* <pointer> [singlethread] <ordering>, align <alignment> [, !invariant.group !<index>]
@@ -361,14 +361,8 @@ void InstParser::do_load(Instruction *inst) {
     get_word_of(" ,");
 
     if (_word == "getelementptr") {
-        // todo: load from array
-        get_lookahead();
-        if (_lookahead == "inbounds") {
-            jump_ahead();
-        }
-        skip_ws();
-        syntax_check(_char == '(');
-        jump_to_end_of_scope();
+        GetElementPtrInst* gepi = new GetElementPtrInst();
+        do_getelementptr(gepi, true);
         match(',');
     }
     else if (_word == "bitcast") {
@@ -386,7 +380,7 @@ void InstParser::do_load(Instruction *inst) {
         return;
     }
 
-    match("align", true);
+    match(" align ");
     get_word(',');
     li->set_raw_field("alignment", _word);
     if (_eol) {
@@ -449,7 +443,8 @@ void InstParser::do_bitcast(Instruction *inst, bool is_embedded) {
         syntax_check(old_ty == embedded_bci->get_raw_field("ty2"));
     }
     else if (_word == "getelementptr") {
-        parser_assert(0, "to deal");
+        GetElementPtrInst* gepi = new GetElementPtrInst();
+        do_getelementptr(gepi, true);
     }
     else {
         I->set_raw_field("value", _word);
@@ -496,5 +491,17 @@ void InstParser::do_branch(Instruction *inst) {
     }
     else {
         guarantee(0, "sanity");
+    }
+}
+
+void InstParser::do_getelementptr(Instruction *inst, bool is_embedded) {
+    get_lookahead();
+    if (_lookahead == "inbounds") {
+        jump_ahead();
+    }
+    skip_ws();
+    if (is_embedded) {
+        syntax_check(_char == '(');
+        string args = jump_to_end_of_scope();
     }
 }
