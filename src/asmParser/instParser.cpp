@@ -177,7 +177,7 @@ void InstParser::do_call_family(Instruction* inst) {
         get_word();
     }
 
-    syntax_check(_word == "call" || _word == "invoke");
+    parser_assert(_word == "call" || _word == "invoke", "word: %s", _word.c_str());
 
     get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
