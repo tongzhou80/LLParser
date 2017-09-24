@@ -468,21 +468,21 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
             continue;
         }
 
-
-        int dbg_pos = line().find(", !dbg");
-        string dbg_text;
-        if (dbg_pos != string::npos) {
-            dbg_text = line().substr(dbg_pos);
-            set_line(line().substr(0, dbg_pos));
-        }
+//
+//        int dbg_pos = line().find(", !dbg");
+//        string dbg_text;
+//        if (dbg_pos != string::npos) {
+//            dbg_text = line().substr(dbg_pos);
+//            set_line(line().substr(0, dbg_pos));
+//        }
 
         Instruction* inst = parse_instruction_line(bb);
 
-        if (dbg_pos != string::npos) {
-            set_line(dbg_text);
-            parse_debug_info(inst);
-            inst->append_raw_text(dbg_text);
-        }
+//        if (dbg_pos != string::npos) {
+//            set_line(dbg_text);
+//            parse_debug_info(inst);
+//            inst->append_raw_text(dbg_text);
+//        }
 
         string opcode = inst->opcode();
 
@@ -531,7 +531,6 @@ void LLParser::parse_debug_info(Instruction* inst) {
 
 Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
     // inst will be appended to bb
-    parser_assert(!Strings::contains(line(), ", !"), "");
     Instruction* inst = IRBuilder::create_instruction(line(), this);
     bb->append_instruction(inst);  // now parsing the instruction shouldn't need bb's info (data flow)
     inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes

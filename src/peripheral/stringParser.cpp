@@ -85,6 +85,33 @@ void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim,
     _eol = eol;
     _fail = fail;
 }
+
+/**@brief Similar to get_word_of(), except that the state of parser does not change. The result is stored in _lookahead.
+ *
+ * @param delims
+ * @param append_delim
+ * @param skip_delim
+ * @param skip_ws
+ */
+void StringParser::get_lookahead_of(string delims, bool append_delim, bool skip_delim, bool skip_ws) {
+    /* save state */
+    string word = _word;
+    int intext_pos = _intext_pos;
+    char chr = _char;
+    bool eol = _eol;
+    bool fail = _fail;
+
+    get_word_of(delims, append_delim, skip_delim, skip_ws);
+    _lookahead = _word;
+    _aheadpos = _intext_pos;
+
+    /* recover */
+    _word = word;
+    _intext_pos = intext_pos;
+    _char = chr;
+    _eol = eol;
+    _fail = fail;
+}
 //
 //void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim, bool skip_whitspace) {
 //    guarantee(_intext_pos < _text.size(), "intext pointer out of range");

@@ -26,6 +26,7 @@ public:
 
     void parse_function_pointer_type();
     Instruction* create_instruction(string &text);
+    void parse_metadata(Instruction* ins);
 
     /* the do_xxx functions will not check dynamic_cast */
     Instruction* do_alloca(bool has_assignment=1);

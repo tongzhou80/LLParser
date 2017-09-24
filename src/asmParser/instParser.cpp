@@ -95,6 +95,7 @@ Instruction* InstParser::create_instruction(string &text) {
 
     if (parse_routine) {
         (this->*parse_routine)(inst);
+        parse_metadata(inst);
         //parse(inst);
     }
     return inst;
@@ -129,6 +130,23 @@ void InstParser::parse(Instruction *inst) {
     }
 }
 
+/**@brief Parse instruction's metadata
+ *
+ * The rest of text(_intext_pos) should start with ", !dbg" or " !dbg"
+ * @param ins
+ */
+void InstParser::parse_metadata(Instruction *ins) {
+    if (_eol) {
+        return;
+    }
+
+    if (_char == ',') {
+        inc_intext_pos();
+    }
+    match(" !dbg !");
+    ins->set_dbg_id(parse_integer());
+    /* todo: more metadata */
+}
 
 /*
  * <result> = [tail | musttail | notail ] call [fast-math flags] [cconv] [ret attrs] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]
@@ -229,11 +247,10 @@ void InstParser::do_call_family(Instruction* inst) {
      */
 
     if (_char == 'b') {
-        get_word();
-        guarantee(_word == "bitcast", " ");
+        match("bitcast");
         ci->set_has_bitcast();
 
-        inc_intext_pos();
+        inc_intext_pos(2);
         //parse_function_pointer_type();
         parse_compound_type();
         skip_ws();
@@ -253,8 +270,7 @@ void InstParser::do_call_family(Instruction* inst) {
             fn_name = _word;
             match("to");
             parse_compound_type();
-            inc_intext_pos();
-            guarantee(_char == '(', " ");  // args start here
+            match(')');  // args start here
         }
         else {
             get_word('(', false, false);
@@ -284,12 +300,15 @@ void InstParser::do_call_family(Instruction* inst) {
     string args = jump_to_end_of_scope();
     ci->set_raw_field("args", args.substr(1, args.size()-2)); // strip the ()
 
-    if (!_eol) {
-        get_word();
-        if (_word[0] == '#') {
+    /* The optional function attributes list */
+    while (!_eol) {
+        get_lookahead_of(", ");
+        if (_lookahead[0] == '#') {
+            jump_ahead();
             ci->set_raw_field("fn-attrs", _word);
-            if (!_eol)
-                get_word();
+        }
+        else {
+            break;
         }
     }
 
@@ -453,25 +472,17 @@ void InstParser::do_bitcast(Instruction *inst) {
 
     if (_word == "bitcast") {
         BitCastInst* bci = parse_inline_bitcast();
-
-        parser_assert(_char == '(', "bitcast should be followed by a ' ('");
-        inc_intext_pos();
-        string old_old_ty = parse_compound_type();
-        get_word();
-
-        I->set_raw_field("value", _word);
-        match("to");
-
-        //todo: the rest of it is not parsed
+        I->set_raw_field("value", bci->get_raw_field("value"));
+        syntax_check(old_ty == bci->get_raw_field("ty2"));
     }
     else {
         I->set_raw_field("value", _word);
-        match("to");
-
-        string new_ty = parse_compound_type();
-        I->set_raw_field("ty2", new_ty);
     }
 
+    match("to", true);
+
+    string new_ty = parse_compound_type();
+    I->set_raw_field("ty2", new_ty);
 }
 
 //void InstParser::skip_and_check_opcode(const char* op, Instruction *inst) {
@@ -502,7 +513,7 @@ void InstParser::do_branch(Instruction *inst) {
         inst->set_raw_field("false-label", _word);
     } // unconditional
     else if (_word == "label") {
-        get_word();
+        get_word_of(" ,");
         inst->set_raw_field("true-label", _word);  // unconditional branches only use 'true-label'
     }
     else {
