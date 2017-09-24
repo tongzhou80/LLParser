@@ -584,7 +584,9 @@ void LLParser::parse_metadatas(Module *module) {
             module->set_named_metadata(_word, data);
         }
         else {
-            guarantee(std::stoi(_word) == module->unnamed_metadata_list().size(), "bad dbg id numbering");
+            if (!UseSplitModule) {
+                guarantee(std::stoi(_word) == module->unnamed_metadata_list().size(), "bad dbg id numbering");
+            }
 
             get_word('!');
             if (_char == '{') {
