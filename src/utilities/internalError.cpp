@@ -28,6 +28,7 @@
 /** Print a demangled stack backtrace of the caller function to FILE* out. */
 void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63)
 {
+    fprintf(out, "[faulty file: %s]\n", SysDict::filename().c_str());
     fprintf(out, "[thread: %llu]\n", pthread_self());
     fprintf(out, "=================== [stack trace] ===================\n");
 
@@ -158,8 +159,6 @@ void Errors::sigsegv_handler(int sig, siginfo_t *info, void *secret) {
     char **messages = (char **)NULL;
     int i, trace_size = 0;
     ucontext_t *uc = (ucontext_t *)secret;
-
-    printf("faulty input file: %s", SysDict::filename().c_str());
 
     /* Do something useful with siginfo_t */
     if (sig == SIGSEGV)
