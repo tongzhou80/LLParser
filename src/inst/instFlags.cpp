@@ -11,7 +11,7 @@ std::set<string> InstFlags::_fastmaths;
 std::set<string> InstFlags::_linkages;
 std::set<string> InstFlags::_cconvs;
 std::set<string> InstFlags::_param_attrs;
-std::set<string> InstFlags::_tails;
+std::unordered_set<string> InstFlags::_tails;
 std::set<string> InstFlags::_terminator_insts;
 
 void InstFlags::init() {
@@ -26,9 +26,9 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
-bool InstFlags::in_tails(string key) {
-    return key == "tail" || key == "musttail" || key == "notail";
-}
+//bool InstFlags::in_tails(string key) {
+//    return key == "tail" || key == "musttail" || key == "notail";
+//}
 
 bool InstFlags::in_param_attrs(string key) {
     const char* p1 = "align%d";
