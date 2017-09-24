@@ -21,6 +21,7 @@
 #include <asmParser/sysDict.h>
 #include "internalError.h"
 #include "macros.h"
+#include "flags.h"
 
 #ifdef __linux__
 
@@ -130,7 +131,12 @@ void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63
 
 void Errors::die() {
     //std::terminate();
-    exit(1);
+    if (ParallelModule) {
+        pthread_exit(0);
+    }
+    else {
+        exit(1);
+    }
 }
 
 void Errors::semantic_error_handler() {
