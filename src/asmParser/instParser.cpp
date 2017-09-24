@@ -448,33 +448,28 @@ void InstParser::do_bitcast(Instruction *inst) {
     BitCastInst* I = dynamic_cast<BitCastInst*>(inst);
 
     string old_ty = parse_compound_type();
-    I->set_ty_str(old_ty);
     I->set_raw_field("ty", old_ty);
     get_word();
 
     if (_word == "bitcast") {
         BitCastInst* bci = parse_inline_bitcast();
-        
+
         parser_assert(_char == '(', "bitcast should be followed by a ' ('");
         inc_intext_pos();
         string old_old_ty = parse_compound_type();
         get_word();
 
-        I->set_value_str(_word);
         I->set_raw_field("value", _word);
         match("to");
 
         //todo: the rest of it is not parsed
     }
     else {
-        I->set_value_str(_word);
         I->set_raw_field("value", _word);
         match("to");
 
         string new_ty = parse_compound_type();
         I->set_raw_field("ty2", new_ty);
-        I->set_ty2_str(new_ty);
-        //zpl("old type: %s, value: %s, new type: %s", old_ty.c_str(), _word.c_str(), new_ty.c_str());
     }
 
 }

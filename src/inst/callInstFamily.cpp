@@ -110,7 +110,7 @@ void CallInstFamily::try_resolve_indirect_call() {
             set_target_inst(I);
 
             if (BitCastInst* bi = dynamic_cast<BitCastInst*>(I)) {
-                string value = bi->value_str();
+                string value = bi->get_raw_field("value");
                 if (value[0] == '@') {
                     //zpl("resolved indirect call target to %s (%s)", value.c_str(), raw_c_str());
                     resolve_callee_symbol(&value[1]);

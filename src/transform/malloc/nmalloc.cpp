@@ -337,7 +337,6 @@ public:
         bci->update_raw_field("value", '@' + new_value);
 
         if (add_id) {
-            string old_casted_ty = bci->ty2_str();
             string new_casted_ty = bci->get_raw_field("ty2");
             int insert_pos = new_casted_ty.find('(');
             new_casted_ty.insert(insert_pos+1, "i32, ");
@@ -355,12 +354,12 @@ public:
 
         /* manipulate the text */
         string text = old->raw_text();
-        string old_value = bci->value_str();
+        string old_value = bci->get_raw_field("value");
         new_value = '@' + new_value;
         Strings::replace(text, old_value, new_value);
 
         if (add_id) {
-            string old_casted_ty = bci->ty2_str();
+            string old_casted_ty = bci->get_raw_field("ty2");
             string new_casted_ty = old_casted_ty;
             int insert_pos = new_casted_ty.find('(');
             new_casted_ty.insert(insert_pos+1, "i32, ");
