@@ -32,9 +32,7 @@ public:
     void do_branch(Instruction* inst);
     void do_call_family(Instruction* inst);
     void do_load(Instruction* inst);
-    void do_bitcast(Instruction* inst);
-
-    BitCastInst* parse_inline_bitcast();
+    void do_bitcast(Instruction* inst, bool is_embedded=false);
 
 
     //static void parse_instruction(Instruction** ip);

@@ -32,7 +32,7 @@ Instruction* InstParser::create_instruction(string &text) {
     get_word_of(" ,");
     op = _word;
     Instruction* inst = NULL;
-    void (InstParser::*parse_routine) (Instruction*) = NULL;
+    //void (InstParser::*parse_routine) (Instruction*) = NULL;
 
     if (op == "tail" || op == "musttail" || op == "notail") {
         op = "call";
@@ -43,17 +43,17 @@ Instruction* InstParser::create_instruction(string &text) {
         case 'b':
             if (op == "bitcast") {
                 inst = new BitCastInst();
-                parse_routine = &InstParser::do_bitcast;
+                //parse_routine = &InstParser::do_bitcast;
             }
             else if (op == "br") {
                 inst = new BranchInst();
-                parse_routine = &InstParser::do_branch;
+                //parse_routine = &InstParser::do_branch;
             }
             break;
         case 'c': {
             if (op == "call") {
                 inst = new CallInst();
-                parse_routine = &InstParser::do_call_family;
+                //parse_routine = &InstParser::do_call_family;
             }
             else {
 
@@ -64,13 +64,13 @@ Instruction* InstParser::create_instruction(string &text) {
         case 'i': {
             if (op == "invoke") {
                 inst = new InvokeInst();
-                parse_routine = &InstParser::do_call_family;
+                //parse_routine = &InstParser::do_call_family;
             }
         }
         case 'l': {
             if (op == "load") {
                 inst = new LoadInst();
-                parse_routine = &InstParser::do_load;
+                //parse_routine = &InstParser::do_load;
             }
         }
         default: {
@@ -89,18 +89,17 @@ Instruction* InstParser::create_instruction(string &text) {
     }
     inst->set_raw_text(text);
 
-    if (parse_routine) {
-        (this->*parse_routine)(inst);
+    if (inst->type() != Instruction::UnknownInstType) {
+        parse(inst);
+        //(this->*parse_routine)(inst);
         parse_metadata(inst);
-        //parse(inst);
+        //
     }
     return inst;
 
 }
 
 void InstParser::parse(Instruction *inst) {
-    string text = inst->raw_text();
-    set_text(text);
     switch (inst->type()) {
         case Instruction::BranchInstType: {
             do_branch(inst);
@@ -115,7 +114,7 @@ void InstParser::parse(Instruction *inst) {
             break;
         }
         case Instruction::LoadInstType: {
-            //do_load(inst);
+            do_load(inst);
             break;
         }
         case Instruction::BitCastInstType :
@@ -373,7 +372,8 @@ void InstParser::do_load(Instruction *inst) {
         match(',');
     }
     else if (_word == "bitcast") {
-        BitCastInst* bci = parse_inline_bitcast();
+        BitCastInst* bci = new BitCastInst();
+        do_bitcast(bci, true);
         li->set_raw_field("pointer", bci->get_raw_field("value"));
         syntax_check(bci->get_raw_field("ty2") == ty_p);
         match(',');
@@ -429,50 +429,38 @@ void InstParser::parse_function_pointer_type() {
     inc_intext_pos(2);
 }
 
-/**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
- *
- * It starts parsing from the '(' after the 'bitcast'
- *
- * @return
- */
-BitCastInst* InstParser::parse_inline_bitcast() {
-    match('(');
-    BitCastInst* bci = new BitCastInst();
-    string old_ty = parse_compound_type();
-    bci->set_raw_field("ty", old_ty);
-    get_word();
-    parser_assert(_word != "bitcast", "Should not contain more than one inline bitcasts");
-    bci->set_raw_field("value", _word);
-    match("to");
-    string new_ty = parse_compound_type();
-    bci->set_raw_field("ty2", new_ty);
-    match(')');
-    return bci;
-}
-
-void InstParser::do_bitcast(Instruction *inst) {
+void InstParser::do_bitcast(Instruction *inst, bool is_embedded) {
     /* corner case
      *  %1 = bitcast void (...)* bitcast (void (i64*, i32)* @wrf_error_fatal_ to void (...)*) to void (i8*, i64, ...)*
      */
     BitCastInst* I = dynamic_cast<BitCastInst*>(inst);
+    if (is_embedded) {
+        match('(');
+    }
 
     string old_ty = parse_compound_type();
     I->set_raw_field("ty", old_ty);
     get_word();
 
     if (_word == "bitcast") {
-        BitCastInst* bci = parse_inline_bitcast();
-        I->set_raw_field("value", bci->get_raw_field("value"));
-        syntax_check(old_ty == bci->get_raw_field("ty2"));
+        BitCastInst* embedded_bci = new BitCastInst();
+        do_bitcast(embedded_bci, true);
+        I->set_raw_field("value", embedded_bci->get_raw_field("value"));
+        syntax_check(old_ty == embedded_bci->get_raw_field("ty2"));
+    }
+    else if (_word == "getelementptr") {
+        parser_assert(0, "to deal");
     }
     else {
         I->set_raw_field("value", _word);
     }
 
     match("to", true);
-
     string new_ty = parse_compound_type();
     I->set_raw_field("ty2", new_ty);
+    if (is_embedded) {
+        match(')');
+    }
 }
 
 //void InstParser::skip_and_check_opcode(const char* op, Instruction *inst) {
