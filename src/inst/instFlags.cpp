@@ -26,6 +26,10 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
+bool InstFlags::in_tails(string key) {
+    return key == "tail" || key == "musttail" || key == "notail";
+}
+
 bool InstFlags::in_param_attrs(string key) {
     const char* p1 = "align%d";
     int dummy;

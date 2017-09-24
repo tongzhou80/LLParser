@@ -28,7 +28,8 @@ public:
     static bool in_cconvs(string key)                          { return _cconvs.find(key) != _cconvs.end(); }
 
     static bool in_param_attrs(string key);
-    static bool in_tails(string key)                           { return _tails.find(key) != _tails.end(); }
+    //static bool in_tails(string key)                           { return _tails.find(key) != _tails.end(); }
+    static bool in_tails(string key);
 
     static bool in_terminator_insts(string key)                { return _terminator_insts.find(key) != _terminator_insts.end(); }
 };
