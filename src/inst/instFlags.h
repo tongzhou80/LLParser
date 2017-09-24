@@ -33,7 +33,7 @@ public:
     static bool in_param_attrs(string key);
     static bool in_tails(string key)                           { return _tails.find(key) != _tails.end(); }
     static void print_tails();
-    //static bool in_tails(string key);
+    static bool in_tails1(string key);
 
     static bool in_terminator_insts(string key)                { return _terminator_insts.find(key) != _terminator_insts.end(); }
 };

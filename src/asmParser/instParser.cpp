@@ -172,7 +172,7 @@ void InstParser::do_call_family(Instruction* inst) {
 
     string ret_ty, fnty;
 
-    InstFlags::print_tails();
+    guarantee(InstFlags::in_tails(_word) == InstFlags::in_tails1(_word), " ");
     if (InstFlags::in_tails(_word)) {
         ci->set_raw_field("tail", _word);
         get_word();

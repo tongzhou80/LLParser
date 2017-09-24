@@ -26,9 +26,10 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
-//bool InstFlags::in_tails(string key) {
-//    return key == "tail" || key == "musttail" || key == "notail";
-//}
+bool InstFlags::in_tails1(string key) {
+    return key == "tail" || key == "musttail" || key == "notail";
+}
+
 void InstFlags::print_tails() {
     zpl("tails:")
     for (auto t: _tails) {
