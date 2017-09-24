@@ -28,7 +28,7 @@ Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
     }
 
     /* for -XX:-ParallelInst pass the entire text to the instParser */
-
+    return llparser->inst_parser()->create_instruction(text);
 
     string op;
     string name;

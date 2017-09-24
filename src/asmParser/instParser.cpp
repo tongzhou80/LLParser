@@ -20,6 +20,87 @@ InstParser::InstParser() {
 //    _table["call"] = InstParser::do_call;
 }
 
+Instruction* InstParser::create_instruction(string &text) {
+    set_text(text);
+    string op;
+    string name;
+    bool has_assignment = false;
+
+    if (Strings::startswith(text, "%")) {
+        get_word();
+        name = _word;
+        match('=');
+        has_assignment = true;
+    }
+
+    get_word_of(" ,");
+    op = _word;
+    Instruction* inst = NULL;
+    void (InstParser::*parse_routine) (Instruction*) = NULL;
+
+    if (op == "call" || op == "tail" || op == "musttail" || op == "notail") {
+        op = "call";
+    }
+
+    /* unaware of the instruction type at this point */
+    switch (op[0]) {
+        case 'b':
+            if (op == "bitcast") {
+                inst = new BitCastInst();
+                parse_routine = &InstParser::do_bitcast;
+            }
+            else if (op == "br") {
+                inst = new BranchInst();
+                parse_routine = &InstParser::do_branch;
+            }
+            break;
+        case 'c': {
+            if (op == "call") {
+                inst = new CallInst();
+                parse_routine = &InstParser::do_call_family;
+            }
+            else {
+
+            }
+
+            break;
+        }
+        case 'i': {
+            if (op == "invoke") {
+                inst = new InvokeInst();
+                parse_routine = &InstParser::do_call_family;
+            }
+        }
+        case 'l': {
+            if (op == "load") {
+                inst = new LoadInst();
+                //parse_routine = &InstParser::do_load;
+            }
+        }
+        default: {
+            break;
+        }
+    }
+
+    if (!inst) {
+        inst = new Instruction();
+    }
+
+    inst->set_opstr(op);
+    inst->set_has_assignment(has_assignment); // have to repeat this for every inst
+    if (has_assignment) {
+        inst->set_name(name);
+    }
+    inst->set_raw_text(text);
+
+    if (parse_routine) {
+        set_text(text);
+        (this->*parse_routine)(inst);
+        //parse(inst);
+    }
+    return inst;
+
+}
 
 void InstParser::parse(Instruction *inst) {
     string text = inst->raw_text();

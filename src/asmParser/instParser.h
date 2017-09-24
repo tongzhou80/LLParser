@@ -22,10 +22,10 @@ public:
 
     Instruction* parse(string& );
     void parse(Instruction* inst);
-    string get_opcode(string& );
+
 
     void parse_function_pointer_type();
-    void fastforwad_bitcast();
+    Instruction* create_instruction(string &text);
 
     /* the do_xxx functions will not check dynamic_cast */
     Instruction* do_alloca(bool has_assignment=1);
@@ -36,7 +36,6 @@ public:
 
     BitCastInst* parse_inline_bitcast();
 
-    static Instruction* create(string& text);
 
     //static void parse_instruction(Instruction** ip);
 };
