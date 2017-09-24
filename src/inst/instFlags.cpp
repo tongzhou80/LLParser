@@ -11,7 +11,7 @@ std::set<string> InstFlags::_fastmaths;
 std::set<string> InstFlags::_linkages;
 std::set<string> InstFlags::_cconvs;
 std::set<string> InstFlags::_param_attrs;
-std::unordered_set<string> InstFlags::_tails;
+std::set<string> InstFlags::_tails;
 std::set<string> InstFlags::_terminator_insts;
 
 void InstFlags::init() {
@@ -29,6 +29,12 @@ void InstFlags::init() {
 //bool InstFlags::in_tails(string key) {
 //    return key == "tail" || key == "musttail" || key == "notail";
 //}
+void InstFlags::print_tails() {
+    zpl("tails:")
+    for (auto t: _tails) {
+        zps(t);
+    }
+}
 
 bool InstFlags::in_param_attrs(string key) {
     const char* p1 = "align%d";

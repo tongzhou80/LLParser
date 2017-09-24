@@ -15,7 +15,7 @@ class InstFlags {
     static std::set<string> _linkages;
     static std::set<string> _cconvs;  // calling conventions
     static std::set<string> _param_attrs;  // attrs for return type and function parameter type
-    static std::unordered_set<string> _tails;
+    static std::set<string> _tails;
     static std::set<string> _terminator_insts;
 
 public:
@@ -32,6 +32,7 @@ public:
 
     static bool in_param_attrs(string key);
     static bool in_tails(string key)                           { return _tails.find(key) != _tails.end(); }
+    static void print_tails();
     //static bool in_tails(string key);
 
     static bool in_terminator_insts(string key)                { return _terminator_insts.find(key) != _terminator_insts.end(); }
