@@ -18,7 +18,6 @@ class InstParser: public IRParser {
 
     //static std::map<string, inst_parse_routine> _table;
 public:
-    InstParser();
 
     Instruction* parse(string& );
     void parse(Instruction* inst);

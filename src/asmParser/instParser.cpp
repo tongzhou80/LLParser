@@ -15,10 +15,6 @@
 //std::map<string, inst_parse_routine> InstParser::_table;
 //int InstParser::MAX_VALUE_LEN = 1024;
 
-InstParser::InstParser() {
-//    _table["alloca"] = InstParser::do_alloca;
-//    _table["call"] = InstParser::do_call;
-}
 
 Instruction* InstParser::create_instruction(string &text) {
     set_text(text);
@@ -132,7 +128,7 @@ void InstParser::parse(Instruction *inst) {
 
 /**@brief Parse instruction's metadata
  *
- * The rest of text(_intext_pos) should start with ", !dbg" or " !dbg"
+ * The rest of text(_intext_pos) should start with ", !" or " !"
  * @param ins
  */
 void InstParser::parse_metadata(Instruction *ins) {
@@ -143,8 +139,12 @@ void InstParser::parse_metadata(Instruction *ins) {
     if (_char == ',') {
         inc_intext_pos();
     }
-    match(" !dbg !");
-    ins->set_dbg_id(parse_integer());
+    match(" !");
+    get_word('!');
+    if (_word == "dbg ") {
+        ins->set_dbg_id(parse_integer());
+    }
+
     /* todo: more metadata */
 }
 
@@ -218,20 +218,19 @@ void InstParser::do_call_family(Instruction* inst) {
 
         /* ()* => part of pointer type */
         if (_char == '*') {
-            inc_intext_pos(2);
+            while (_char == '*') {
+                inc_intext_pos();
+            }
         } // (...) variable args check
         else {
             ci->set_is_varargs();
             parser_assert(Strings::endswith(args_sig, "...)"), "vararg signature should end with '...)'");
             ci->set_raw_field("fnty", args_sig);
-            inc_intext_pos();
         }
-    }
-    else {
-
+        inc_intext_pos();
     }
 
-    // Not deal with this for now, ty might also contain '%' as there are global structs
+
 
     if (CallInstParsingVerbose) {
         printf( "call:\n"
@@ -243,21 +242,21 @@ void InstParser::do_call_family(Instruction* inst) {
     /* deal with bitcast first if at all
      * corner cases:
      * tail call void bitcast (void (%struct.bContext*, %struct.uiBlock.22475* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)* @uiPupBlock
-     * to void (%struct.bContext*, %struct.uiBlock* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)*)(%struct.bContext* %C, %struct.uiBlock* (%struct.bContext*, %struct.ARegion*, i8*)* nonnull @wm_enum_search_menu, i8* %0) #3
+     * to void (%struct.bContext*, %struct.uiBlock* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)*)
+     * (%struct.bContext* %C, %struct.uiBlock* (%struct.bContext*, %struct.ARegion*, i8*)* nonnull @wm_enum_search_menu, i8* %0) #3
      */
 
     if (_char == 'b') {
-        match("bitcast");
+        match("bitcast (");
         ci->set_has_bitcast();
 
-        inc_intext_pos(2);
         //parse_function_pointer_type();
         parse_compound_type();
         skip_ws();
         parser_assert(_char == '%' || _char == '@', " ");
     }
 
-    //
+
     // %15 = call i64 (i8*, i8*, ...) bitcast (i64 (...)* @f90_auto_alloc04 to i64 (i8*, i8*, ...)*)
     // (i8* nonnull %14, i8* bitcast (i32* @.C323_shell_ to i8*))"
 
@@ -278,7 +277,6 @@ void InstParser::do_call_family(Instruction* inst) {
         }
 
         ci->set_raw_field("fnptrval", fn_name);
-        //ci->resolve_callee_symbol(fn_name);
     }
     else if (_char == '%') {
         // todo: indirect calls
@@ -288,15 +286,13 @@ void InstParser::do_call_family(Instruction* inst) {
         ci->set_is_indirect_call();
         ci->set_called_label(label);
         ci->set_raw_field("fnptrval", label);
-//
-//        if (ci->parent())
-//            ci->try_resolve_indirect_call();
-        guarantee(!ci->has_bitcast(), "just check");
+        parser_assert(!ci->has_bitcast(), "just check");
     }
     else {
         parser_assert(0, "Expect '%%' or '@', char: |%c|, pos: %d", _char, _intext_pos);
     }
 
+    /* do args */
     string args = jump_to_end_of_scope();
     ci->set_raw_field("args", args.substr(1, args.size()-2)); // strip the ()
 
@@ -313,16 +309,11 @@ void InstParser::do_call_family(Instruction* inst) {
     }
 
     if (inst->type() == Instruction::InvokeInstType) {
-        guarantee(_word == "to", "word is %s", _word.c_str());
-        get_word();
-        guarantee(_word == "label", " ");
+        match("to label ", true);
         get_word();
         inst->set_raw_field("normal-label", _word);
-        get_word();
-        guarantee(_word == "unwind", " ");
-        get_word();
-        guarantee(_word == "label", " ");
-        get_word();
+        match("unwind label ");
+        get_word(',');
         inst->set_raw_field("exception-label", _word);
     }
     return;
@@ -405,28 +396,6 @@ void InstParser::do_load(Instruction *inst) {
     /* TODO: more field */
 }
 
-/**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
- *
- * It starts parsing from the '(' after the 'bitcast'
- *
- * @return
- */
-BitCastInst* InstParser::parse_inline_bitcast() {
-    match('(');
-    BitCastInst* bci = new BitCastInst();
-    string old_ty = parse_compound_type();
-    bci->set_raw_field("ty", old_ty);
-    get_word();
-    guarantee(_word != "bitcast", "Should not contain more than one inline bitcasts");
-    bci->set_raw_field("value", _word);
-    get_word();
-    guarantee(_word == "to", "syntax check");
-    string new_ty = parse_compound_type();
-    bci->set_raw_field("ty2", new_ty);
-    match(')');
-    return bci;
-}
-
 void InstParser::parse_function_pointer_type() {
     /* corner case
      * tail call void bitcast (void (%struct.bContext*, %struct.uiBlock.22475* (%struct.bContext*, %struct.ARegion*, i8*)*, i8*)* @uiPupBlock
@@ -458,6 +427,27 @@ void InstParser::parse_function_pointer_type() {
     inc_intext_pos();
     guarantee(_char == '*', "Bad function pointer type: %s", _text.c_str());
     inc_intext_pos(2);
+}
+
+/**@brief Returns a pseudo BitCastInst which is used to provide info for the host inst
+ *
+ * It starts parsing from the '(' after the 'bitcast'
+ *
+ * @return
+ */
+BitCastInst* InstParser::parse_inline_bitcast() {
+    match('(');
+    BitCastInst* bci = new BitCastInst();
+    string old_ty = parse_compound_type();
+    bci->set_raw_field("ty", old_ty);
+    get_word();
+    parser_assert(_word != "bitcast", "Should not contain more than one inline bitcasts");
+    bci->set_raw_field("value", _word);
+    match("to");
+    string new_ty = parse_compound_type();
+    bci->set_raw_field("ty2", new_ty);
+    match(')');
+    return bci;
 }
 
 void InstParser::do_bitcast(Instruction *inst) {
