@@ -10,8 +10,8 @@
 std::set<string> InstFlags::_fastmaths;
 std::set<string> InstFlags::_linkages;
 std::set<string> InstFlags::_cconvs;
-std::set<string> InstFlags::_visibility;
-std::set<string> InstFlags::_dll_storage_class;
+std::set<string> InstFlags::_visibilities;
+std::set<string> InstFlags::_dll_storage_classes;
 std::set<string> InstFlags::_param_attrs;
 std::set<string> InstFlags::_tails;
 std::set<string> InstFlags::_terminator_insts;

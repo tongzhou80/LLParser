@@ -41,7 +41,7 @@ typedef std::string string;
             fprintf(stderr, "Assertion `" #condition "` failed in %s:%d: ", __FILE__, __LINE__); \
             fprintf(stderr, ##args); \
             fprintf(stderr, "\n"); \
-            fprintf(stderr, "problematic line: %s\n", text().c_str()); \
+            fprintf(stderr, "problematic line: %s\n", this->text().c_str()); \
             Errors::semantic_error_handler(); \
         } \
     } while (false)

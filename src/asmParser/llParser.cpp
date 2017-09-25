@@ -322,14 +322,27 @@ Function* LLParser::create_function(string &text) {
     if (text[len-1] == ' ') {
         len--;
     }
+    Function* func = new Function();
     set_line(text.substr(0, len));
     get_word();
-    string declare_or_define = _word;
+    if (_word == "declare") {
+        func->set_is_external();
+    }
+    else if (_word == "define") {
+        func->set_is_defined();
+    }
+    else {
+        guarantee(0, "function starts with neither declare nor define");
+    }
     string linkage, cconv, ret_attrs, ret_type;
+
 
     get_lookahead();
     /* process optional flags */
-    set_linkage_flag()
+    set_linkage_flag(func);
+    set_cconv_flag(func);
+    set_ret_attrs(func);
+    /* todo: more to add */
 //    if (InstFlags::in_linkages(_lookahead)) {
 //        linkage = _lookahead;
 //        jump_ahead();
@@ -362,24 +375,31 @@ Function* LLParser::create_function(string &text) {
     ret_type = parse_compound_type();
     skip_ws();
 
+    parser_assert(_char == '@', "Bad function header");
+    inc_inline_pos();
+
+    get_word('(', false, false);
+    string name = _word;
+    func->set_name(name);
+    string params = jump_to_end_of_scope();  // todo: parse params
+    int dbg = -1;
+
+    // fast-forward to !dbg
+    int pos = this->text().find("!dbg");
+    if (pos != string::npos) {
+        set_intext_pos(pos+strlen("!dbg !"));
+        get_word();
+        dbg = std::stoi(_word);
+        func->set_dbg_id(dbg);
+    }
+
     if (FunctionParsingVerbose) {
-        printf("%s function:\n", declare_or_define.c_str());
+        printf("  name: |%s|\n"
+                       "  args: |%s|\n",
+               name.c_str(), params.c_str());
     }
 
-    /* Now we can determine which function it is */
-    Function* func = parse_function_name_and_args();
     func->set_raw_text(line());
-
-    if (declare_or_define[2] == 'c') {
-        func->set_is_external();
-    }
-    else if (declare_or_define[2] == 'f') {
-        func->set_is_defined();
-    }
-    else {
-        guarantee(0, "function starts with neither declare nor define");
-    }
-
     return func;
 }
 

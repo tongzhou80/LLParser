@@ -30,17 +30,17 @@ void SysArgs::init(SoptInitArgs* initArgs) {
         std::vector<string> benches;
         //benches.push_back("450.soplex");
         //benches.push_back("433.milc");
-        //benches.push_back("453.povray");
-        //benches.push_back("401.bzip2");
+        benches.push_back("453.povray");
+        benches.push_back("401.bzip2");
         //benches.push_back("456.hmmer");
         //benches.push_back("astar");
         //benches.push_back("429.mcf");
         //benches.push_back("gobmk");
         //benches.push_back("h264ref");
         //benches.push_back("462.libquantum");
-        benches.push_back("403.gcc");
-        for (int i = 0; i < benches.size(); ++i) {
-            string path = "../../benchmarks/cpu2006/" + benches[i] + "/src/" + benches[i].substr(4) +".ll";
+        //benches.push_back("403.gcc");
+        for (auto bench: benches) {
+            string path = "../../benchmarks/cpu2006/" + bench + "/src/" + bench.substr(4) +".ll";
             //parser->parse("../../test/fortran/a.ll");
             //parser->parse("../../test/clone/clone3.ll");
             //path = "../../test/fortran/spec_backtrace.o.ll";
