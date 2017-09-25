@@ -9,17 +9,18 @@
 
 class SplitModulePass: public Pass {
     string _output_dir;
+    int _ncores;
 public:
     SplitModulePass() {
         set_is_module_pass();
 
         _output_dir = ".";
+        _ncores = std::thread::hardware_concurrency();;
     }
 
     bool run_on_module(Module* module) override {
-        auto ncores = std::thread::hardware_concurrency();
-        if (ncores < 4) {
-            fprintf(stderr, "The number of cores should at least be 4, but got %d", ncores);
+        if (_ncores < 4) {
+            fprintf(stderr, "The number of cores should at least be 4, but got %d", _ncores);
             exit(1);
         }
 
@@ -59,10 +60,18 @@ public:
         ofs.close();
     }
 
+    std::size_t total_inst_lines(Module* m) {
+        std::size_t lines = 0;
+        for (auto F: m->function_list()) {
+            lines += F->instruction_count();
+        }
+        return lines;
+    }
+
     void print_functions(Module* m) {
         std::ofstream ofs;
-        auto ncores = std::thread::hardware_concurrency();
-        int nfiles = (ncores-1) / 3 * 2;
+        int nfiles = (_ncores-1) / 3 * 2;
+        std::size_t lines_per_file = total_inst_lines(m) / nfiles;
         auto nfuncs = m->function_list().size();
         std::size_t nfunc_per_file;
         if (nfuncs % nfiles == 0) {
@@ -72,28 +81,53 @@ public:
             nfunc_per_file = nfuncs / nfiles + 1;
         }
 
-        for (int i = 0; i < nfuncs; ++i) {
-            if (i % nfunc_per_file == 0) {
-                if (ofs.is_open()) {
-                    ofs.close();
-                }
-                ofs.open(_output_dir+"/func"+std::to_string(i/nfunc_per_file)+".sm");
+        std::size_t lines = 0;
+        int i = 0;
+        ofs.open(_output_dir+"/func"+std::to_string(i++/nfunc_per_file)+".sm");
+
+        ofs << "; ModuleID = '" << m->module_id() << "'\n";
+        for (auto pair: m->headers()) {
+            ofs << pair.first << " = \"" << pair.second << "\"\n";
+        }
+        ofs << '\n';
+
+        for (auto F: m->function_list()) {
+            lines += F->instruction_count();
+            if (lines > lines_per_file) {
+                lines = 0;
+                ofs.close();
+                ofs.open(_output_dir+"/func"+std::to_string(i++/nfunc_per_file)+".sm");
 
                 ofs << "; ModuleID = '" << m->module_id() << "'\n";
                 for (auto pair: m->headers()) {
                     ofs << pair.first << " = \"" << pair.second << "\"\n";
                 }
                 ofs << '\n';
-
             }
-            ofs << m->function_list()[i];
+
+            ofs << F;
         }
+//        for (int i = 0; i < nfuncs; ++i) {
+//            if (i % nfunc_per_file == 0) {
+//                if (ofs.is_open()) {
+//                    ofs.close();
+//                }
+//                ofs.open(_output_dir+"/func"+std::to_string(i/nfunc_per_file)+".sm");
+//
+//                ofs << "; ModuleID = '" << m->module_id() << "'\n";
+//                for (auto pair: m->headers()) {
+//                    ofs << pair.first << " = \"" << pair.second << "\"\n";
+//                }
+//                ofs << '\n';
+//
+//            }
+//            ofs << m->function_list()[i];
+//        }
     }
 
     void print_debug_info(Module* m) {
         std::ofstream ofs;
-        auto ncores = std::thread::hardware_concurrency();
-        int nfiles = (ncores-1) / 3 * 1;
+        int nfiles = (_ncores-1) / 3 * 1;
         auto nfuncs = m->unnamed_metadata_list().size();
         std::size_t nfunc_per_file;
         if (nfuncs % nfiles == 0) {
