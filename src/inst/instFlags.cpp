@@ -10,6 +10,8 @@
 std::set<string> InstFlags::_fastmaths;
 std::set<string> InstFlags::_linkages;
 std::set<string> InstFlags::_cconvs;
+std::set<string> InstFlags::_visibility;
+std::set<string> InstFlags::_dll_storage_class;
 std::set<string> InstFlags::_param_attrs;
 std::set<string> InstFlags::_tails;
 std::set<string> InstFlags::_terminator_insts;
@@ -18,7 +20,9 @@ void InstFlags::init() {
     _fastmaths = { "nnan", "ninf", "nsz", "arcp", "contract", "fast"};
     _linkages = { "private", "internal", "available_externally", "weak", "linkonce", "common",
                   "appending", "extern_weak", "linkonce_odr", "weak_odr", "external" };
-    _cconvs = { "ccc", "fastcc" };
+    _cconvs = { "ccc", "fastcc", "coldcc", "cc 10", "cc 11", "webkit_jscc", "anyregcc", "preserve_mostcc", "preserve_allcc", "cxx_fast_tlscc", "swiftcc" };
+    _visibility = { "default", "hidden", "protected" };  // A symbol with internal or private linkage must have default visibility.
+    _dll_storage_class = { "dllimport", "dllexport" };
     _param_attrs = { "zeroext", "signext", "inreg", "byval", "inalloca", "sret", "align", "noalias",
                      "nocapture", "nest", "returned", "nonnull", "dereferenceable", "dereferenceable_or_null" }; // more to go
     _tails = { "tail", "musttail", "notail" };
@@ -26,18 +30,18 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
-bool InstFlags::in_tails1(string key) {
-    return key == "tail" || key == "musttail" || key == "notail";
-}
+bool InstFlags::in_cconvs(const string& key) {
+    if (_cconvs.find(key) != _cconvs.end()) {
+        return true;
+    }
 
-void InstFlags::print_tails() {
-    zpl("tails:")
-    for (auto t: _tails) {
-        zps(t);
+    if (Strings::startswith(key, "cc")) {
+        return Strings::is_number(key.substr(2));
     }
 }
 
-bool InstFlags::in_param_attrs(string key) {
+
+bool InstFlags::in_param_attrs(const string& key) {
     const char* p1 = "align%d";
     int dummy;
     int matched1 = sscanf(key.c_str(), p1, &dummy);
@@ -45,21 +49,17 @@ bool InstFlags::in_param_attrs(string key) {
         return true;
     }
 
-    if (Strings::startswith(key, "dereferenceable_or_null")) {
-        int start_pos = strlen("dereferenceable_or_null") + 2;
-        guarantee(key[start_pos-1] == '(', " ");
-        int end_pos = key.find(')', start_pos);
-        string number = key.substr(start_pos, end_pos-start_pos);
-        guarantee(Strings::is_number(number), " ");
-        return true;
-    }
-    else if (Strings::startswith(key, "dereferenceable")) {
-        int start_pos = strlen("dereferenceable") + 1;
-        guarantee(key[start_pos-1] == '(', " ");
-        int end_pos = key.find(')', start_pos);
-        string number = key.substr(start_pos, end_pos-start_pos);
-        guarantee(Strings::is_number(number), " ");
-        return true;
+    /* dereferenceable_or_null never seemed to be used */
+    const char* prefixes[2] = { "dereferenceable", "dereferenceable_or_null" };
+    for (auto prefix: prefixes) {
+        if (Strings::startswith(key, prefix)) {
+            int start_pos = strlen(prefix) + 1;
+            guarantee(key[start_pos-1] == '(', "char: %c, key: %s", key[start_pos-1], key.c_str());
+            int end_pos = key.find(')', start_pos);
+            string number = key.substr(start_pos, end_pos-start_pos);
+            guarantee(Strings::is_number(number), " ");
+            return true;
+        }
     }
 
     return _param_attrs.find(key) != _param_attrs.end();

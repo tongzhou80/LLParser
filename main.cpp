@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
 
     /* todo:
      * structs and globals need more parsing
+     * more instFlags
      */
 
     pthread_t* tids = NULL;

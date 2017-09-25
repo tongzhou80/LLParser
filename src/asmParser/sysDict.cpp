@@ -86,7 +86,7 @@ const string SysDict::filedir() {
 /**@brief Register a module.
  *
  * ThreadLocal data is also initilized here.
- * Hopefully the lock/unlock won't have much overhead in case of single thread.
+ * The lock/unlock is still executed in case of single thread.
  *
  * @param module
  */

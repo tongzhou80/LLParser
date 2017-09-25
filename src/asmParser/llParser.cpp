@@ -327,35 +327,38 @@ Function* LLParser::create_function(string &text) {
     string declare_or_define = _word;
     string linkage, cconv, ret_attrs, ret_type;
 
-    get_word();
+    get_lookahead();
     /* process optional flags */
-    if (InstFlags::in_linkages(_word)) {
-        linkage = _word;
-        get_word();
+    if (InstFlags::in_linkages(_lookahead)) {
+        linkage = _lookahead;
+        jump_ahead();
+        get_lookahead();
     }
 
-    if (InstFlags::in_cconvs(_word)) {
-        cconv = _word;
-        get_word();
+    if (InstFlags::in_visibility(_lookahead)) {
+        linkage = _lookahead;
+        jump_ahead();
+        get_lookahead();
     }
 
-    while (InstFlags::in_param_attrs(_word)) {
-        ret_attrs += _word;
-        get_word();
+    if (InstFlags::in_cconvs(_lookahead)) {
+        linkage = _lookahead;
+        jump_ahead();
+        get_lookahead();
     }
 
-    ret_type = _word;
+    while (InstFlags::in_param_attrs(_lookahead)) {
+        linkage = _lookahead;
+        jump_ahead();
+        get_lookahead();
+    }
+
 
     /* A function pointer return type looks like this:
      *   declare void (i32)* @signal(i32, void (i32)*) local_unnamed_addr #3
      * Not parse this return type for now
      */
-    ret_type = "";
-
-    // call for todo
-    while (_char != '@') {
-        inc_inline_pos();
-    }
+    ret_type = parse_compound_type();
 
     if (FunctionParsingVerbose) {
         printf("%s function:\n", declare_or_define.c_str());
@@ -444,9 +447,6 @@ void LLParser::remove_tail_comments() {
 
 void LLParser::parse_basic_block(BasicBlock* bb) {
     while (1) {
-        //zpl("line: |%s|", line().c_str())
-            //if (Strings::startswith(line(), "}")) break;
-        
         parser_assert(!Strings::startswith(line(), "}"), "Not a block");
         
 
@@ -653,42 +653,6 @@ void LLParser::parse_di_fields(MetaData* data)  {
         string value = _word.substr(colon_pos+2);
         data->set_raw_field(key, value);
     }
-}
-
-DIFile* LLParser::parse_difile() {
-    /* !DIFile(filename: "specrand.c", directory: "/home/tlaber/CLionProjects/LLParser/benchmarks/cpu2006/libquantum/src") */
-    DIFile* data = new DIFile();
-    const int nfields = 2;
-    const char* fields[nfields] = {"filename", "directory"};
-    for (int i = 0; i < nfields; ++i) {
-        get_word(':');
-        guarantee(_word == fields[i], "Bad DIFile format");
-        get_word('"');
-        get_word('"');
-        if (i == 0) {
-            data->set_filename(_word);
-        }
-        else if ( i ==1 ) {
-            data->set_directory(_word);
-        }
-        get_word(',');
-    }
-    return data;
-}
-
-DISubprogram* LLParser::parse_disubprogram() {
-    /* distinct !DISubprogram(name: "spec_rand", scope: !1200, file: !1200, line: 25, ...) */
-
-    DISubprogram* data = new DISubprogram();
-    while (!_eol) {
-        get_word_of(",)");
-        int colon_pos = _word.find(':');
-        string key = _word.substr(0, colon_pos);
-        string value = _word.substr(colon_pos+2);
-
-        data->set_raw_field(key, value);
-    }
-    return data;
 }
 
 Module* LLParser::parse(string file) {
