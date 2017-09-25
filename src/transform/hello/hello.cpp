@@ -21,7 +21,9 @@ public:
         printf("hello function: %s\n", func->name().c_str());
     }
 
-    bool do_finalization(Module*)  {}
+    bool do_finalization(Module* m)  {
+        printf("function count: %d\n", m->function_list().size());
+    }
 };
 
 REGISTER_PASS(HelloPass)
