@@ -206,6 +206,7 @@ void LLParser::parse_aliases() {
 void LLParser::parse_functions() {
     while (true) {
         // should either start with 'declare' or 'define'
+        guarantee(!line().empty(), "");
         if (line()[2] == 'f') {
             parse_function_definition();
         }
@@ -309,7 +310,6 @@ Function* LLParser::parse_function_header() {
  */
 Function* LLParser::create_function(string &text) {
     int len = text.length();
-    guarantee(len != 0, "create_function: empty text");
     if (text[len-1] == '{') {
         len--;
     }
