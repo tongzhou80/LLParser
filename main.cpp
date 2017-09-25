@@ -22,7 +22,7 @@ void* llparser_start(string* filename) {
         exit(1);
     }
     t.stop();
-    zpl("file: %s; time: %.3f seconds, line: %lld", (*filename).c_str(), t.seconds(), llparser->line_numer());
+    zpl("file: %s; time: %.3f seconds, line: %lld", (*filename).c_str(), t.seconds(), llparser->line_number());
 }
 
 

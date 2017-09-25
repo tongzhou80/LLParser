@@ -205,6 +205,7 @@ void LLParser::parse_aliases() {
 
 void LLParser::parse_functions() {
     while (true) {
+        zps(line()) zpd(line_number())
         // should either start with 'declare' or 'define'
         guarantee(!line().empty(), "");
         if (line()[2] == 'f') {
@@ -635,7 +636,7 @@ void LLParser::parse_metadatas(Module *module) {
         get_real_line();
     }
 
-    guarantee(_ifs.eof(), "should be end of file, line: %d", line_numer());
+    guarantee(_ifs.eof(), "should be end of file, line: %d", line_number());
     //zpl("Module %s: end of file, total: %d", module->name_as_c_str(), _line_number);
 }
 

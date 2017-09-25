@@ -18,7 +18,7 @@ public:
     FileParser();
     const string& filename()                                 { return _file_name; }
     string& line()                                           { return _text; }
-    long long line_numer()                                   { return _line_number; }
+    long long line_number()                                  { return _line_number; }
 
     std::ifstream& getline();
     std::ifstream& getline_nocomment();
