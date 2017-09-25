@@ -3,6 +3,7 @@
 //
 
 #include "flags.h"
+#include "macros.h"
 #include <map>
 #include <cassert>
 

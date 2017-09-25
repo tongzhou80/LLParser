@@ -17,6 +17,7 @@ void* llparser_start(string* filename) {
     else {
         llparser = SysDict::parser;
     }
+
     Module* m = llparser->parse(*filename);
     if (!m) {
         exit(1);
@@ -44,15 +45,26 @@ int main(int argc, char** argv) {
      */
 
     pthread_t* tids = NULL;
-    int file_num = SysArgs::filenames().size();
+    auto& files = SysArgs::filenames();
+    int file_num = files.size();
+
+    // todo: quick & dirty code, to delete
+    if (!files.empty()) {
+        if (Strings::endswith(files[0], ".sm") && !UseSplitModule) {
+            Flags::set_flag("UseSplitModule", true);
+        }
+    }
+
+
     if (ParallelModule) {
         tids = new pthread_t[file_num];
     }
 
     for (int i = 0; i < file_num; ++i) {
-        string file = SysArgs::filenames()[i];
+        string file = files[i];
+
         if (ParallelModule) {
-            pthread_create(&tids[i], NULL, (void* (*)(void*))llparser_start, &SysArgs::filenames()[i]);
+            pthread_create(&tids[i], NULL, (void* (*)(void*))llparser_start, &files[i]);
         }
         else {
             llparser_start(&file);

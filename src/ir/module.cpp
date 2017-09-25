@@ -7,6 +7,7 @@
 #include <inst/instEssential.h>
 #include <di/diEssential.h>
 #include <utilities/flags.h>
+#include <asmParser/sysDict.h>
 
 string Module::get_header(string key) {
      if (_headers.find(key) == _headers.end()) {
