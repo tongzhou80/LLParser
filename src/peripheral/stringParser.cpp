@@ -269,7 +269,7 @@ StringParser* StringParser::get_word_of(string delims, bool append_delim, bool s
 //}
 
 void StringParser::range_check() {
-    parser_assert(_intext_pos < _text.size(), "intext pointer out of range");
+    parser_assert(_intext_pos < _text.size(), "intext pointer out of range, pos: %d, size: %d", _intext_pos, _text.size());
     parser_assert(_char == _text[_intext_pos], "_char: %c, _text[_intext_pos]: %c", _char, _text[_intext_pos]);
 }
 
