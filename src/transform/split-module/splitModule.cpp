@@ -83,7 +83,7 @@ public:
 
         std::size_t lines = 0;
         int i = 0;
-        ofs.open(_output_dir+"/func"+std::to_string(i++/nfunc_per_file)+".sm");
+        ofs.open(_output_dir+"/func"+std::to_string(i++)+".sm");
 
         ofs << "; ModuleID = '" << m->module_id() << "'\n";
         for (auto pair: m->headers()) {
@@ -96,7 +96,7 @@ public:
             if (lines > lines_per_file) {
                 lines = 0;
                 ofs.close();
-                ofs.open(_output_dir+"/func"+std::to_string(i++/nfunc_per_file)+".sm");
+                ofs.open(_output_dir+"/func"+std::to_string(i++)+".sm");
 
                 ofs << "; ModuleID = '" << m->module_id() << "'\n";
                 for (auto pair: m->headers()) {
