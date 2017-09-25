@@ -339,8 +339,9 @@ Function* LLParser::create_function(string &text) {
 
     get_lookahead();
     /* process optional flags */
-    set_linkage_flag(func);
-    set_cconv_flag(func);
+    set_linkage(func);
+    set_visibility(func);
+    set_cconv(func);
     set_ret_attrs(func);
     /* todo: more to add */
 //    if (InstFlags::in_linkages(_lookahead)) {

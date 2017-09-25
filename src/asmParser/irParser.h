@@ -10,7 +10,7 @@
 class Value;
 
 /**@brief IRParser provides common parsing routines for LLVM language.
- * Both LLParser (parse the whole file) and InstParser (parse an instruction) derive from it.
+ * Both LLParser (parse the whole file) and InstParser (parse an vtruction) derive from it.
  *
  */
 class IRParser: public virtual StringParser {
@@ -21,11 +21,12 @@ public:
     string parse_basic_type();
     string parse_compound_type();
     string parse_complex_structs();
-    void set_fastmath_flag(Value* ins);
-    void set_cconv_flag(Value* ins);
-    void set_linkage_flag(Value* ins);
-    void set_param_attrs(Value* ins);
-    void set_ret_attrs(Value* ins);
+    void set_fastmath(Value* v);
+    void set_cconv(Value* v);
+    void set_linkage(Value* v);
+    void set_param_attrs(Value* v);
+    void set_ret_attrs(Value* v);
+    void set_visibility(Value* v);
 };
 
 #endif //LLPARSER_LLASMPARSER_H

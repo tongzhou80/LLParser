@@ -191,40 +191,48 @@ string IRParser::parse_complex_structs() {
  * 
  * Will call get_lookahead() if flag is set
  * 
- * @param ins 
+ * @param v 
  */
-void IRParser::set_cconv_flag(Value *ins) {
+void IRParser::set_cconv(Value *v) {
     if (InstFlags::in_cconvs(_lookahead)) {
-        ins->set_raw_field("cconv", _lookahead);
+        v->set_raw_field("cconv", _lookahead);
         jump_ahead();
         get_lookahead();
     }
 }
 
-void IRParser::set_fastmath_flag(Value *ins) {
+void IRParser::set_fastmath(Value *v) {
     if (InstFlags::in_fastmaths(_lookahead)) {
-        ins->set_raw_field("fast-math", _lookahead);
+        v->set_raw_field("fast-math", _lookahead);
         jump_ahead();
         get_lookahead();
     }
 }
 
-void IRParser::set_linkage_flag(Value *ins) {
+void IRParser::set_linkage(Value *v) {
     if (InstFlags::in_linkages(_lookahead)) {
-        ins->set_raw_field("linkage", _lookahead);
+        v->set_raw_field("linkage", _lookahead);
         jump_ahead();
         get_lookahead();
     }
 }
 
-void IRParser::set_param_attrs(Value *ins) {
+void IRParser::set_visibility(Value *v) {
+    if (InstFlags::in_visibilities(_lookahead)) {
+        v->set_raw_field("visibility", _lookahead);
+        jump_ahead();
+        get_lookahead();
+    }
+}
+
+void IRParser::set_param_attrs(Value *v) {
     string flag = "param-attrs";
     while (InstFlags::in_param_attrs(_lookahead)) {
-        if (!ins->has_raw_field(flag)) {
-            ins->set_raw_field(flag, _lookahead);
+        if (!v->has_raw_field(flag)) {
+            v->set_raw_field(flag, _lookahead);
         }
         else {
-            ins->set_raw_field(flag, ins->get_raw_field(flag) + ' ' + _lookahead);
+            v->set_raw_field(flag, v->get_raw_field(flag) + ' ' + _lookahead);
         }
 
         jump_ahead();
@@ -232,14 +240,14 @@ void IRParser::set_param_attrs(Value *ins) {
     }
 }
 
-void IRParser::set_ret_attrs(Value *ins) {
+void IRParser::set_ret_attrs(Value *v) {
     string flag = "ret-attrs";
     while (InstFlags::in_param_attrs(_lookahead)) {
-        if (!ins->has_raw_field(flag)) {
-            ins->set_raw_field(flag, _lookahead);
+        if (!v->has_raw_field(flag)) {
+            v->set_raw_field(flag, _lookahead);
         }
         else {
-            ins->set_raw_field(flag, ins->get_raw_field(flag) + ' ' + _lookahead);
+            v->set_raw_field(flag, v->get_raw_field(flag) + ' ' + _lookahead);
         }
 
         jump_ahead();
