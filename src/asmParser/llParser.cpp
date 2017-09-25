@@ -309,6 +309,7 @@ Function* LLParser::parse_function_header() {
  */
 Function* LLParser::create_function(string &text) {
     int len = text.length();
+    guarantee(len != 0, "create_function: empty text");
     if (text[len-1] == '{') {
         len--;
     }
