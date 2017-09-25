@@ -131,7 +131,7 @@ void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63
 #endif
 
 void Errors::die() {
-    //std::terminate();
+    uninstall_sig_handlers();
     if (ParallelModule) {
         pthread_exit(0);
     }
@@ -181,8 +181,11 @@ void Errors::init() {
     install_sig_handlers();
 }
 
+void Errors::uninstall_sig_handlers() {
+    signal(SIGABRT, SIG_DFL);
+}
+
 void Errors::install_sig_handlers() {
-#ifdef __linux__
     struct sigaction act;
     memset (&act, '\0', sizeof(act));
 
@@ -202,7 +205,6 @@ void Errors::install_sig_handlers() {
         fprintf(stderr, "install signal handler failed\n, exit...");
         die();
     }
-#endif
 }
 
 void Errors::print_backtrace_symbols() {

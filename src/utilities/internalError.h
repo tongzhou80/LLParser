@@ -16,6 +16,7 @@ class Errors {
 public:
     static void init();
     static void install_sig_handlers();
+    static void uninstall_sig_handlers();
     static void semantic_error_handler();
     static void sigsegv_handler(int sig, siginfo_t *siginfo, void *context);
     //static void sigsegv_handler(int sig);
