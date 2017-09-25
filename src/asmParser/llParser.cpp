@@ -329,29 +329,30 @@ Function* LLParser::create_function(string &text) {
 
     get_lookahead();
     /* process optional flags */
-    if (InstFlags::in_linkages(_lookahead)) {
-        linkage = _lookahead;
-        jump_ahead();
-        get_lookahead();
-    }
-
-    if (InstFlags::in_visibility(_lookahead)) {
-        linkage = _lookahead;
-        jump_ahead();
-        get_lookahead();
-    }
-
-    if (InstFlags::in_cconvs(_lookahead)) {
-        linkage = _lookahead;
-        jump_ahead();
-        get_lookahead();
-    }
-
-    while (InstFlags::in_param_attrs(_lookahead)) {
-        linkage = _lookahead;
-        jump_ahead();
-        get_lookahead();
-    }
+    set_linkage_flag()
+//    if (InstFlags::in_linkages(_lookahead)) {
+//        linkage = _lookahead;
+//        jump_ahead();
+//        get_lookahead();
+//    }
+//
+//    if (InstFlags::in_visibilities(_lookahead)) {
+//        linkage = _lookahead;
+//        jump_ahead();
+//        get_lookahead();
+//    }
+//
+//    if (InstFlags::in_cconvs(_lookahead)) {
+//        linkage = _lookahead;
+//        jump_ahead();
+//        get_lookahead();
+//    }
+//
+//    while (InstFlags::in_param_attrs(_lookahead)) {
+//        linkage = _lookahead;
+//        jump_ahead();
+//        get_lookahead();
+//    }
 
 
     /* A function pointer return type looks like this:
@@ -359,6 +360,7 @@ Function* LLParser::create_function(string &text) {
      * Not parse this return type for now
      */
     ret_type = parse_compound_type();
+    skip_ws();
 
     if (FunctionParsingVerbose) {
         printf("%s function:\n", declare_or_define.c_str());

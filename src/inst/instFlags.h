@@ -14,8 +14,8 @@ class InstFlags {
     static std::set<string> _fastmaths;
     static std::set<string> _linkages;
     static std::set<string> _cconvs;  // calling conventions
-    static std::set<string> _visibility;
-    static std::set<string> _dll_storage_class;
+    static std::set<string> _visibilities;
+    static std::set<string> _dll_storage_classes;
     static std::set<string> _param_attrs;  // attrs for return type and function parameter type
     static std::set<string> _tails;
     static std::set<string> _terminator_insts;
@@ -32,8 +32,8 @@ public:
     static std::set<string> cconvs()                           { return _cconvs; }
     static bool in_cconvs(const string& key);
 
-    static std::set<string> visibility()                       { return _visibility; }
-    static bool in_visibility(const string& key)                     { return _visibility.find(key) != _visibility.end(); }
+    static std::set<string> visibilities()                       { return _visibilities; }
+    static bool in_visibilities(const string& key)                     { return _visibilities.find(key) != _visibilities.end(); }
 
     static bool in_param_attrs(const string& key);
     static bool in_tails(const string& key)                           { return _tails.find(key) != _tails.end(); }

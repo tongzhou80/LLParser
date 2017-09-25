@@ -2,6 +2,8 @@
 // Created by tzhou on 9/17/17.
 //
 
+#include <inst/instFlags.h>
+#include <ir/instruction.h>
 #include "irParser.h"
 
 /**@brief Match extended alphabetic ([-a-zA-Z$._]) strings until the current char is not a match
@@ -166,7 +168,7 @@ string IRParser::parse_compound_type() {
     return ty;
 }
 
-/**@brief parse structs of the following form: (not parsing the * at the end, if any)
+/**@brief Parse structs of the following form: (not parsing the * at the end, if any)
  * Parsing starts with '%'
  *
  * %struct.name
@@ -183,4 +185,64 @@ string IRParser::parse_complex_structs() {
     string name = match_identifier();
     parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', "sanity");
     return '%' + name;
+}
+
+/**@brief The following functions check _lookahead and set the flag if presented
+ * 
+ * Will call get_lookahead() if flag is set
+ * 
+ * @param ins 
+ */
+void IRParser::set_cconv_flag(Value *ins) {
+    if (InstFlags::in_cconvs(_lookahead)) {
+        ins->set_raw_field("cconv", _lookahead);
+        jump_ahead();
+        get_lookahead();
+    }
+}
+
+void IRParser::set_fastmath_flag(Value *ins) {
+    if (InstFlags::in_fastmaths(_lookahead)) {
+        ins->set_raw_field("fast-math", _lookahead);
+        jump_ahead();
+        get_lookahead();
+    }
+}
+
+void IRParser::set_linkage_flag(Value *ins) {
+    if (InstFlags::in_linkages(_lookahead)) {
+        ins->set_raw_field("linkage", _lookahead);
+        jump_ahead();
+        get_lookahead();
+    }
+}
+
+void IRParser::set_param_attrs(Value *ins) {
+    string flag = "param-attrs";
+    while (InstFlags::in_param_attrs(_lookahead)) {
+        if (!ins->has_raw_field(flag)) {
+            ins->set_raw_field(flag, _lookahead);
+        }
+        else {
+            ins->set_raw_field(flag, ins->get_raw_field(flag) + ' ' + _lookahead);
+        }
+
+        jump_ahead();
+        get_lookahead();
+    }
+}
+
+void IRParser::set_ret_attrs(Value *ins) {
+    string flag = "ret-attrs";
+    while (InstFlags::in_param_attrs(_lookahead)) {
+        if (!ins->has_raw_field(flag)) {
+            ins->set_raw_field(flag, _lookahead);
+        }
+        else {
+            ins->set_raw_field(flag, ins->get_raw_field(flag) + ' ' + _lookahead);
+        }
+
+        jump_ahead();
+        get_lookahead();
+    }
 }

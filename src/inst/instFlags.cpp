@@ -21,8 +21,8 @@ void InstFlags::init() {
     _linkages = { "private", "internal", "available_externally", "weak", "linkonce", "common",
                   "appending", "extern_weak", "linkonce_odr", "weak_odr", "external" };
     _cconvs = { "ccc", "fastcc", "coldcc", "cc 10", "cc 11", "webkit_jscc", "anyregcc", "preserve_mostcc", "preserve_allcc", "cxx_fast_tlscc", "swiftcc" };
-    _visibility = { "default", "hidden", "protected" };  // A symbol with internal or private linkage must have default visibility.
-    _dll_storage_class = { "dllimport", "dllexport" };
+    _visibilities = { "default", "hidden", "protected" };  // A symbol with internal or private linkage must have default visibility.
+    _dll_storage_classes = { "dllimport", "dllexport" };
     _param_attrs = { "zeroext", "signext", "inreg", "byval", "inalloca", "sret", "align", "noalias",
                      "nocapture", "nest", "returned", "nonnull", "dereferenceable", "dereferenceable_or_null" }; // more to go
     _tails = { "tail", "musttail", "notail" };
