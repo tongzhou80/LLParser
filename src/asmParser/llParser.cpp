@@ -205,7 +205,12 @@ void LLParser::parse_aliases() {
 
 void LLParser::parse_functions() {
     while (true) {
-        zps(line()) zpd(line_number())
+        if (!_ifs) {
+            if (!NoParserWarning) {
+                fprintf(stderr, "WARNING: Reached end-of-file during function parsing\n");
+            }
+            break;
+        }
         // should either start with 'declare' or 'define'
         guarantee(!line().empty(), "");
         if (line()[2] == 'f') {

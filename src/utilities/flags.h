@@ -48,6 +48,8 @@
          "")                                                                              \
   develop(bool, IgnoreIntrinsicCalls, 0,                                                  \
          "")                                                                              \
+  develop(bool, NoParserWarning, 0,                                                       \
+         "")                                                                              \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG)
