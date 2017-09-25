@@ -82,7 +82,7 @@ void CallInstFamily::resolve_callee_symbol(string fn_name) {
     }
 
     Function* callee = SysDict::module()->get_function(fn_name);
-    guarantee(callee, "at this point, the module should be fully parsed");
+    guarantee(callee, "function %s not found", fn_name.c_str());
 //    if (callee == NULL) {
 //        callee = SysDict::module()->create_child_function_symbol(fn_name);
 //    }
