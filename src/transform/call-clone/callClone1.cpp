@@ -614,6 +614,7 @@ public:
 
     bool run_on_module(Module* module) {
         ContextGenerator cg;
+        cg.reset();
         cg.generate(module, "malloc", 3); // todo other allocs
         cg.generate(module, "calloc", 3); // todo other allocs
         cg.generate(module, "realloc", 3); // todo other allocs

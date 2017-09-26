@@ -9,12 +9,13 @@
 #include "contextGenerator.h"
 
 void ContextGenerator::reset() {
-    _paths.clear();
-    _stack.clear();
+    std::ofstream ofs(SysDict::filedir() + "contexts.txt");
+    ofs.close();
 }
 
 void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
-    reset();
+    _paths.clear();
+    _stack.clear();
     Function* malloc = module->get_function(alloc);
     if (!malloc) {
         return;
