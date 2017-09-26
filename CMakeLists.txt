@@ -24,7 +24,7 @@ file(GLOB pass_cmakelists
 add_library(Hello SHARED src/transform/hello/hello.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
-add_library(CallClone SHARED src/transform/call-clone/callClone.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
+add_library(CallClone SHARED src/transform/call-clone/callClone1.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
