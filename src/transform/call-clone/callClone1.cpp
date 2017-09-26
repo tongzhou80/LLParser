@@ -96,17 +96,56 @@ public:
         }
     }
 
-    void do_all() {
-        bool replaced = false;
-        for (int i = 0; i < _all_paths.size()-1; ++i) {
-            auto main_path = _all_paths[i]->path;
-            for (int j = i+1; j < _all_paths.size(); ++j) {
-                auto side_path = _all_paths[j]->path;
-                int k = 0;
-                while (side_path[k] == main_path[k]) {
-                    k++;
-                }
+    bool check_common_edge(std::vector<XPath*>& paths, int pos) {
+        guarantee(pos < paths[0]->path.size(), "pos: %d, size: %lu", pos, paths.size());
+        auto sentinel = paths[0]->path[pos];
+        for (int i = 1; i < paths.size(); ++i) {
+            if (paths[i]->path[pos] != sentinel) {
+                return false;
             }
+        }
+        return true;
+    }
+
+    void scan() {
+        bool replaced = false;
+        std::map<CallInstFamily*, std::vector<XPath*>> dr_map;
+        for (auto xpath: _all_paths) {
+            auto dr = xpath->path[0];
+            if (dr_map.find(dr) == dr_map.end()) {
+                dr_map[dr] = std::vector<XPath*>();
+            }
+            dr_map[dr].push_back(xpath);
+        }
+
+        for (auto dr: dr_map) {
+            auto& paths = dr.second;
+            if (paths.size() > 1) {
+                replaced = true;
+                int i = 0;
+                for (; check_common_edge(paths, i) ; ++i) {}
+                if (i == 0) {
+                    for (auto p: paths) {
+                        check_path(p->path, true);
+                    }
+                }
+                guarantee(i > 0, "");
+                /* i is the position that divergence starts */
+                auto root = paths[0]->path[i-1];  // the last shared ins
+                auto callee = root->function();
+                for (int j = 1; j < paths.size(); ++j) {
+                    auto& this_path = paths[j]->path;
+                    auto cloned_callee = callee->clone();
+                    SysDict::module()->append_new_function(cloned_callee);
+                    _cloned++;
+                    update_callee_in_all_paths(this_path[i], cloned_callee);
+                }
+                break;
+            }
+        }
+
+        if (!replaced) {
+            _done = true;
         }
     }
 
@@ -594,37 +633,35 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         else {
-            load_hot_aps_file("contexts.txt");
+            load_hot_aps_file(SysDict::filedir() + "contexts.txt");
         }
+//
         get_distinct_all_paths();
         check_all_paths();
 
-//        if (PathCheck)
-//            check_all_paths();
-        int round = 0;
-        while (!_done) {
-            do_one();
-            if (CloneVerbose) {
-                zpl("one clone done.")
-            }
-
-            round++;
-        }
+////        if (PathCheck)
+////            check_all_paths();
+//        int round = 0;
+//        while (!_done) {
+//            scan();
+//            if (CloneVerbose) {
+//                zpl("one clone done.")
+//            }
 //
-        replace_malloc();
-
-        string out = SysArgs::get_option("output");
-        if (out.empty()) {
-            out = SysDict::filename() + '.' + name();
-        }
-
-        SysDict::module()->print_to_file(out);
-
-        check_all_paths();
-//        if (PathCheck) {
-//            check_all_paths();
+//            round++;
+//        }
+////
+//        replace_malloc();
+//
+//        string out = SysArgs::get_option("output");
+//        if (out.empty()) {
+//            out = SysDict::filename() + '.' + name();
 //        }
 //
+//        SysDict::module()->print_to_file(out);
+//
+//        check_all_paths();
+
 //
 //        _timer.stop();
 //        std::ofstream stat_ofs;
