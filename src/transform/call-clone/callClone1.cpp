@@ -453,30 +453,20 @@ public:
         guarantee(Strings::contains(line, "("), " ");
         line = line.substr(line.find('('));  // strip the exe name before '('
 
-        const char* line_pattern = ""
-
         int pos1 = line.find(' ');
         string bt_symbol = line.substr(0, pos1);
         string fileline = line.substr(pos1+1);
 
-        if (bt_symbol != "()") {
-            int pos2 = bt_symbol.find('+');
-            _caller = bt_symbol.substr(1, pos2-1);
-            string offset = bt_symbol.substr(pos2+1);
 
-            if (Alias* alias = SysDict::module()->get_alias(_caller)) {
-                _caller = dynamic_cast<Function*>(alias->aliasee())->name();
-            }
+        int pos2 = bt_symbol.find('+');
+        _caller = bt_symbol.substr(1, pos2-1);
+        if (Alias* alias = SysDict::module()->get_alias(_caller)) {
+            _caller = dynamic_cast<Function*>(alias->aliasee())->name();
         }
-        else {
-            _caller = "";
-        }
+        string offset = bt_symbol.substr(pos2+1);
+        int bi, ii;
+        sscanf(offset.c_str(), "%d_%d", &bi, &ii);
 
-        /* remove (discriminator x) */
-        int pos4 = fileline.find(' ');
-        if (pos4 != fileline.npos) {
-            fileline = fileline.substr(0, pos4);
-        }
 
         int pos3 = fileline.find(':');
         string file = fileline.substr(0, pos3);
@@ -486,96 +476,12 @@ public:
             line_num = std::stoi(lino_str);
         }
 
-        CallInstFamily* ret = NULL;
-
-        ret = approximately_match(file, line_num);
-
+        CallInstFamily* ret = dynamic_cast<CallInstFamily*>(SysDict::module()->get_function(_caller)->get_instruction(bi, ii));
+        DILocation* loc = ret->debug_loc();
+        guarantee(ret && loc->filename() == file && loc->line() == line_num, "");
         _callee = _caller;
 
         return ret;
-    }
-
-    CallInstFamily* approximately_match(const string& filename, int line) {
-        Function* calleef = SysDict::module()->get_function(_callee);
-
-        CallInstFamily* final = NULL;
-        guarantee(calleef, "Function %s not found", _callee.c_str());
-        auto users = calleef->caller_list();
-
-        // level 0
-        if (users.size() == 1) {
-            final = users[0];
-        }
-
-        // level 1
-        std::map<CallInstFamily*, int> users_offsets;
-        std::vector<CallInstFamily*> other_callers;
-        if (!final) {
-            for (auto ci: calleef->caller_list()) {
-
-                DILocation *loc = ci->debug_loc();
-                guarantee(loc, "This pass needs full debug info, please compile with -g");
-                if (filename == loc->filename()
-                    && line == loc->line()
-                    && ci->function()->name() == _caller) {
-//                    if (MatchVerbose) {
-//                        printf("loc->filename(): %s, loc->line(): %d, loc function: %s\n",
-//                               loc->filename().c_str(), loc->line(), loc->function_linkage_name().c_str());
-//                        printf("filename: %s, line: %d, caller: %s\n\n",
-//                               filename.c_str(), line, _caller.c_str());
-//                    }
-                    final = ci;
-                }
-
-            }
-        }
-
-        if (final) {
-            if (!_caller.empty()) {
-                if (Alias* alias = SysDict::module()->get_alias(_caller)) {
-                    _caller = dynamic_cast<Function*>(alias->aliasee())->name();
-                }
-
-                if (final->owner() != _caller) {
-                    return NULL;
-                }
-            }
-            else {
-                _caller = final->owner();
-                zpl("infer caller: %s", _caller.c_str())
-            }
-
-        }
-
-        if (MatchVerbose) {
-            if (final) {
-                DILocation *loc = final->debug_loc();
-                guarantee(loc, "This pass needs full debug info, please compile with -g");
-                printf("(%s, %s, %s, %d) => (%p, %s, %s, %s, %d)\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line,
-                       final, loc->function().c_str(), _callee.c_str(), loc->filename().c_str(), loc->line());
-
-            } else {
-                printf("(%s, %s, %s, %d) => None\n", _caller.c_str(), _callee.c_str(), filename.c_str(), line);
-            }
-        }
-        return final;
-    }
-
-
-    bool has_recursion() {
-        std::set<string> chain;
-        string alloc = _stack[0]->called_function()->name();
-        chain.insert(alloc);
-        for (auto I: _stack) {
-            string caller = I->function()->name();
-            if (chain.find(caller) != chain.end()) {
-                return true;
-            }
-            else {
-                chain.insert(caller);
-            }
-        }
-        return false;
     }
 
     bool has_direct_recursion() {
@@ -642,28 +548,28 @@ public:
         get_distinct_all_paths();
         check_all_paths();
 
-////        if (PathCheck)
-////            check_all_paths();
-//        int round = 0;
-//        while (!_done) {
-//            scan();
-//            if (CloneVerbose) {
-//                zpl("one clone done.")
-//            }
+//        if (PathCheck)
+//            check_all_paths();
+        int round = 0;
+        while (!_done) {
+            scan();
+            if (CloneVerbose) {
+                zpl("one clone done.")
+            }
+
+            round++;
+        }
 //
-//            round++;
-//        }
-////
-//        replace_malloc();
-//
-//        string out = SysArgs::get_option("output");
-//        if (out.empty()) {
-//            out = SysDict::filename() + '.' + name();
-//        }
-//
-//        SysDict::module()->print_to_file(out);
-//
-//        check_all_paths();
+        replace_malloc();
+
+        string out = SysArgs::get_option("output");
+        if (out.empty()) {
+            out = SysDict::filename() + '.' + name();
+        }
+
+        SysDict::module()->print_to_file(out);
+
+        check_all_paths();
 
 //
 //        _timer.stop();
