@@ -453,6 +453,8 @@ public:
         guarantee(Strings::contains(line, "("), " ");
         line = line.substr(line.find('('));  // strip the exe name before '('
 
+        const char* line_pattern = ""
+
         int pos1 = line.find(' ');
         string bt_symbol = line.substr(0, pos1);
         string fileline = line.substr(pos1+1);
