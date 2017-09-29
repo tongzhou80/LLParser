@@ -56,6 +56,9 @@ void Value::remove_user(Instruction *user) {
 void Value::print_to_file(const char *file) {
     std::ofstream ofs;
     ofs.open(file);
+    if (!ofs.good()) {
+        fprintf(stderr, "open file %s failed.\n", file);
+    }
     ofs << this;
     ofs.close();
 //    FILE* fp = fopen(file, "w");

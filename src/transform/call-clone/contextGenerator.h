@@ -17,7 +17,7 @@ class ContextGenerator {
     std::vector<CallInstFamily*> _stack;
     int _counter;
 public:
-    ContextGenerator(): _counter(0) {}
+    ContextGenerator();
     void generate(Module* module, string alloc="malloc", int nlevel=1);
     void traverse();
     void reset();

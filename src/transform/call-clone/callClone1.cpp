@@ -69,7 +69,7 @@ public:
         CloneVerbose = false;
         MatchVerbose = false;
         PathCheck = false;
-        _min_cxt = 2;
+        _min_cxt = 1;
         _path_counter = 1;
         _cxt_counter = 0;
         _skip = false;
@@ -225,33 +225,20 @@ public:
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
         bool is_replaced = false;
         for (auto& xps_path: _all_paths) {
+
             auto& stack = xps_path->path;
             guarantee(caller != NULL, " ");
-            if (caller == NULL && stack[stack.size()-1]->function() == new_callee->copy_prototype()) {
-                auto callee_call = stack[stack.size()-1];
-                int i_index = callee_call->get_index_in_block();
-                int b_index = callee_call->parent()->get_index_in_function();
-                //zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
-                auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
-                stack[stack.size()-1] = ci_in_new_callee;
-                if (CloneVerbose) {
-                    zpl("path pos %d to %s", stack.size() - 1, ci_in_new_callee->function()->name_as_c_str())
-                }
-                //check_path(stack);
-                return;
-            }
-
             for (int i = 1; i < stack.size(); ++i) {
-
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
                     if (!is_replaced) {
-                        if (CloneVerbose)
-                        zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        if (CloneVerbose) {
+                            zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                        }
+
                         I->replace_callee(new_callee->name());
                         is_replaced = true;
                     }
-
                     auto callee_call = stack[i-1];
                     int i_index = callee_call->get_index_in_block();
                     int b_index = callee_call->parent()->get_index_in_function();
@@ -264,6 +251,7 @@ public:
                     //check_path(stack);
                 }
             }
+
         }
     }
 
@@ -520,13 +508,16 @@ public:
         return false;
     }
 
-    bool run_on_module(Module* module) {
-        ContextGenerator cg;
-        cg.reset();
-        cg.generate(module, "malloc", 3); // todo other allocs
-        cg.generate(module, "calloc", 3); // todo other allocs
-        cg.generate(module, "realloc", 3); // todo other allocs
+    bool run_on_module(Module* module) override {
+        int nlevel = 1;
+        if (has_argument("nlevel")) {
+            nlevel = std::stoi(get_argument("nlevel"));
+        }
 
+        ContextGenerator cg;
+        cg.generate(module, "malloc", nlevel); // todo other allocs
+        cg.generate(module, "calloc", nlevel); // todo other allocs
+        cg.generate(module, "realloc", nlevel); // todo other allocs
 
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));
@@ -535,6 +526,7 @@ public:
         insert_declaration("malloc", "ben_malloc", true);
         insert_declaration("calloc", "ben_calloc", true);
         insert_declaration("realloc", "ben_realloc", true);
+        insert_declaration("free", "ben_free", true);
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
@@ -559,14 +551,16 @@ public:
 
             round++;
         }
-//
+
         replace_malloc();
+        replace_free();
 
         string out = SysArgs::get_option("output");
         if (out.empty()) {
-            out = SysDict::filename() + '.' + name();
+            out = SysDict::filename();
+            Strings::replace(out, ".ll", ".clone.ll");
+            //out = SysDict::filename() + '.' + name();
         }
-
         SysDict::module()->print_to_file(out);
 
         check_all_paths();
@@ -583,23 +577,24 @@ public:
     }
 
     void replace_malloc() {
+        int id = 0;
         for (auto p: _all_paths) {
             auto path = p->path;
-            if (p->hotness == 1) {
-                _used_hot_cxt++;
-                CallInstFamily* ci = path[0];
-                string old_callee = ci->called_function()->name();
+            CallInstFamily* ci = path[0];
+            string old_callee = ci->called_function()->name();
 
-                if (old_callee.find("ben_") == 0) {
-                    continue;
-                }
+            guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
+            ci->replace_callee("ben_"+old_callee);
+            _ben_num++;
+            string new_args = "i32 " + std::to_string(id++) + ", " + ci->get_raw_field("args");
+            ci->replace_args(new_args);
+        }
+    }
 
-                guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
-                ci->replace_callee("ben_"+old_callee);
-                _ben_num++;
-                string new_args = "i32 " + std::to_string(_hot_counter) + ", " + ci->get_raw_field("args");
-                ci->replace_args(new_args);
-            }
+    void replace_free() {
+        Function* free_fp = SysDict::module()->get_function("free");
+        for (auto ci: free_fp->caller_list()) {
+            ci->replace_callee("ben_free");
         }
     }
 

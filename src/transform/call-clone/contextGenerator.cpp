@@ -8,6 +8,12 @@
 #include <set>
 #include "contextGenerator.h"
 
+ContextGenerator::ContextGenerator() {
+    std::ofstream ofs(SysDict::filedir() + "contexts.txt");
+    ofs.close();
+    _counter = 0;
+}
+
 void ContextGenerator::reset() {
     std::ofstream ofs(SysDict::filedir() + "contexts.txt");
     ofs.close();
@@ -31,17 +37,27 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         _paths.push_back(path);
     }
 
+    /* discard all contexts whose depth is less than nlevel */
     while (--nlevel) {
         std::vector<XPath*> new_paths;
         for (auto xpath: _paths) {
             auto& context = xpath->path;
             auto tos = context[context.size()-1];
-            for (auto ci: tos->function()->caller_list()) {
-                XPath* nxp = new XPath();
-                nxp->hotness = xpath->hotness;
-                nxp->path = context;
-                nxp->path.push_back(ci);
-                new_paths.push_back(nxp);
+            if (tos->function()->name() == "main") {
+                new_paths.push_back(xpath);
+                zpl("reached main:")
+                for (auto i: context) {
+                    zpl("%s ", i->function()->name_as_c_str())
+                }
+            }
+            else {
+                for (auto ci: tos->function()->caller_list()) {
+                    XPath* nxp = new XPath();
+                    nxp->hotness = xpath->hotness;
+                    nxp->path = context;
+                    nxp->path.push_back(ci);
+                    new_paths.push_back(nxp);
+                }
             }
         }
         _paths = new_paths;
