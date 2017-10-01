@@ -526,7 +526,7 @@ public:
         insert_declaration("malloc", "ben_malloc", true);
         insert_declaration("calloc", "ben_calloc", true);
         insert_declaration("realloc", "ben_realloc", true);
-        insert_declaration("free", "ben_free", true);
+        insert_declaration("free", "ben_free", false);
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
