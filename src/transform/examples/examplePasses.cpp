@@ -53,7 +53,7 @@ public:
         set_is_basic_block_pass();
     }
 
-    bool run_on_basic_block(BasicBlock* bb) {
+    bool run_on_basic_block(BasicBlock* bb) override {
         for (auto I: bb->instruction_list()) {
             std::cout << I->name() << std::endl;
         }
