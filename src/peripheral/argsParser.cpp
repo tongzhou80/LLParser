@@ -10,8 +10,7 @@
 #include "sysArgs.h"
 
 ArgsParser::ArgsParser() {
-    _p = 1;  // skip the first argument
-    _eoa = false;
+
 }
 
 void ArgsParser::parse_config_files() {
@@ -41,21 +40,6 @@ void ArgsParser::parse_config_files() {
     }
 }
 
-void ArgsParser::get_arg() {
-    if (_p >= _args->argc) {
-        _eoa = true;
-        if (ArgParsingVerbose) {
-            printf("arg ends\n");
-        }
-        return;
-    }
-    else {
-        string cur = _args->argv[_p];
-        set_text(cur);
-        ++_p;
-    }
-}
-
 void ArgsParser::parse_args(SoptInitArgs* init_args) {
     _args = init_args;
 
@@ -74,7 +58,7 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
     while (!_eol) {
         get_word_of(" =");
         if (Strings::startswith(_word, "-XX:")) {
-            int xx_len = strlen("-XX:");
+            size_t xx_len = strlen("-XX:");
             if (_word[xx_len] == '+') {
                 Flags::set_flag(_word.substr(xx_len+1), true);
             }
@@ -91,38 +75,6 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
         else {
             SysArgs::add_target_file(_word);
         }
-    }
-}
-
-void ArgsParser::parse_short_flag() {
-    if (_word == "-g") {
-        SysArgs::set_flag("debug-info");
-    }
-    else if (_word == "-load") {
-        get_arg();
-        guarantee(!_eoa, " ");
-
-        auto passes = Strings::split(_text, ',');
-        if (passes.size() == 0) {
-            passes = Strings::split(_text, '+');
-        }
-        guarantee(passes.size() != 0, ".");
-        for (auto p: passes) {
-            SysArgs::passes().push_back(p);
-        }
-    }
-    else if (_word == "-path") {
-        get_arg();
-        guarantee(!_eoa, " ");
-        SysArgs::set_property("ld-pass-path", _text);
-    }
-    else if (_word == "-o") {
-        get_arg();
-        guarantee(!_eoa, " ");
-        SysArgs::set_property("output", _text);
-    }
-    else {
-        std::cout << "ignored short option: " << _word << std::endl;
     }
 }
 
@@ -148,10 +100,10 @@ void ArgsParser::parse_long_option() {
         get_word();
 
         auto passes = Strings::split(_word, ',');
-        if (passes.size() == 0) {
+        if (passes.empty()) {
             passes = Strings::split(_word, '+');
         }
-        guarantee(passes.size() != 0, ".");
+        guarantee(!passes.empty(), ".");
         for (auto p: passes) {
             SysArgs::passes().push_back(p);
         }
