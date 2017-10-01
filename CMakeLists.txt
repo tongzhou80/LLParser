@@ -100,7 +100,7 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/ir/alias.cpp src/ir/alias.h
         src/asmParser/irParser.cpp src/asmParser/irParser.h
         src/inst/branchInst.cpp src/inst/branchInst.h
-        src/inst/getelementptrInst.cpp src/inst/getelementptrInst.h)
+        src/inst/getelementptrInst.cpp src/inst/getelementptrInst.h src/inst/allocaInst.cpp src/inst/allocaInst.h)
 add_executable(sopt ${SOURCE_FILES} )
 install(TARGETS sopt DESTINATION /home/marena/llparser/bin/)
 target_link_libraries(sopt "-ldl") # for dyopen etc.

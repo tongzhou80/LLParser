@@ -28,12 +28,12 @@ public:
     void parse_metadata(Instruction* ins);
 
     /* the do_xxx functions will not check dynamic_cast */
-    Instruction* do_alloca(bool has_assignment=1);
-    void do_branch(Instruction* inst);
-    void do_call_family(Instruction* inst);
-    void do_load(Instruction* inst);
-    void do_bitcast(Instruction* inst, bool is_embedded=false);
-    void do_getelementptr(Instruction* inst, bool is_embedded=false);
+    void do_alloca(Instruction* ins);
+    void do_branch(Instruction* ins);
+    void do_call_family(Instruction* ins);
+    void do_load(Instruction* ins);
+    void do_bitcast(Instruction* ins, bool is_embedded=false);
+    void do_getelementptr(Instruction* ins, bool is_embedded=false);
 
 
     //static void parse_instruction(Instruction** ip);

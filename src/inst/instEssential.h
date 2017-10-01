@@ -6,6 +6,7 @@
 #define LLPARSER_INSTESSENTIAL_H
 
 #include "instFlags.h"
+#include "allocaInst.h"
 #include "callInst.h"
 #include "invokeInst.h"
 #include "loadInst.h"

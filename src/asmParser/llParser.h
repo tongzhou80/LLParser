@@ -26,8 +26,15 @@ class DILexicalBlock;
 class DILexicalBlockFile;
 
 class InstParser;
-
 class SysDict;
+
+class InstStats {
+    std::map<Instruction::InstType, size_t> _inst_count;
+    std::map<string, size_t> _op_count;
+public:
+    void collect_inst_stats(Instruction* ins);
+    void report();
+};
 
 class LLParser: public FileParser, public IRParser {
     int _major_version;
@@ -40,6 +47,9 @@ class LLParser: public FileParser, public IRParser {
     Module* _module;
     InstParser* _inst_parser;
     bool _done;
+
+    /* some basic statistics */
+    InstStats _stats;
 public:
     int MAX_LINE_LEN;
     int MAX_VALUE_LEN;
@@ -91,6 +101,8 @@ public:
 
     void set_line_to_full_instruction();
     void remove_tail_comments();
+
+    void print_stats();
 };
 
 

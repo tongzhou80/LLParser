@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
-
+#include <iomanip>
 #include <peripheral/sysArgs.h>
 #include <utilities/mutex.h>
 #include <ir/irEssential.h>
@@ -20,14 +20,28 @@
 #include "sysDict.h"
 
 
+// class InstStats
+
+void InstStats::collect_inst_stats(Instruction *ins) {
+    _op_count[ins->opcode()]++;
+}
+
+void InstStats::report() {
+    std::cout << "==================== Inst Count ====================\n";
+    for (auto op: _op_count) {
+        std::cout << std::setw(20) << op.first << " insts: " << op.second << '\n';
+    }
+    std::cout << "\n";
+}
+
+// class LLParser
+
 LLParser::LLParser() {
     initialize();
 }
 
 LLParser::~LLParser() {
-    if (_inst_parser) {
-        delete _inst_parser;
-    }
+    delete _inst_parser;
 }
 
 void LLParser::set_llvm_version(string v) {
@@ -565,6 +579,9 @@ Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
     bb->append_instruction(inst);  // now parsing the instruction shouldn't need bb's info (data flow)
     inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes
 
+#ifdef LLDEBUG
+    _stats.collect_inst_stats(inst);
+#endif
     if (InstructionParsingVerbose) {
         printf("Inst line raw: %s\n", line().c_str());
     }
@@ -684,6 +701,10 @@ Module* LLParser::parse(string file) {
     return parse();
 }
 
+void LLParser::print_stats() {
+    _stats.report();
+}
+
 Module* LLParser::parse() {
 /* 1. the parser always read in one line ahead, namely _line
  *    the next parsing phase will start from _line
@@ -718,6 +739,10 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     module()->resolve_after_parse();
+
+#ifdef LLDEBUG
+    print_stats();
+#endif
 
 #ifndef PRODUCTION
     /* perform post check */

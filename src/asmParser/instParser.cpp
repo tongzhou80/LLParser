@@ -40,7 +40,13 @@ Instruction* InstParser::create_instruction(string &text) {
 
     /* unaware of the instruction type at this point */
     switch (op[0]) {
-        case 'b':
+        case 'a': {
+            if (op == "alloca") {
+                //inst = new AllocaInst();
+            }
+            break;
+        }
+        case 'b': {
             if (op == "bitcast") {
                 inst = new BitCastInst();
                 //parse_routine = &InstParser::do_bitcast;
@@ -50,15 +56,12 @@ Instruction* InstParser::create_instruction(string &text) {
                 //parse_routine = &InstParser::do_branch;
             }
             break;
+        }
         case 'c': {
             if (op == "call") {
                 inst = new CallInst();
                 //parse_routine = &InstParser::do_call_family;
             }
-            else {
-
-            }
-
             break;
         }
         case 'i': {
@@ -66,12 +69,14 @@ Instruction* InstParser::create_instruction(string &text) {
                 inst = new InvokeInst();
                 //parse_routine = &InstParser::do_call_family;
             }
+            break;
         }
         case 'l': {
             if (op == "load") {
                 inst = new LoadInst();
                 //parse_routine = &InstParser::do_load;
             }
+            break;
         }
         default: {
             break;
@@ -101,6 +106,9 @@ Instruction* InstParser::create_instruction(string &text) {
 
 void InstParser::parse(Instruction *inst) {
     switch (inst->type()) {
+//        case Instruction::AllocaInstType: {
+//
+//        }
         case Instruction::BranchInstType: {
             do_branch(inst);
             break;
@@ -490,8 +498,12 @@ void InstParser::do_branch(Instruction *inst) {
         inst->set_raw_field("true-label", _word);  // unconditional branches only use 'true-label'
     }
     else {
-        guarantee(0, "sanity");
+        syntax_check(0);
     }
+}
+
+void InstParser::do_alloca(Instruction *ins) {
+
 }
 
 void InstParser::do_getelementptr(Instruction *inst, bool is_embedded) {

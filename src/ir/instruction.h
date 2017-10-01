@@ -20,6 +20,7 @@ class Instruction: public Value {
 public:
     enum InstType {
         UnknownInstType,
+        AllocaInstType,
         BranchInstType,
         CallInstType,
         InvokeInstType,
@@ -41,10 +42,10 @@ protected:
 public:
     Instruction();
 
-    string opcode()                           { return _opcode; }
+    const string& opcode()                    { return _opcode; }
     void set_opcode(string op)                { _opcode = op; }
 
-    string owner()                            { return _owner; }
+    string owner()                            { return _owner; }  // unsafe
     void set_owner(string owner)              { _owner = owner; }
 
     bool is_fully_parsed()                    { return _is_fully_parsed; }
