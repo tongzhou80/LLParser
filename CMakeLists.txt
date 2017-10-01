@@ -22,6 +22,7 @@ file(GLOB pass_cmakelists
 # include(${pass_cmakelists})  # shouldn't include them in this file
 
 add_library(Hello SHARED src/transform/hello/hello.cpp)
+add_library(Instcount SHARED src/transform/instcount/instcount.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
 add_library(CallClone SHARED src/transform/call-clone/callClone1.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)

@@ -587,7 +587,7 @@ Instruction* LLParser::parse_instruction_line(BasicBlock *bb) {
     inst->set_owner(bb->parent()->name());  // todo: only for debug use, this _owner will not change when the owner's name changes
 
 #ifdef LLDEBUG
-    _stats.collect_inst_stats(inst);
+    //_stats.collect_inst_stats(inst);
 #endif
     if (InstructionParsingVerbose) {
         printf("Inst line raw: %s\n", line().c_str());

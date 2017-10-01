@@ -172,7 +172,11 @@ void ArgsParser::parse_long_option() {
         SysArgs::set_property("output", _word);
     }
     else {
-        std::cout << "ignored long option: " << opt << std::endl;
+        if (opt[1] != '-') {
+            SysArgs::passes().push_back(opt.substr(1));
+        }
+        else
+            std::cout << "ignored long option: " << opt << std::endl;
     }
 }
 
