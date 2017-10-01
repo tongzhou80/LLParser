@@ -29,9 +29,11 @@ class InstParser;
 class SysDict;
 
 class InstStats {
+    size_t _parsed;
     std::map<Instruction::InstType, size_t> _inst_count;
     std::map<string, size_t> _op_count;
 public:
+    InstStats(): _parsed(0) {}
     void collect_inst_stats(Instruction* ins);
     void report();
 };
@@ -102,6 +104,7 @@ public:
     void set_line_to_full_instruction();
     void remove_tail_comments();
 
+    void resolve();
     void print_stats();
 };
 

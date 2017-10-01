@@ -73,7 +73,7 @@ Instruction* InstParser::create_instruction(string &text) {
         }
         case 'l': {
             if (op == "load") {
-                inst = new LoadInst();
+                //inst = new LoadInst();
                 //parse_routine = &InstParser::do_load;
             }
             break;
@@ -106,9 +106,10 @@ Instruction* InstParser::create_instruction(string &text) {
 
 void InstParser::parse(Instruction *inst) {
     switch (inst->type()) {
-//        case Instruction::AllocaInstType: {
-//
-//        }
+        case Instruction::AllocaInstType: {
+            do_alloca(inst);
+            break;
+        }
         case Instruction::BranchInstType: {
             do_branch(inst);
             break;
@@ -503,7 +504,22 @@ void InstParser::do_branch(Instruction *inst) {
 }
 
 void InstParser::do_alloca(Instruction *ins) {
+    get_lookahead();
+    if (_lookahead == "inalloca") {
+        ins->set_raw_field("inalloca", "");
+        jump_ahead();
+    }
 
+    string type = parse_compound_type();
+    match(',');
+    get_lookahead();
+    if (_lookahead != "align") {
+        string type2 = parse_compound_type(); // todo: need more parsing; don't understand type2
+        get_word_of(" ,");
+    }
+    match(" align ");
+    get_word_of(" ,");
+    ins->set_raw_field("alignment", _word);
 }
 
 void InstParser::do_getelementptr(Instruction *inst, bool is_embedded) {

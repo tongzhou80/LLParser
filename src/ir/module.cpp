@@ -180,7 +180,8 @@ void Module::resolve_callinsts_and_aliases() {
 }
 
 void Module::resolve_after_parse() {
-    if (ParallelModule) {
+    if (1) {
+    //if (ParallelModule) {
         std::thread t1(&Module::resolve_debug_info, this);
         //std::thread t1([=] { resolve_debug_info();});
         resolve_callinsts();

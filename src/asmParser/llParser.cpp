@@ -24,13 +24,20 @@
 
 void InstStats::collect_inst_stats(Instruction *ins) {
     _op_count[ins->opcode()]++;
+
+    if (ins->type() != Instruction::UnknownInstType) {
+        _parsed++;
+    }
 }
 
 void InstStats::report() {
     std::cout << "==================== Inst Count ====================\n";
+    size_t total = 0;
     for (auto op: _op_count) {
         std::cout << std::setw(20) << op.first << " insts: " << op.second << '\n';
+        total += op.second;
     }
+    std::cout << std::setw(20) << "parsed" << " insts: " << _parsed << "/" << total << '\n';
     std::cout << "\n";
 }
 
@@ -701,6 +708,10 @@ Module* LLParser::parse(string file) {
     return parse();
 }
 
+void LLParser::resolve() {
+
+}
+
 void LLParser::print_stats() {
     _stats.report();
 }
@@ -739,10 +750,6 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     module()->resolve_after_parse();
-
-#ifdef LLDEBUG
-    print_stats();
-#endif
 
 #ifndef PRODUCTION
     /* perform post check */
