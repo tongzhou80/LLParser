@@ -167,3 +167,5 @@ module, synchronization will be minimized.
 
 While LLVM's `opt` only accepts one input file, `sopt` accepts multiple input files and will do the
 parsing/analyzing/transforming in parallel if `-XX:+ParallelModule` is on.
+
+To add ``-XX:+UseSplitModule` doc.
