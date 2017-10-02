@@ -9,14 +9,14 @@
 #include "contextGenerator.h"
 
 ContextGenerator::ContextGenerator() {
-    std::ofstream ofs(SysDict::filedir() + "contexts.txt");
-    ofs.close();
+    string out = SysDict::filedir() + "contexts.txt";
+    _ofs.close();  // clear the file and start appending
     _counter = 0;
+    _ofs.open(out, std::ios::app);
 }
 
-void ContextGenerator::reset() {
-    std::ofstream ofs(SysDict::filedir() + "contexts.txt");
-    ofs.close();
+ContextGenerator::~ContextGenerator() {
+    _ofs.close();
 }
 
 void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
@@ -26,10 +26,7 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     if (!malloc) {
         return;
     }
-
-    std::ofstream ofs;
-    ofs.open(SysDict::filedir() + "contexts.txt", std::ios::app);
-
+    
     for (auto ci: malloc->caller_list()) {
         XPath* path = new XPath;
         path->hotness = 0;
@@ -71,16 +68,16 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         if (rand() / (double)RAND_MAX > 0.5) {
             hotness = "0xffffffff";
         }
-        ofs << _counter++ << " " + hotness + " " << alloc << std::endl;
+        _ofs << _counter++ << " " + hotness + " " << alloc << std::endl;
         for (auto ci: xpath->path) {
             DILocation* loc = ci->debug_loc();
-            ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
+            _ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
                 << loc->filename() << ':' << loc->line() << std::endl;
         }
-        ofs << std::endl;
+        _ofs << std::endl;
     }
 
-    ofs.close();
+    _ofs.close();
 }
 
 void ContextGenerator::traverse() {

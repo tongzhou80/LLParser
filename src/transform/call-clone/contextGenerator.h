@@ -13,11 +13,13 @@ struct XPath {
 };
 
 class ContextGenerator {
+    std::ofstream _ofs;
     std::vector<XPath*> _paths;
     std::vector<CallInstFamily*> _stack;
     int _counter;
 public:
     ContextGenerator();
+    ~ContextGenerator();
     void generate(Module* module, string alloc="malloc", int nlevel=1);
     void traverse();
     void reset();
