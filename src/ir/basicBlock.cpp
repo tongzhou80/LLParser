@@ -204,7 +204,7 @@ void BasicBlock::print_to_stream(FILE *fp) {
 }
 
 void BasicBlock::print_to_stream(std::ostream &os) {
-    if (!is_entry())
+    //if (!is_entry())
         os << raw_text() << '\n';
 
     for (auto i: instruction_list()) {
