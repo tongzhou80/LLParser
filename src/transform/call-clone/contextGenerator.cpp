@@ -10,6 +10,7 @@
 
 ContextGenerator::ContextGenerator() {
     string out = SysDict::filedir() + "contexts.txt";
+    _ofs.open(out);
     _ofs.close();  // clear the file and start appending
     _counter = 0;
     _ofs.open(out, std::ios::app);
