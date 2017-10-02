@@ -56,7 +56,7 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
     set_text(args);
 
     while (!_eol) {
-        get_word_of(" =");
+        get_word();
         if (Strings::startswith(_word, "-XX:")) {
             size_t xx_len = strlen("-XX:");
             if (_word[xx_len] == '+') {
@@ -79,7 +79,14 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
 }
 
 void ArgsParser::parse_long_option() {
-    string opt = _word;
+    string value, opt = _word;
+    if (!Strings::contains(_word, ":")) {
+        int split_pos = _word.find('=');
+        if (split_pos != _word.npos) {
+            opt = _word.substr(0, split_pos);
+            value = _word.substr(split_pos+1);
+        }
+    }
 
     if (opt == "--help") {
         SysArgs::print_help();
@@ -95,36 +102,35 @@ void ArgsParser::parse_long_option() {
         SysArgs::set_property("load-dbg", "");
     }
     else if (opt == "--load" || opt == "-load") {
-        if (_eol) {
-            fprintf(stderr, "--load requires an argument!\n");
-            exit(0);
+        if (value.empty()) {
+            guarantee(!_eol, "--load requires an argument!\n");
+            get_word();
+            value = _word;
         }
 
-        get_word();
-
-        auto passes = Strings::split(_word, ',');
+        auto passes = Strings::split(value, ',');
         if (passes.empty()) {
-            passes = Strings::split(_word, '+');
+            passes = Strings::split(value, '+');
         }
         guarantee(!passes.empty(), ".");
         for (auto p: passes) {
             SysArgs::passes().push_back(p);
         }
     } else if (opt == "--ld-pass-path") {
-        if (_eol) {
-            fprintf(stderr, "--ld-pass-path requires an argument!\n");
-            exit(0);
+        if (value.empty()) {
+            guarantee(!_eol, "--load requires an argument!\n");
+            get_word();
+            value = _word;
         }
-        get_word();
-        SysArgs::set_property("ld-pass-path", _word);
+        SysArgs::set_property("ld-pass-path", value);
     }
     else if (opt == "--output" || opt == "-o") {
-        if (_eol) {
-            fprintf(stderr, "--output requires an argument!\n");
-            exit(0);
+        if (value.empty()) {
+            guarantee(!_eol, "--load requires an argument!\n");
+            get_word();
+            value = _word;
         }
-        get_word();
-        SysArgs::set_property("output", _word);
+        SysArgs::set_property("output", value);
     }
     else {
         if (opt[1] != '-') {
