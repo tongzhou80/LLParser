@@ -2,10 +2,12 @@
 // Created by GentlyGuitar on 6/6/2017.
 //
 
-#include "flags.h"
-#include "macros.h"
 #include <map>
 #include <cassert>
+#include <iomanip>
+#include "flags.h"
+#include "macros.h"
+
 
 // GENERATE_RUNTIME_FLAGS(DEFINE_DEVELOP_FLAG, DEFINE_DIAGNOSTIC_FLAG, DEFINE_DEVELOP_FLAG, DEFINE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DEFINE_DEVELOP_FLAG)
@@ -13,6 +15,17 @@ GENERATE_RUNTIME_FLAGS(DEFINE_DEVELOP_FLAG)
 
 #define ADD_FLAG_TO_MAP(type, name, value, doc)                ty = #type; _map[#name] = new Flag(ty[0], &name);
 #define DELETE_FLAG(type, name, value, doc)                    delete _map[#name];
+
+#define PRINT_FLAG(type, name, value, doc) \
+  std::cout \
+  << "flag: " \
+  << std::left << std::setw(30) << #name \
+  << " type: " \
+  << std::left << std::setw(10) << #type \
+  << " default: " \
+  << std::left << std::setw(10) << value \
+  << " doc: " \
+  << doc << "\n";
 
 std::map<std::string, Flag*> Flags::_map;
 
@@ -25,6 +38,10 @@ void Flags::init() {
 
 void Flags::destroy() {
     GENERATE_RUNTIME_FLAGS(DELETE_FLAG)
+}
+
+void Flags::print_flags() {
+    GENERATE_RUNTIME_FLAGS(PRINT_FLAG)
 }
 
 Flag* Flags::get_flag(std::string key) {

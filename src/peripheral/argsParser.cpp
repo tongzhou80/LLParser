@@ -88,6 +88,9 @@ void ArgsParser::parse_long_option() {
     else if (opt == "--save-dbg") {
         SysArgs::set_property("save-dbg", "");
     }
+    else if (opt == "--print-flags") {
+        Flags::print_flags();
+    }
     else if (opt == "--load-dbg") {
         SysArgs::set_property("load-dbg", "");
     }

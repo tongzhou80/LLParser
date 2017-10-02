@@ -93,7 +93,7 @@ void SysArgs::print_help() {
               << "The current syntax is --load=<pass>:arg1=xxx:arg2=xxx, or -load <pass>:arg1=xxx:arg2=xxx etc.\n\n"
               << "Examples:\n"
               << "  # produces a call graph in dot format for a.ll. The call Graph only contains paths to 'malloc'. The output is a.dot\n"
-              << "  sopt --load=callGraph?bottom=malloc a.ll --output=a.dot\n"
+              << "  sopt --load=callGraph:bottom=malloc a.ll --output=a.dot\n"
               << "  # run a HelloWorld pass that prints a hello when each function is examined\n"
               << "  sopt -load hello input.ll  # or sopt -load /xxx/xxx/pass_dir/libHello.so input.ll\n"
               << "  \n"

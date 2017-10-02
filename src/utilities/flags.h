@@ -70,6 +70,7 @@ public:
     static void set_flag(std::string key, bool v);
     static void set_flag(std::string key, int v);
     static void set_flag(std::string key, std::string value);
+    static void print_flags();
 };
 
 
