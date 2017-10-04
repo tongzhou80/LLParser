@@ -183,34 +183,20 @@ void InstParser::do_call_family(Instruction* inst) {
 
     if (InstFlags::is_tail_flag(_word)) {
         ci->set_raw_field("tail", _word);
+        zps(_word)
         get_word();
     }
 
     parser_assert(_word == "call" || _word == "invoke", "word: %s", _word.c_str());
 
-    get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
-        if (InstFlags::is_fastmath_flag(_lookahead)) {
-            ci->set_raw_field("fast-math", _lookahead);
-            jump_ahead();
-            get_lookahead();
-        }
+        set_fastmath(ci);
     }
 
-    if (InstFlags::is_cconv_flag(_lookahead)) {
-        ci->set_raw_field("cconv", _lookahead);
-        jump_ahead();
-        get_lookahead();
-    }
-
-    if (InstFlags::is_param_attr_flag(_lookahead)) {
-        // This assert is in the document, but not in practice
-        //assert(_word == "zeroext" || _word == "signext" || _word == "inreg" || _word == "noalias" &&
-        //          "Only ‘zeroext‘, ‘signext‘, and ‘inreg‘ attributes are valid here for return type");
-        ci->set_raw_field("ret-attrs", _lookahead);
-        jump_ahead();
-    }
-
+    set_cconv(ci);
+    set_ret_attrs(ci);
+    //ci->dump_raw_fields();
+    
     parse_basic_type();
 
     skip_ws();

@@ -22,6 +22,7 @@ public:
     string parse_compound_type();
     string parse_complex_structs();
     void set_fastmath(Value* v);
+    void set_tail(Value* v);
     void set_cconv(Value* v);
     void set_linkage(Value* v);
     void set_param_attrs(Value* v);

@@ -199,6 +199,14 @@ void IRParser::set_cconv(Value *v) {
     }
 }
 
+void IRParser::set_tail(Value *v) {
+    get_lookahead();
+    if (InstFlags::is_tail_flag(_lookahead)) {
+        v->set_raw_field("tail", _lookahead);
+        jump_ahead();
+    }
+}
+
 void IRParser::set_fastmath(Value *v) {
     get_lookahead();
     if (InstFlags::is_fastmath_flag(_lookahead)) {
@@ -248,6 +256,10 @@ void IRParser::set_param_attrs(Value *v) {
 }
 
 void IRParser::set_ret_attrs(Value *v) {
+    // This assert is in the document, but not in practice
+    //assert(_word == "zeroext" || _word == "signext" || _word == "inreg" || _word == "noalias" &&
+    //          "Only ‘zeroext‘, ‘signext‘, and ‘inreg‘ attributes are valid here for return type");
+
     get_lookahead();
     string flag = "ret-attrs";
     while (InstFlags::is_param_attr_flag(_lookahead)) {
