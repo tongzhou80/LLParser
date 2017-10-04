@@ -18,8 +18,8 @@ CallInst::CallInst() {
 
 void CallInst::init_raw_field() {
     CallInstFamily::init_raw_field();
-    set_raw_field("tail", "");
-    set_raw_field("fast-math", "");
+//    set_raw_field("tail", "");
+//    set_raw_field("fast-math", "");
 }
 
 Instruction* CallInst::clone() {

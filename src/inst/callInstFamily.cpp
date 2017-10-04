@@ -18,9 +18,9 @@ CallInstFamily::CallInstFamily() {
 }
 
 void CallInstFamily::init_raw_field() {
-    set_raw_field("cconv", "");
-    set_raw_field("ret-attrs", "");
-    set_raw_field("args", "");
+//    set_raw_field("cconv", "");
+//    set_raw_field("ret-attrs", "");
+//    set_raw_field("args", "");
 }
 
 Function* CallInstFamily::called_function() {
