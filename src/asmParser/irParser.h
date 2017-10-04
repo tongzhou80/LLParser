@@ -21,6 +21,8 @@ public:
     string parse_basic_type();
     string parse_compound_type();
     string parse_complex_structs();
+    void set_optional_field(Value* v, string field);  // fields that have no value
+    //void set_optional_field(Value* v, string field, string value);
     void set_fastmath(Value* v);
     void set_tail(Value* v);
     void set_cconv(Value* v);

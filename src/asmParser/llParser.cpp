@@ -186,7 +186,7 @@ void LLParser::parse_aliases() {
         get_word();
         guarantee(_word == "=", " ");
         get_word();
-        if (InstFlags::is_linkage_flag(_word)) {
+        if (IRFlags::is_linkage_flag(_word)) {
             alias->set_raw_field("linkage", _word);
         }
 
@@ -368,25 +368,25 @@ Function* LLParser::create_function(string &text) {
 
     
     /* todo: more to add */
-//    if (InstFlags::is_linkage_flag(_lookahead)) {
+//    if (IRFlags::is_linkage_flag(_lookahead)) {
 //        linkage = _lookahead;
 //        jump_ahead();
 //        get_lookahead();
 //    }
 //
-//    if (InstFlags::is_visibility_flag(_lookahead)) {
+//    if (IRFlags::is_visibility_flag(_lookahead)) {
 //        linkage = _lookahead;
 //        jump_ahead();
 //        get_lookahead();
 //    }
 //
-//    if (InstFlags::is_cconv_flag(_lookahead)) {
+//    if (IRFlags::is_cconv_flag(_lookahead)) {
 //        linkage = _lookahead;
 //        jump_ahead();
 //        get_lookahead();
 //    }
 //
-//    while (InstFlags::is_param_attr_flag(_lookahead)) {
+//    while (IRFlags::is_param_attr_flag(_lookahead)) {
 //        linkage = _lookahead;
 //        jump_ahead();
 //        get_lookahead();
@@ -541,7 +541,7 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
         string opcode = inst->opcode();
 
         //zpl("opcode: %s", opcode.c_str())
-        if (InstFlags::is_terminator_inst(opcode)) {
+        if (IRFlags::is_terminator_inst(opcode)) {
             break;
         }
 

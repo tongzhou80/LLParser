@@ -70,7 +70,7 @@ set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h
         src/asmParser/instParser.cpp src/asmParser/instParser.h
         src/inst/callInst.cpp src/inst/callInst.h
         src/inst/instEssential.h
-        src/inst/instFlags.cpp src/inst/instFlags.h
+        src/asmParser/instFlags.cpp src/asmParser/instFlags.h
         src/peripheral/optParser.cpp src/peripheral/optParser.h
         src/peripheral/sysArgs.cpp src/peripheral/sysArgs.h
         src/peripheral/stringParser.cpp src/peripheral/stringParser.h

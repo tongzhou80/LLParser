@@ -8,9 +8,9 @@
 #include <set>
 #include <unordered_set>
 #include <bits/unordered_set.h>
-#include "../utilities/macros.h"
+#include "utilities/macros.h"
 
-class InstFlags {
+class IRFlags {
     static std::set<string> _fastmaths;
     static std::set<string> _linkages;
     static std::set<string> _cconvs;  // calling conventions

@@ -14,6 +14,14 @@ protected:
     string _raw_text;
     bool _has_raw_text;
     bool _fully_parsed;
+
+    /** Terms
+     *  Field here includes three types of fields:
+     *  1. Required fields of the instruction such as operands, arguments
+     *  2. Optional fields that have a value such as "fastmath"
+     *  3. Optional fields that have no value such as "volatile"
+     *  All of them are stored in this map
+     */
     std::map<string, string> _raw_fields;
 public:
     Shadow(): _has_raw_text(false), _fully_parsed(false) {}

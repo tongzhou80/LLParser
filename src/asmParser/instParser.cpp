@@ -181,7 +181,8 @@ void InstParser::do_call_family(Instruction* inst) {
 
     string ret_ty, fnty;
 
-    if (InstFlags::is_tail_flag(_word)) {
+    // _word here contains the opcode, which could be either call, invoke or a tail flag
+    if (IRFlags::is_tail_flag(_word)) {
         ci->set_raw_field("tail", _word);
         get_word();
     }
@@ -309,7 +310,6 @@ void InstParser::do_call_family(Instruction* inst) {
         get_word(',');
         inst->set_raw_field("exception-label", _word);
     }
-    return;
 }
 
 
@@ -332,17 +332,8 @@ void InstParser::do_load(Instruction *inst) {
      */
     LoadInst* li = dynamic_cast<LoadInst*>(inst);
 
-    get_lookahead();
-    if (_lookahead == "atomic") {
-        li->set_raw_field("atomic", "");
-        jump_ahead();
-        get_lookahead();
-    }
-
-    if (_lookahead == "volatile") {
-        li->set_raw_field("volatile", "");
-        jump_ahead();
-    }
+    set_optional_field(inst, "atomic");
+    set_optional_field(inst, "volatile");
 
 
     string ty = parse_compound_type();

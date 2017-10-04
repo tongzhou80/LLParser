@@ -7,7 +7,7 @@
 #include <utilities/mutex.h>
 #include <utilities/flags.h>
 #include <asmParser/llParserTLS.h>
-#include <inst/instFlags.h>
+#include <asmParser/instFlags.h>
 #include "sysDict.h"
 #include "instParser.h"
 #include "llParser.h"
@@ -22,7 +22,7 @@ void SysDict::init() {
     parser = new LLParser();
     //instParser = new InstParser();
 
-    InstFlags::init();
+    IRFlags::init();
     Locks::init();
 }
 

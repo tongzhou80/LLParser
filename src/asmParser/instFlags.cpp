@@ -7,16 +7,16 @@
 #include "instFlags.h"
 
 
-std::set<string> InstFlags::_fastmaths;
-std::set<string> InstFlags::_linkages;
-std::set<string> InstFlags::_cconvs;
-std::set<string> InstFlags::_visibilities;
-std::set<string> InstFlags::_dll_storage_classes;
-std::set<string> InstFlags::_param_attrs;
-std::set<string> InstFlags::_tails;
-std::set<string> InstFlags::_terminator_insts;
+std::set<string> IRFlags::_fastmaths;
+std::set<string> IRFlags::_linkages;
+std::set<string> IRFlags::_cconvs;
+std::set<string> IRFlags::_visibilities;
+std::set<string> IRFlags::_dll_storage_classes;
+std::set<string> IRFlags::_param_attrs;
+std::set<string> IRFlags::_tails;
+std::set<string> IRFlags::_terminator_insts;
 
-void InstFlags::init() {
+void IRFlags::init() {
     _fastmaths = { "nnan", "ninf", "nsz", "arcp", "contract", "fast"};
     _linkages = { "private", "internal", "available_externally", "weak", "linkonce", "common",
                   "appending", "extern_weak", "linkonce_odr", "weak_odr", "external" };
@@ -30,7 +30,7 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
-bool InstFlags::is_cconv_flag(const string& key) {
+bool IRFlags::is_cconv_flag(const string& key) {
     if (_cconvs.find(key) != _cconvs.end()) {
         return true;
     }
@@ -41,7 +41,7 @@ bool InstFlags::is_cconv_flag(const string& key) {
 }
 
 
-bool InstFlags::is_param_attr_flag(const string& key) {
+bool IRFlags::is_param_attr_flag(const string& key) {
     const char* p1 = "align%d";
     int dummy;
     int matched1 = sscanf(key.c_str(), p1, &dummy);

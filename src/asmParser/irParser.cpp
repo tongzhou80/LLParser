@@ -2,7 +2,7 @@
 // Created by tzhou on 9/17/17.
 //
 
-#include <inst/instFlags.h>
+#include <asmParser/instFlags.h>
 #include <ir/instruction.h>
 #include "irParser.h"
 
@@ -187,13 +187,21 @@ string IRParser::parse_complex_structs() {
     return '%' + name;
 }
 
+void IRParser::set_optional_field(Value *v, string field) {
+    get_lookahead();
+    if (_lookahead == field) {
+        v->set_raw_field(field, "");
+        jump_ahead();
+    }
+}
+
 /**@brief The following functions check _lookahead and set the relevant flag if presented
  * 
  * @param v 
  */
 void IRParser::set_cconv(Value *v) {
     get_lookahead();
-    if (InstFlags::is_cconv_flag(_lookahead)) {
+    if (IRFlags::is_cconv_flag(_lookahead)) {
         v->set_raw_field("cconv", _lookahead);
         jump_ahead();
     }
@@ -201,7 +209,7 @@ void IRParser::set_cconv(Value *v) {
 
 void IRParser::set_tail(Value *v) {
     get_lookahead();
-    if (InstFlags::is_tail_flag(_lookahead)) {
+    if (IRFlags::is_tail_flag(_lookahead)) {
         v->set_raw_field("tail", _lookahead);
         jump_ahead();
     }
@@ -209,7 +217,7 @@ void IRParser::set_tail(Value *v) {
 
 void IRParser::set_fastmath(Value *v) {
     get_lookahead();
-    if (InstFlags::is_fastmath_flag(_lookahead)) {
+    if (IRFlags::is_fastmath_flag(_lookahead)) {
         v->set_raw_field("fast-math", _lookahead);
         jump_ahead();
     }
@@ -217,7 +225,7 @@ void IRParser::set_fastmath(Value *v) {
 
 void IRParser::set_linkage(Value *v) {
     get_lookahead();
-    if (InstFlags::is_linkage_flag(_lookahead)) {
+    if (IRFlags::is_linkage_flag(_lookahead)) {
         v->set_raw_field("linkage", _lookahead);
         jump_ahead();
     }
@@ -225,7 +233,7 @@ void IRParser::set_linkage(Value *v) {
 
 void IRParser::set_visibility(Value *v) {
     get_lookahead();
-    if (InstFlags::is_visibility_flag(_lookahead)) {
+    if (IRFlags::is_visibility_flag(_lookahead)) {
         v->set_raw_field("visibility", _lookahead);
         jump_ahead();
     }
@@ -233,7 +241,7 @@ void IRParser::set_visibility(Value *v) {
 
 void IRParser::set_dll_storage_class(Value *v) {
     get_lookahead();
-    if (InstFlags::is_dll_storage_class_flag(_lookahead)) {
+    if (IRFlags::is_dll_storage_class_flag(_lookahead)) {
         v->set_raw_field("visibility", _lookahead);
         jump_ahead();
     }
@@ -242,7 +250,7 @@ void IRParser::set_dll_storage_class(Value *v) {
 void IRParser::set_param_attrs(Value *v) {
     get_lookahead();
     string flag = "param-attrs";
-    while (InstFlags::is_param_attr_flag(_lookahead)) {
+    while (IRFlags::is_param_attr_flag(_lookahead)) {
         if (!v->has_raw_field(flag)) {
             v->set_raw_field(flag, _lookahead);
         }
@@ -262,7 +270,7 @@ void IRParser::set_ret_attrs(Value *v) {
 
     get_lookahead();
     string flag = "ret-attrs";
-    while (InstFlags::is_param_attr_flag(_lookahead)) {
+    while (IRFlags::is_param_attr_flag(_lookahead)) {
         if (!v->has_raw_field(flag)) {
             v->set_raw_field(flag, _lookahead);
         }
