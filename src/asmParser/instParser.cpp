@@ -183,7 +183,6 @@ void InstParser::do_call_family(Instruction* inst) {
 
     if (InstFlags::is_tail_flag(_word)) {
         ci->set_raw_field("tail", _word);
-        zps(_word)
         get_word();
     }
 
