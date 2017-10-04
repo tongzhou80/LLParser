@@ -187,45 +187,44 @@ string IRParser::parse_complex_structs() {
     return '%' + name;
 }
 
-/**@brief The following functions check _lookahead and set the flag if presented
- * 
- * Will call get_lookahead() if flag is set
+/**@brief The following functions check _lookahead and set the relevant flag if presented
  * 
  * @param v 
  */
 void IRParser::set_cconv(Value *v) {
+    get_lookahead();
     if (InstFlags::in_cconvs(_lookahead)) {
         v->set_raw_field("cconv", _lookahead);
         jump_ahead();
-        get_lookahead();
     }
 }
 
 void IRParser::set_fastmath(Value *v) {
+    get_lookahead();
     if (InstFlags::in_fastmaths(_lookahead)) {
         v->set_raw_field("fast-math", _lookahead);
         jump_ahead();
-        get_lookahead();
     }
 }
 
 void IRParser::set_linkage(Value *v) {
+    get_lookahead();
     if (InstFlags::in_linkages(_lookahead)) {
         v->set_raw_field("linkage", _lookahead);
         jump_ahead();
-        get_lookahead();
     }
 }
 
 void IRParser::set_visibility(Value *v) {
+    get_lookahead();
     if (InstFlags::in_visibilities(_lookahead)) {
         v->set_raw_field("visibility", _lookahead);
         jump_ahead();
-        get_lookahead();
     }
 }
 
 void IRParser::set_param_attrs(Value *v) {
+    get_lookahead();
     string flag = "param-attrs";
     while (InstFlags::in_param_attrs(_lookahead)) {
         if (!v->has_raw_field(flag)) {
@@ -241,6 +240,7 @@ void IRParser::set_param_attrs(Value *v) {
 }
 
 void IRParser::set_ret_attrs(Value *v) {
+    get_lookahead();
     string flag = "ret-attrs";
     while (InstFlags::in_param_attrs(_lookahead)) {
         if (!v->has_raw_field(flag)) {

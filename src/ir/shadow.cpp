@@ -23,3 +23,14 @@ void Shadow::update_raw_field(string field, string new_value) {
         set_raw_field(field, new_value);
     }
 }
+
+/**@brief Dump all raw fields of the value
+ *
+ */
+void Shadow::dump_raw_fields() {
+    std::cout << "num of fields: " << _raw_fields.size() << '\n';
+    for (auto i: _raw_fields) {
+        std::cout << "  " << i.first << ": " << i.second << '\n';
+    }
+    std::cout << '\n';
+}

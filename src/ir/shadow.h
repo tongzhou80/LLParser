@@ -36,6 +36,7 @@ public:
 
 
     virtual void dump()                 { std::cout << raw_text() << std::endl; }
+    virtual void dump_raw_fields();
 };
 
 #endif //LLPARSER_SHADOW_H

@@ -358,12 +358,14 @@ Function* LLParser::create_function(string &text) {
     string linkage, cconv, ret_attrs, ret_type;
 
 
-    get_lookahead();
+    
     /* process optional flags */
     set_linkage(func);
     set_visibility(func);
     set_cconv(func);
     set_ret_attrs(func);
+
+    func->dump_raw_fields();
     /* todo: more to add */
 //    if (InstFlags::in_linkages(_lookahead)) {
 //        linkage = _lookahead;
