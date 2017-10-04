@@ -30,7 +30,7 @@ void InstFlags::init() {
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
 }
 
-bool InstFlags::in_cconvs(const string& key) {
+bool InstFlags::is_cconv_flag(const string& key) {
     if (_cconvs.find(key) != _cconvs.end()) {
         return true;
     }
@@ -41,7 +41,7 @@ bool InstFlags::in_cconvs(const string& key) {
 }
 
 
-bool InstFlags::in_param_attrs(const string& key) {
+bool InstFlags::is_param_attr_flag(const string& key) {
     const char* p1 = "align%d";
     int dummy;
     int matched1 = sscanf(key.c_str(), p1, &dummy);

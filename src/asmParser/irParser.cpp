@@ -193,7 +193,7 @@ string IRParser::parse_complex_structs() {
  */
 void IRParser::set_cconv(Value *v) {
     get_lookahead();
-    if (InstFlags::in_cconvs(_lookahead)) {
+    if (InstFlags::is_cconv_flag(_lookahead)) {
         v->set_raw_field("cconv", _lookahead);
         jump_ahead();
     }
@@ -201,7 +201,7 @@ void IRParser::set_cconv(Value *v) {
 
 void IRParser::set_fastmath(Value *v) {
     get_lookahead();
-    if (InstFlags::in_fastmaths(_lookahead)) {
+    if (InstFlags::is_fastmath_flag(_lookahead)) {
         v->set_raw_field("fast-math", _lookahead);
         jump_ahead();
     }
@@ -209,7 +209,7 @@ void IRParser::set_fastmath(Value *v) {
 
 void IRParser::set_linkage(Value *v) {
     get_lookahead();
-    if (InstFlags::in_linkages(_lookahead)) {
+    if (InstFlags::is_linkage_flag(_lookahead)) {
         v->set_raw_field("linkage", _lookahead);
         jump_ahead();
     }
@@ -217,7 +217,15 @@ void IRParser::set_linkage(Value *v) {
 
 void IRParser::set_visibility(Value *v) {
     get_lookahead();
-    if (InstFlags::in_visibilities(_lookahead)) {
+    if (InstFlags::is_visibility_flag(_lookahead)) {
+        v->set_raw_field("visibility", _lookahead);
+        jump_ahead();
+    }
+}
+
+void IRParser::set_dll_storage_class(Value *v) {
+    get_lookahead();
+    if (InstFlags::is_dll_storage_class_flag(_lookahead)) {
         v->set_raw_field("visibility", _lookahead);
         jump_ahead();
     }
@@ -226,7 +234,7 @@ void IRParser::set_visibility(Value *v) {
 void IRParser::set_param_attrs(Value *v) {
     get_lookahead();
     string flag = "param-attrs";
-    while (InstFlags::in_param_attrs(_lookahead)) {
+    while (InstFlags::is_param_attr_flag(_lookahead)) {
         if (!v->has_raw_field(flag)) {
             v->set_raw_field(flag, _lookahead);
         }
@@ -242,7 +250,7 @@ void IRParser::set_param_attrs(Value *v) {
 void IRParser::set_ret_attrs(Value *v) {
     get_lookahead();
     string flag = "ret-attrs";
-    while (InstFlags::in_param_attrs(_lookahead)) {
+    while (InstFlags::is_param_attr_flag(_lookahead)) {
         if (!v->has_raw_field(flag)) {
             v->set_raw_field(flag, _lookahead);
         }

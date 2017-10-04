@@ -138,7 +138,7 @@ Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
 //        /* todo: push to a stack and each inst parser thread should call its own InstParser instance to parse it */
 //    }
 
-    //if (InstFlags::in_terminator_insts(op)) {
+    //if (InstFlags::is_terminator_inst(op)) {
         inst->set_opcode(op);
     //}
     inst->set_raw_text(text);

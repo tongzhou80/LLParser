@@ -22,24 +22,26 @@ class InstFlags {
 
 public:
     static void init();
-    static std::set<string> fastmaths()                        { return _fastmaths; }
-    static bool in_fastmaths(const string& key)                       { return _fastmaths.find(key) != _fastmaths.end(); }
-    //static bool in_fastmaths(string key);
+    static std::set<string> fastmaths()                                   { return _fastmaths; }
+    static bool is_fastmath_flag(const string& key)                       { return _fastmaths.find(key) != _fastmaths.end(); }
+    //static bool is_fastmath_flag(string key);
 
-    static std::set<string> linkages()                         { return _linkages; }
-    static bool in_linkages(const string& key)                        { return _linkages.find(key) != _linkages.end(); }
+    static std::set<string> linkages()                                    { return _linkages; }
+    static bool is_linkage_flag(const string& key)                        { return _linkages.find(key) != _linkages.end(); }
 
-    static std::set<string> cconvs()                           { return _cconvs; }
-    static bool in_cconvs(const string& key);
+    static std::set<string> cconvs()                                      { return _cconvs; }
+    static bool is_cconv_flag(const string& key);
 
-    static std::set<string> visibilities()                       { return _visibilities; }
-    static bool in_visibilities(const string& key)                     { return _visibilities.find(key) != _visibilities.end(); }
+    static std::set<string> visibilities()                                { return _visibilities; }
+    static bool is_visibility_flag(const string& key)                     { return _visibilities.find(key) != _visibilities.end(); }
 
-    static bool in_param_attrs(const string& key);
-    static bool in_tails(const string& key)                           { return _tails.find(key) != _tails.end(); }
-    //static bool in_tails1(string key);
+    static bool is_dll_storage_class_flag(const string& key)              { return _dll_storage_classes.find(key) != _dll_storage_classes.end(); }
 
-    static bool in_terminator_insts(const string& key)                { return _terminator_insts.find(key) != _terminator_insts.end(); }
+    static bool is_param_attr_flag(const string& key);
+    static bool is_tail_flag(const string& key)                           { return _tails.find(key) != _tails.end(); }
+    //static bool is_tail_flag1(string key);
+
+    static bool is_terminator_inst(const string& key)                     { return _terminator_insts.find(key) != _terminator_insts.end(); }
 };
 
 #endif //LLPARSER_INSTFLAG_H

@@ -27,6 +27,7 @@ public:
     void set_param_attrs(Value* v);
     void set_ret_attrs(Value* v);
     void set_visibility(Value* v);
+    void set_dll_storage_class(Value* v);
 };
 
 #endif //LLPARSER_LLASMPARSER_H

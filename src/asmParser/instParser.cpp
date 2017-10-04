@@ -181,7 +181,7 @@ void InstParser::do_call_family(Instruction* inst) {
 
     string ret_ty, fnty;
 
-    if (InstFlags::in_tails(_word)) {
+    if (InstFlags::is_tail_flag(_word)) {
         ci->set_raw_field("tail", _word);
         get_word();
     }
@@ -190,20 +190,20 @@ void InstParser::do_call_family(Instruction* inst) {
 
     get_lookahead();
     if (inst->type() == Instruction::CallInstType) {
-        if (InstFlags::in_fastmaths(_lookahead)) {
+        if (InstFlags::is_fastmath_flag(_lookahead)) {
             ci->set_raw_field("fast-math", _lookahead);
             jump_ahead();
             get_lookahead();
         }
     }
 
-    if (InstFlags::in_cconvs(_lookahead)) {
+    if (InstFlags::is_cconv_flag(_lookahead)) {
         ci->set_raw_field("cconv", _lookahead);
         jump_ahead();
         get_lookahead();
     }
 
-    if (InstFlags::in_param_attrs(_lookahead)) {
+    if (InstFlags::is_param_attr_flag(_lookahead)) {
         // This assert is in the document, but not in practice
         //assert(_word == "zeroext" || _word == "signext" || _word == "inreg" || _word == "noalias" &&
         //          "Only ‘zeroext‘, ‘signext‘, and ‘inreg‘ attributes are valid here for return type");
