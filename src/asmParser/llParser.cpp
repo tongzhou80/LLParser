@@ -357,7 +357,6 @@ Function* LLParser::create_function(string &text) {
     }
     string linkage, cconv, ret_attrs, ret_type;
 
-
     
     /* process optional flags */
     set_linkage(func);
@@ -366,31 +365,6 @@ Function* LLParser::create_function(string &text) {
     set_cconv(func);
     set_ret_attrs(func);
 
-    
-    /* todo: more to add */
-//    if (IRFlags::is_linkage_flag(_lookahead)) {
-//        linkage = _lookahead;
-//        jump_ahead();
-//        get_lookahead();
-//    }
-//
-//    if (IRFlags::is_visibility_flag(_lookahead)) {
-//        linkage = _lookahead;
-//        jump_ahead();
-//        get_lookahead();
-//    }
-//
-//    if (IRFlags::is_cconv_flag(_lookahead)) {
-//        linkage = _lookahead;
-//        jump_ahead();
-//        get_lookahead();
-//    }
-//
-//    while (IRFlags::is_param_attr_flag(_lookahead)) {
-//        linkage = _lookahead;
-//        jump_ahead();
-//        get_lookahead();
-//    }
 
 
     /* A function pointer return type looks like this:
