@@ -44,7 +44,6 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
 
 void BasicBlock::check_insertion_side_effects_on_module(Instruction* ins) {
     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
-        _callinst_list.push_back(ci);
         Function* callee = ci->called_function();
         if (callee) {
             callee->append_user(ci);
@@ -184,7 +183,7 @@ BasicBlock* BasicBlock::clone() {
         *it = neu;
 
         /* if instruction is CallInst, it changes the call graph upon insertion */
-        if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(neu)) {
+        if (auto ci = dynamic_cast<CallInstFamily*>(neu)) {
             bb->callinst_list().push_back(ci);
         }
         neu->set_parent(bb);

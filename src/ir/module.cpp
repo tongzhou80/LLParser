@@ -71,8 +71,7 @@ void Module::insert_new_function(int pos, Function *inserted) {
     // iterate all the CallInstFamily of the inserted function
     if (is_fully_resolved()) {
         if (inserted->is_defined()) {
-            for (auto bit = inserted->begin(); bit != inserted->end(); ++bit) {
-                BasicBlock* bb = *bit;
+            for (auto bb: inserted->basic_block_list()) {
                 for (auto ci: bb->callinst_list()) {
                     bb->check_insertion_side_effects_on_module(ci);
                 }
@@ -193,6 +192,7 @@ void Module::resolve_after_parse() {
         resolve_aliases();
         resolve_debug_info();
     }
+    set_is_fully_resolved();
 }
 
 void Module::print_to_stream(std::ostream &os) {

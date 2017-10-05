@@ -67,7 +67,7 @@ public:
      *
      * @return
      */
-    std::vector<CallInstFamily*> callinst_list()          { return _callinst_list; }
+    std::vector<CallInstFamily*>& callinst_list()         { return _callinst_list; }
 
     /**@brief return a clone of this basic block, except the parent of the copy if NULL
      *

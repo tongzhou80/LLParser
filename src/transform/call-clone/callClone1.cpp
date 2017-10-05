@@ -509,7 +509,7 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        int nlevel = 1;
+        int nlevel = 2;
         if (has_argument("nlevel")) {
             nlevel = std::stoi(get_argument("nlevel"));
         }
