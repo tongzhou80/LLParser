@@ -48,8 +48,9 @@ typedef std::string string;
 
 #define syntax_check(condition) parser_assert(condition, "syntax check")
 
-#define zpp(fmt, args...) \
-  std::printf(fmt, ##args);
+#define zpp(arg) \
+  std::printf(#arg ": %p", arg); \
+  std::printf("\n");
 
 #define zpl(fmt, args...) \
   std::printf(fmt, ##args); \

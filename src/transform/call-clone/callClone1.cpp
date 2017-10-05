@@ -515,6 +515,7 @@ public:
         }
 
         ContextGenerator cg;
+
         cg.generate(module, "malloc", nlevel); // todo other allocs
         cg.generate(module, "calloc", nlevel); // todo other allocs
         cg.generate(module, "realloc", nlevel); // todo other allocs
@@ -582,6 +583,7 @@ public:
             auto path = p->path;
             CallInstFamily* ci = path[0];
             string old_callee = ci->called_function()->name();
+            //zps(old_callee)
 
             guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
             ci->replace_callee("ben_"+old_callee);

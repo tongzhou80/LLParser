@@ -23,12 +23,13 @@ ContextGenerator::~ContextGenerator() {
 void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     _paths.clear();
     _stack.clear();
-    Function* malloc = module->get_function(alloc);
-    if (!malloc) {
+    Function* alloc_f = module->get_function(alloc);
+
+    if (!alloc_f) {
         return;
     }
     
-    for (auto ci: malloc->caller_list()) {
+    for (auto ci: alloc_f->caller_list()) {
         XPath* path = new XPath;
         path->hotness = 0;
         path->path.push_back(ci);
@@ -77,8 +78,6 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         }
         _ofs << std::endl;
     }
-
-    _ofs.close();
 }
 
 void ContextGenerator::traverse() {
