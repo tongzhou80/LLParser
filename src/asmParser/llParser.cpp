@@ -357,7 +357,7 @@ Function* LLParser::create_function(string &text) {
     }
     string linkage, cconv, ret_attrs, ret_type;
 
-    
+
     /* process optional flags */
     set_linkage(func);
     set_visibility(func);
