@@ -73,7 +73,7 @@ Instruction* InstParser::create_instruction(string &text) {
         }
         case 'l': {
             if (op == "load") {
-                //inst = new LoadInst();
+                inst = new LoadInst();
                 //parse_routine = &InstParser::do_load;
             }
             break;
@@ -342,12 +342,14 @@ void InstParser::do_load(Instruction *inst) {
     inc_intext_pos(2);
     string ty_p = parse_compound_type();
     syntax_check(ty_p == ty + '*');
+    li->set_raw_field("ty", ty);
 
     get_word_of(" ,");
 
     if (_word == "getelementptr") {
         GetElementPtrInst* gepi = new GetElementPtrInst();
         do_getelementptr(gepi, true);
+        li->set_raw_field("pointer", gepi->raw_text());
         match(',');
     }
     else if (_word == "bitcast") {
@@ -360,6 +362,9 @@ void InstParser::do_load(Instruction *inst) {
     else {
         li->set_raw_field("pointer", _word);  // might do some syntax check on pointer
     }
+
+    //zps(li->raw_text())
+    //zpl("load from %s", li->get_raw_field("pointer").c_str())
 
     if (_eol) {
         return;
@@ -430,6 +435,7 @@ void InstParser::do_bitcast(Instruction *inst, bool is_embedded) {
     else if (_word == "getelementptr") {
         GetElementPtrInst* gepi = new GetElementPtrInst();
         do_getelementptr(gepi, true);
+        I->set_raw_field("value", gepi->raw_text());
     }
     else {
         I->set_raw_field("value", _word);
@@ -440,6 +446,7 @@ void InstParser::do_bitcast(Instruction *inst, bool is_embedded) {
     I->set_raw_field("ty2", new_ty);
     if (is_embedded) {
         match(')');
+        I->set_raw_text("bitcast (" + I->get_raw_field("ty") + ' ' + I->get_raw_field("value") + " to " + I->get_raw_field("ty2") + ')');
     }
 }
 
@@ -497,13 +504,11 @@ void InstParser::do_alloca(Instruction *ins) {
 }
 
 void InstParser::do_getelementptr(Instruction *inst, bool is_embedded) {
-    get_lookahead();
-    if (_lookahead == "inbounds") {
-        jump_ahead();
-    }
+    set_optional_field(inst, "inbounds");
     skip_ws();
     if (is_embedded) {
         syntax_check(_char == '(');
         string args = jump_to_end_of_scope();
+        inst->set_raw_text("getelementptr " + inst->get_raw_field("inbounds") + " " + args);
     }
 }

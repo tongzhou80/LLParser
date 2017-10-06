@@ -190,7 +190,7 @@ string IRParser::parse_complex_structs() {
 void IRParser::set_optional_field(Value *v, string field) {
     get_lookahead();
     if (_lookahead == field) {
-        v->set_raw_field(field, "");
+        v->set_raw_field(field, field);
         jump_ahead();
     }
 }
