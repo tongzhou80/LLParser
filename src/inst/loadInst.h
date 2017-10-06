@@ -18,17 +18,7 @@ class LoadInst: public Instruction {
 public:
     LoadInst();
 
-    string addr_str()                                   { return _addr_str; }
-    void set_addr_str(string s)                         { _addr_str = s; }
-
-    string ret_type_str()                               { return _ret_ty_str; }
-    void set_ret_type_str(string t)                     { _ret_ty_str = t; }
-
-    string pointer_type_str()                           { return _pointer_ty_str; }
-    void set_pointer_type_str(string t)                 { _pointer_ty_str = t; }
-
-    int alignment()                                     { return _align; }
-    void set_alignment(int a)                           { _align = a; }
+    string pointer_type_str()                           { return get_raw_field("ty") + '*'; }
 
     static void parse(Instruction* inst);
 };

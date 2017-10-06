@@ -7,6 +7,7 @@
 
 #include "asmParser/instFlags.h"
 #include "allocaInst.h"
+#include "storeInst.h"
 #include "callInst.h"
 #include "invokeInst.h"
 #include "loadInst.h"

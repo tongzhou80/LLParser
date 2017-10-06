@@ -78,6 +78,12 @@ Instruction* InstParser::create_instruction(string &text) {
             }
             break;
         }
+        case 's': {
+            if (op == "store") {
+                inst = new StoreInst();
+            }
+            break;
+        }
         default: {
             break;
         }
@@ -124,6 +130,10 @@ void InstParser::parse(Instruction *inst) {
         }
         case Instruction::LoadInstType: {
             do_load(inst);
+            break;
+        }
+        case Instruction::LoadInstType: {
+            do_store(inst);
             break;
         }
         case Instruction::BitCastInstType :

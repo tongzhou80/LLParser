@@ -32,6 +32,7 @@ public:
     void do_branch(Instruction* ins);
     void do_call_family(Instruction* ins);
     void do_load(Instruction* ins);
+    void do_store(Instruction* ins);
     void do_bitcast(Instruction* ins, bool is_embedded=false);
     void do_getelementptr(Instruction* ins, bool is_embedded=false);
 

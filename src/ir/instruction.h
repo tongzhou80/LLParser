@@ -21,10 +21,11 @@ public:
     enum InstType {
         UnknownInstType,
         AllocaInstType,
+        LoadInstType,
+        StoreInstType,
         BranchInstType,
         CallInstType,
         InvokeInstType,
-        LoadInstType,
         BitCastInstType,
         GetElementPtrInstType,
     };

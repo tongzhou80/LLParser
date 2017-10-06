@@ -56,9 +56,9 @@ public:
             Instruction* I = ls[i];
             LoadInst* li = dynamic_cast<LoadInst*>(I);
             I->dump();
-            if (li && !li->addr_str().empty()) {
+            if (li && !li->get_raw_field("pointer").empty()) {
                 zpl("got %s, %s", I->raw_c_str(), li->pointer_type_str().c_str());
-                string addr = li->addr_str();
+                string addr = li->get_raw_field("pointer");
 
                 string casted_addr = "%__tz_casted" + std::to_string(_cast_cnt++);
                 string cast_inst_text = "  " +  casted_addr + " = bitcast " + li->pointer_type_str() + " " + addr + " to i8*";
