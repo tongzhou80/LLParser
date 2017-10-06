@@ -260,19 +260,16 @@ StringParser* StringParser::get_word_of(string delims, bool append_delim, bool s
     }
 
     if (!_eol) {
-        int startp = _intext_pos;
-        int len = 0;
-        //while (_text[_intext_pos] != delim) {
-        while (delims.find(_text[_intext_pos]) == delims.npos) {
-            inc_intext_pos();
-            len++;
-            if (_eol) {
-                break;
-            }
+        int startp = intext_pos();
+        int endp = text().find_first_of(delims, startp);
+
+        if (endp == string::npos) {
+            endp = text().size();
         }
 
-        char delim = delims[delims.find(_text[_intext_pos])];
-        _word = _text.substr(startp, len);
+        inc_intext_pos(endp - startp);
+        _word = text().substr(startp, endp - startp);
+        char delim = text()[endp];
 
         if (append_delim) {
             _word += delim;
