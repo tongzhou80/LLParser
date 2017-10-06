@@ -126,7 +126,7 @@ void LLParser::parse_module_level_asms() {
 // todo: structs need finer-grain parse
 void LLParser::parse_structs(Module* module) {
     while (true) {
-        if (Strings::startswith(line(), "%")) {
+        if (line()[0] == '%') {
             StructType* st = new StructType();
             st->set_raw_text(line());
             module->add_struct_type(st);
@@ -621,7 +621,7 @@ void LLParser::parse_attributes(Module *module) {
 }
 
 void LLParser::parse_metadatas(Module *module) {
-    while (_ifs && Strings::startswith(line(), "!")) {
+    while (_ifs && line()[0] == '!') {
         inc_inline_pos();
         get_word();
         MetaData* data;
