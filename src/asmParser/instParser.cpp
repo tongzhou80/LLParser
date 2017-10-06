@@ -132,7 +132,7 @@ void InstParser::parse(Instruction *inst) {
             do_load(inst);
             break;
         }
-        case Instruction::LoadInstType: {
+        case Instruction::StoreInstType: {
             do_store(inst);
             break;
         }
@@ -347,8 +347,9 @@ void InstParser::do_load(Instruction *inst) {
 
 
     string ty = parse_compound_type();
-    if (_char != ',')
-    syntax_check(_char == ',');
+    if (_char != ',') {
+        syntax_check(_char == ',');
+    }
     inc_intext_pos(2);
     string ty_p = parse_compound_type();
     syntax_check(ty_p == ty + '*');
@@ -388,6 +389,81 @@ void InstParser::do_load(Instruction *inst) {
     }
 
     /* TODO: more field */
+}
+
+void InstParser::do_store(Instruction *ins) {
+    StoreInst* di = dynamic_cast<StoreInst*>(ins);
+    set_optional_field(ins, "atomic");
+    set_optional_field(ins, "volatile");
+
+    string ty = parse_compound_type();
+    zps(ty)
+    get_lookahead();
+    if (_lookahead == "getelementptr") {
+        jump_ahead();
+        auto gepi = new GetElementPtrInst();
+        do_getelementptr(gepi, true);
+        di->set_raw_field("value", gepi->raw_text());
+        match(',');
+    }
+    else if (_lookahead == "bitcast") {
+        jump_ahead();
+        auto bci = new BitCastInst();
+        do_bitcast(bci, true);
+        di->set_raw_field("value", bci->get_raw_field("value"));
+        syntax_check(bci->get_raw_field("ty2") == ty);
+        match(',');
+    }
+    else {
+        string value = match_value();
+        zps(value)
+        di->set_raw_field("value", value);
+    }
+
+
+
+    //zps(ins->raw_text())
+    inc_intext_pos(1);
+    string ty_p = parse_compound_type();
+    if (ty_p != ty + '*') {
+        syntax_check(ty_p == ty + '*');
+    }
+
+    di->set_raw_field("ty", ty);
+
+
+    get_word_of(" ,");
+
+    if (_word == "getelementptr") {
+        GetElementPtrInst* gepi = new GetElementPtrInst();
+        do_getelementptr(gepi, true);
+        di->set_raw_field("pointer", gepi->raw_text());
+        match(',');
+    }
+    else if (_word == "bitcast") {
+        BitCastInst* bci = new BitCastInst();
+        do_bitcast(bci, true);
+        di->set_raw_field("pointer", bci->get_raw_field("value"));
+        syntax_check(bci->get_raw_field("ty2") == ty_p);
+        match(',');
+    }
+    else {
+        di->set_raw_field("pointer", _word);  // might do some syntax check on pointer
+    }
+
+    //zps(li->raw_text())
+    //zpl("load from %s", li->get_raw_field("pointer").c_str())
+
+    if (_eol) {
+        return;
+    }
+
+    match(" align ");
+    get_word(',');
+    di->set_raw_field("alignment", _word);
+    if (_eol) {
+        return;
+    }
 }
 
 void InstParser::parse_function_pointer_type() {

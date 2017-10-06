@@ -76,6 +76,106 @@ string IRParser::match_identifier() {
     }
 }
 
+string IRParser::match_value() {
+    if (_char == '%' || _char == '@') {  // named variables and unnamed variables(%num)
+        get_word_of(" ,");
+        return _word;
+    }
+    else {  // constants
+        return match_constant();
+    }
+}
+
+string IRParser::match_simple_constant() {
+    if (_char == 't') {
+        match("true");
+        return "true";
+    }
+    else if (_char == 'f') {
+        match("false");
+        return "false";
+    }
+    else if (_char == 'n') {
+        get_word_of(" ,");
+        syntax_check(_word == "none" || _word == "null");
+        return _word;
+    }
+    else {
+        string number = match_number();
+        syntax_check(!number.empty());
+        return number;
+    }
+}
+
+string IRParser::match_complex_constant() {
+    return jump_to_end_of_scope();
+}
+
+string IRParser::match_constant() {
+    if (_char == '{' || _char == '[' || _char == '<') {
+        return match_complex_constant();
+    }
+    else {
+        return match_simple_constant();
+    }
+}
+
+/**@brief Match an integer or a float number
+ *
+ * @return
+ */
+string IRParser::match_number() {
+    if (try_match("0x")) {
+        return match_hexnum();
+    }
+    else {
+        return match_decnum();
+    }
+}
+
+string IRParser::match_hexnum() {
+    int startp = _intext_pos;
+    int len = 0;
+    int ndot = 0;
+    for (; !_eol && std::isxdigit(_char); len++) {
+        inc_intext_pos();
+    }
+
+    string matched = _text.substr(startp, len);
+    return matched;
+}
+
+string IRParser::match_decnum() {
+    int startp = _intext_pos;
+    int len = 0;
+    int ndot = 0;
+    string sign = "";
+    if (_char == '-' || _char == '+') {
+        sign += _char;
+        inc_intext_pos();
+    }
+
+    while (!_eol) {
+        if (std::isdigit(_char)) {
+            inc_intext_pos();
+        }
+        else if (_char == '.') {
+            inc_intext_pos();
+            ndot++;
+        }
+        else if (_char == 'e') {
+            match("e+");  // exponential notation
+        }
+        else {
+            break;
+        }
+        len++;
+    }
+
+    string matched = _text.substr(startp, len);
+    guarantee(ndot < 2, "invalid number: %s", matched.c_str());
+    return sign+matched;
+}
 
 string IRParser::parse_basic_type() {
     skip_ws();
@@ -140,6 +240,7 @@ string IRParser::parse_basic_type() {
 /**@brief Parse a basic type or a compound type such as function pointer
  *
  * Like function pointers, a function type (without a '*' at the end) is also considered a compound type.
+ * The _char will point to the next non-whitespace character upon returning
  *
  * @return
  */
@@ -164,6 +265,7 @@ string IRParser::parse_compound_type() {
             inc_intext_pos();
         }
     }
+    skip_ws();
 
     return ty;
 }

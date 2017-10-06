@@ -16,11 +16,19 @@ class Value;
 class IRParser: public virtual StringParser {
 public:
     string match_identifier();
+    string match_constant();
+    string match_value();
+    string match_hexnum();
+    string match_decnum();
+    string match_simple_constant();
+    string match_complex_constant();
+    string match_number();
     string match_xalpha();
     string match_xalphanumeric();
     string parse_basic_type();
     string parse_compound_type();
     string parse_complex_structs();
+
     void set_optional_field(Value* v, string field);  // fields that have no value
     //void set_optional_field(Value* v, string field, string value);
     void set_fastmath(Value* v);

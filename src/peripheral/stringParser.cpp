@@ -37,7 +37,7 @@ void StringParser::match(char c, bool skip_whitspace) {
     parser_assert(c == _char, "match |%c| but get |%c|", c, _char);
     inc_intext_pos();
 }
-//
+
 void StringParser::match(const string& s, bool skip_whitspace) {
     if (skip_whitspace) skip_ws();
 
@@ -52,6 +52,24 @@ void StringParser::match(const string& s, bool skip_whitspace) {
         else {
             parser_assert(0, "match |%s| but get |%s|", s.c_str(), text().substr(startp, len).c_str());
         }
+    }
+}
+
+/**@brief Similar to match(), but may not find a match and return false
+ *
+ * @param s
+ * @param skip_whitspace
+ */
+bool StringParser::try_match(const string& s, bool skip_whitspace) {
+    if (skip_whitspace) skip_ws();
+
+    int startp = _intext_pos;
+    if (text().find(s, startp) == startp) {
+        inc_intext_pos(s.size());
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
