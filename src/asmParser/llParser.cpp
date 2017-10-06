@@ -422,7 +422,7 @@ void LLParser::parse_function_definition() {
             get_real_line();
         }
 
-        if (Strings::startswith(line(), "}")) {
+        if (line()[0] == '}') {
             bb->set_is_exit();
             break;
         }
@@ -431,12 +431,12 @@ void LLParser::parse_function_definition() {
     SysDict::module()->append_new_function(func);
 }
 
-void LLParser::parse_basic_block_header(BasicBlock *bb) {
+void LLParser::parse_basic_block_header(BasicBlock *bb, bool use_comment) {
     bb->set_raw_text(line());
 
     // get label
-    string label_start = "; <label>:";
-    if (Strings::startswith(line(), label_start)) {
+    const string label_start = "; <label>:";
+    if (use_comment) {
         inc_inline_pos(label_start.size());
         get_word();
         bb->set_name(_word);
@@ -468,12 +468,11 @@ void LLParser::remove_tail_comments() {
 
 void LLParser::parse_basic_block(BasicBlock* bb) {
     while (1) {
-        parser_assert(!Strings::startswith(line(), "}"), "Not a block");
-        
+        parser_assert(line()[0] != '}', "Not a block");
 
         /* parse header first */
-        if (Strings::startswith(line(), "; <label>:")) {
-            parse_basic_block_header(bb);
+        if (line()[0] == ';') {
+            parse_basic_block_header(bb, true);
             get_real_line();
         }
         else if (line()[0] != ' ' && Strings::contains(line(), ":")) {
@@ -486,6 +485,22 @@ void LLParser::parse_basic_block(BasicBlock* bb) {
             //bb->set_raw_text(line());
             //get_real_line();
         }
+
+//        /* parse header first */
+//        if (Strings::startswith(line(), "; <label>:")) {
+//            parse_basic_block_header(bb);
+//            get_real_line();
+//        }
+//        else if (line()[0] != ' ' && Strings::contains(line(), ":")) {
+//            parse_basic_block_header(bb);
+//            get_real_line();
+//        }
+//        else {
+//            // assume starting with a blank space means a instruction line
+//            guarantee(line()[0] == ' ', "unrecognized block sentence: %s", line().c_str());
+//            //bb->set_raw_text(line());
+//            //get_real_line();
+//        }
 
         set_line_to_full_instruction();
 

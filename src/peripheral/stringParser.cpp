@@ -10,7 +10,6 @@ StringParser::StringParser() {
     _intext_pos = 0;
     _char = _text[_intext_pos];
     _eol = false;
-    _fail = false;
 }
 
 void StringParser::set_text(string & text) {
@@ -18,7 +17,6 @@ void StringParser::set_text(string & text) {
     _intext_pos = 0;
     _char = _text[_intext_pos];
     _eol = false;
-    _fail = false;
 }
 
 /**@brief This function won't set _eol in any case.
@@ -39,7 +37,7 @@ void StringParser::match(char c, bool skip_whitspace) {
     parser_assert(c == _char, "match |%c| but get |%c|", c, _char);
     inc_intext_pos();
 }
-
+//
 void StringParser::match(const string& s, bool skip_whitspace) {
     if (skip_whitspace) skip_ws();
 
@@ -57,6 +55,15 @@ void StringParser::match(const string& s, bool skip_whitspace) {
     }
 }
 
+//void StringParser::match(const string& s, bool skip_whitspace) {
+//    if (skip_whitspace) skip_ws();
+//
+//    int startp = _intext_pos;
+//    int matchp = text().find(s, startp);
+//    parser_assert(matchp = startp, "match |%s| failed", s.c_str());
+//    inc_intext_pos(s.size());
+//}
+
 /**@brief Similar to get_word(), except that the state of parser does not change. The result is stored in _lookahead.
  *
  * Use jump_ahead() to actually set the states. get_lookahead() + jump_ahead() === get_word().
@@ -72,7 +79,6 @@ void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim,
     int intext_pos = _intext_pos;
     char chr = _char;
     bool eol = _eol;
-    bool fail = _fail;
 
     get_word(delim, append_delim, skip_delim, skip_ws);
     _lookahead = _word;
@@ -83,7 +89,6 @@ void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim,
     _intext_pos = intext_pos;
     _char = chr;
     _eol = eol;
-    _fail = fail;
 }
 
 /**@brief Similar to get_word_of(), except that the state of parser does not change. The result is stored in _lookahead.
@@ -99,7 +104,6 @@ void StringParser::get_lookahead_of(string delims, bool append_delim, bool skip_
     int intext_pos = _intext_pos;
     char chr = _char;
     bool eol = _eol;
-    bool fail = _fail;
 
     get_word_of(delims, append_delim, skip_delim, skip_ws);
     _lookahead = _word;
@@ -110,7 +114,6 @@ void StringParser::get_lookahead_of(string delims, bool append_delim, bool skip_
     _intext_pos = intext_pos;
     _char = chr;
     _eol = eol;
-    _fail = fail;
 }
 //
 //void StringParser::get_lookahead(char delim, bool append_delim, bool skip_delim, bool skip_whitspace) {
@@ -238,17 +241,7 @@ StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_de
         }
     }
 
-    if (!_word.empty()) {
-        return this;
-    }
-    else {
-        _fail = true;  // mimic std::getline()
-        return this;
-    }
-}
-
-StringParser::operator bool() const {
-    return !_fail;
+    return this;
 }
 
 StringParser* StringParser::get_word_of(string delims, bool append_delim, bool skip_delim, bool skip_whitespace) {
@@ -283,9 +276,6 @@ StringParser* StringParser::get_word_of(string delims, bool append_delim, bool s
         }
     }
 
-    if (_word.empty()) {
-        _fail = true;
-    }
     return this;
 }
 
@@ -407,5 +397,4 @@ void StringParser::reset_parser() {
     _aheadpos = 0;
     _char = 0;
     _eol = false;
-    _fail = false;
 }

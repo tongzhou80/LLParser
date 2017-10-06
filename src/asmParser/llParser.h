@@ -86,7 +86,7 @@ public:
     Function* create_function(string& text);
     Function* parse_function_name_and_args();
     void parse_basic_block(BasicBlock* bb);
-    void parse_basic_block_header(BasicBlock* bb);
+    void parse_basic_block_header(BasicBlock* bb, bool use_comment=false);
     Instruction* parse_instruction_line(BasicBlock* bb);
     void parse_instruction_table(BasicBlock* bb, string op="");
     void parse_attributes(Module* module);
