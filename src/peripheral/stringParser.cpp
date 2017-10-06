@@ -165,6 +165,44 @@ int StringParser::parse_integer(bool skip_whitespace) {
         guarantee(0, "end of line");
     }
 }
+//
+//StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_delim, bool skip_whitespace) {
+//    range_check();
+//
+//    _word.clear();
+//
+//    if (skip_whitespace) {
+//        skip_ws();
+//    }
+//
+//    if (!_eol) {
+//        int startp = _intext_pos;
+//        int len = 0;
+//        while (!_eol && _text[_intext_pos] != delim) {
+//            inc_intext_pos();
+//            len++;
+//        }
+//
+//        _word = _text.substr(startp, len);
+//        if (append_delim) {
+//            _word += delim;
+//            zpl("append %c", delim);
+//        }
+//
+//        if (skip_delim) {
+//            if (!_eol) {
+//                inc_intext_pos();
+//            }
+//        }
+//    }
+//
+//    if (_word.empty()) {
+//        _fail = true;  // mimic std::getline()
+//    }
+//
+//    return this;
+//}
+//
 
 StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_delim, bool skip_whitespace) {
     range_check();
@@ -176,14 +214,18 @@ StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_de
     }
 
     if (!_eol) {
-        int startp = _intext_pos;
-        int len = 0;
-        while (!_eol && _text[_intext_pos] != delim) {
-            inc_intext_pos();
-            len++;
+        int startp = intext_pos();
+        int endp = text().find(delim, startp);
+
+        if (endp == string::npos) {
+            endp = text().size();
         }
 
-        _word = _text.substr(startp, len);
+        inc_intext_pos(endp - startp);
+        _word = _text.substr(startp, endp - startp);
+        //guarantee(endp != string::npos, "Char %c not found in subtext %s", delim, text().substr(intext_pos()).c_str());
+
+
         if (append_delim) {
             _word += delim;
             zpl("append %c", delim);
@@ -196,11 +238,13 @@ StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_de
         }
     }
 
-    if (_word.empty()) {
-        _fail = true;  // mimic std::getline()
+    if (!_word.empty()) {
+        return this;
     }
-
-    return this;
+    else {
+        _fail = true;  // mimic std::getline()
+        return this;
+    }
 }
 
 StringParser::operator bool() const {
@@ -269,8 +313,10 @@ StringParser* StringParser::get_word_of(string delims, bool append_delim, bool s
 //}
 
 void StringParser::range_check() {
+#ifdef LLDEBUG
     parser_assert(_intext_pos < _text.size(), "intext pointer out of range, pos: %d, size: %d", _intext_pos, _text.size());
     parser_assert(_char == _text[_intext_pos], "_char: %c, _text[_intext_pos]: %c", _char, _text[_intext_pos]);
+#endif
 }
 
 /**@brief Increment the position in text. _intext_pos and _char will change. _eol will possibly be set.

@@ -22,8 +22,10 @@ public:
 
     StringParser();
 
-    string text()                                        { return _text; }
+    string& text()                                        { return _text; }
     void set_text(string& );
+
+    int intext_pos()                                      { return _intext_pos; }
     void set_intext_pos(int p);
 
     string jump_to_end_of_scope();
