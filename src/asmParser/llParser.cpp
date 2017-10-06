@@ -157,7 +157,7 @@ void LLParser::parse_comdats() {
 }
 
 void LLParser::parse_globals(Module * module) {
-    while (Strings::startswith(line(), "@")) {
+    while (line()[0] == '@') {
         GlobalVariable* gv = new GlobalVariable();
         inc_intext_pos();
         get_word('=');
@@ -177,7 +177,7 @@ void LLParser::parse_globals(Module * module) {
 }
 
 void LLParser::parse_aliases() {
-    while (Strings::startswith(line(), "@")) {
+    while (line()[0] == '@') {
         Alias* alias = new Alias();
 
         inc_intext_pos();

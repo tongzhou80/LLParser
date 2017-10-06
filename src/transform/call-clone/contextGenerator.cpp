@@ -42,12 +42,18 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         for (auto xpath: _paths) {
             auto& context = xpath->path;
             auto tos = context[context.size()-1];
-            if (tos->function()->name() == "main") {
+
+            //            if (tos->function()->name() == "main") {
+//                new_paths.push_back(xpath);
+//                zpl("reached main:")
+//                for (auto i: context) {
+//                    zpl("%s ", i->function()->name_as_c_str())
+//                }
+//            }
+
+            if (tos->function()->caller_list().empty()) {
                 new_paths.push_back(xpath);
-                zpl("reached main:")
-                for (auto i: context) {
-                    zpl("%s ", i->function()->name_as_c_str())
-                }
+                zpl("reached top: %s", tos->function()->name_as_c_str());
             }
             else {
                 for (auto ci: tos->function()->caller_list()) {
