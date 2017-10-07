@@ -78,7 +78,7 @@ bool Strings::is_number(const std::string &s) {
     return !s.empty() && it == s.end();
 }
 
-bool Strings::replace(std::string  &s, std::string &oldsub, std::string& newsub) {
+bool Strings::replace(std::string  &s, std::string oldsub, std::string newsub) {
     int pos = s.find(oldsub);
     if (pos == s.npos) {
         return false;

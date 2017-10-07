@@ -82,6 +82,7 @@ string IRParser::match_value() {
         return _word;
     }
     else {  // constants
+        // todo: check if lookahead is constant expressions such as inttoptr
         return match_constant();
     }
 }

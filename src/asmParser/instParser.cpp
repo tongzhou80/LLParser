@@ -80,7 +80,7 @@ Instruction* InstParser::create_instruction(string &text) {
         }
         case 's': {
             if (op == "store") {
-                inst = new StoreInst();
+                //inst = new StoreInst();
             }
             break;
         }

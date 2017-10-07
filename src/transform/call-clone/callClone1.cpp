@@ -505,7 +505,7 @@ public:
     }
 
     void replace_malloc() {
-        int id = 0;
+        int id = 1;
         for (auto p: _all_paths) {
             auto path = p->path;
             CallInstFamily* ci = path[0];
@@ -524,6 +524,24 @@ public:
         Function* free_fp = SysDict::module()->get_function("free");
         for (auto ci: free_fp->caller_list()) {
             ci->replace_callee("ben_free");
+        }
+
+        //todo: non-dirty way
+        string suffixes[3] = {" ", ",", ")"};
+        for (auto F: SysDict::module()->function_list()) {
+            for (auto B: F->basic_block_list()) {
+                for (auto I: B->callinst_list()) {
+                    for (auto& suf: suffixes) {
+                        string targets[4] = {"malloc", "calloc", "realloc", "free"};
+                        for (auto& t: targets) {
+                            string old = "@"+t+suf;
+                            if (I->raw_text().find(old) != string::npos) {
+                                Strings::replace(I->raw_text(), old, "@indi_"+t+suf);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
