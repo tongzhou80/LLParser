@@ -12,22 +12,29 @@
 // A module pass template
 
 class RawReplaceCallPass: public Pass {
+    string _prefix;
 public:
     RawReplaceCallPass() {
         set_is_module_pass();
     }
 
     bool run_on_module(Module* module) override {
-        insert_declaration("malloc", "je_malloc", false);
-        insert_declaration("calloc", "je_calloc", false);
-        insert_declaration("realloc", "je_realloc", false);
-        insert_declaration("free", "je_free", false);
+        _prefix = "je_";
+        int nlevel = 2;
+        if (has_argument("prefix")) {
+            _prefix = get_argument("prefix");
+        }
+
+        insert_declaration("malloc", _prefix+"malloc", false);
+        insert_declaration("calloc", _prefix+"calloc", false);
+        insert_declaration("realloc", _prefix+"realloc", false);
+        insert_declaration("free", _prefix+"free", false);
 
         replace();
         string out = SysArgs::get_option("output");
         if (out.empty()) {
             out = SysDict::filename();
-            Strings::replace(out, ".ll", ".je.ll");
+            Strings::replace(out, ".ll", "." + _prefix + ".ll");
         }
         SysDict::module()->print_to_file(out);
         return true;
@@ -44,7 +51,7 @@ public:
                         for (auto& t: targets) {
                             string old = "@"+t+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@je_"+t+suf);
+                                Strings::replace(I->raw_text(), old, "@"+_prefix+t+suf);
                             }
                         }
                     }
