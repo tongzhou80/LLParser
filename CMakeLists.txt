@@ -25,6 +25,7 @@ add_library(Hello SHARED src/transform/hello/hello.cpp)
 add_library(Instcount SHARED src/transform/instcount/instcount.cpp)
 add_library(GlobalHello SHARED src/transform/global-pass-hello/globalHello.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
+add_library(RawReplaceCall SHARED src/transform/raw-replace-call/rawReplaceCall.cpp)
 add_library(CallClone SHARED src/transform/call-clone/callClone1.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
@@ -44,6 +45,7 @@ install(TARGETS
         ATrace
         HotCallClone
         NewClone
+        RawReplaceCall
         PrintCaller
         DESTINATION /home/marena/llparser/passes/)
 
