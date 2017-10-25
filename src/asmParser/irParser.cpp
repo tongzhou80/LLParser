@@ -286,7 +286,9 @@ string IRParser::parse_complex_structs() {
     match('%');
 
     string name = match_identifier();
-    parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', "sanity");
+    /* doesn't have to start with these */
+    //parser_assert(name[0] == 's' || name[0] == 'c' || name[0] == 'u' || name[0] == '"', "sanity");
+
     return '%' + name;
 }
 

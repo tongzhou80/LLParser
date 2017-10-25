@@ -526,9 +526,10 @@ public:
     }
 
     void replace_free() {
-        Function* free_fp = SysDict::module()->get_function("free");
-        for (auto ci: free_fp->caller_list()) {
-            ci->replace_callee("ben_free");
+        if (Function* free_fp = SysDict::module()->get_function("free")) {
+            for (auto ci: free_fp->caller_list()) {
+                ci->replace_callee("ben_free");
+            }
         }
 
         //todo: non-dirty way
