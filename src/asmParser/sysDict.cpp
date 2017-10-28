@@ -87,6 +87,8 @@ const string SysDict::filedir() {
  *
  * ThreadLocal data is also initilized here.
  * The lock/unlock is still executed in case of single thread.
+ * Note that the name used for module registery/lookup is
+ * the input file name corresponding to that module
  *
  * @param module
  */

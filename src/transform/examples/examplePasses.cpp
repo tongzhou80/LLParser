@@ -5,6 +5,24 @@
 #include <passes/pass.h>
 #include <ir/irEssential.h>
 
+
+// A global pass template
+
+class ExampleGlobalPass: public Pass {
+public:
+    ExampleGlobalPass() {
+        set_is_global_pass();
+    }
+
+    bool run_on_global() override {
+        printf("number of modules: %lu\n", SysDict::module_table().size());
+    }
+};
+
+REGISTER_PASS(ExampleGlobalPass)
+/*********************************************************/
+
+
 // A module pass template
 
 class ExampleModulePass: public Pass {
