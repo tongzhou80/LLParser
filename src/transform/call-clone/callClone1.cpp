@@ -175,15 +175,15 @@ public:
         guarantee(sp, "Function %s has no debug info", host->name_as_c_str());
         string host_log_name = sp->to_string();
         string cloned_log_name = cloned->name();
-        _clone_log << "clone: " << host_log_name << " " << cloned_log_name << '\n';
+        _clone_log << host_log_name << " " << cloned_log_name << " ";
     }
 
     void record_callee_update(Instruction* caller, Function* new_callee) {
         auto sp = caller->function()->di_subprogram();
         guarantee(sp, "Function %s has no debug info", caller->function()->name_as_c_str());
         string caller_log_name = sp->to_string();
-        _clone_log << "update: " << caller_log_name << "+" << caller->get_position_in_function()
-                   << " " + new_callee->name() << "\n\n";
+        _clone_log << caller_log_name << "+" << caller->get_position_in_function()
+                   << " " + new_callee->name() << "\n";
     }
 
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {

@@ -28,6 +28,7 @@ add_library(LinkTrace SHARED src/transform/link-trace/linkTrace1.cpp)
 add_library(Malloc SHARED src/transform/malloc/nmalloc.cpp)
 add_library(RawReplaceCall SHARED src/transform/raw-replace-call/rawReplaceCall.cpp)
 add_library(CallClone SHARED src/transform/call-clone/callClone1.cpp src/transform/call-clone/contextGenerator.h src/transform/call-clone/contextGenerator.cpp)
+add_library(GuidedClone SHARED src/transform/guided-clone/guidedClone.cpp)
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
 add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
@@ -43,6 +44,7 @@ install(TARGETS
         LinkTrace
         Malloc
         CallClone
+        GuidedClone
         Callgraph
         ATrace
         HotCallClone
