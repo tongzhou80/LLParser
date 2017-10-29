@@ -19,9 +19,12 @@ string Module::get_header(string key) {
 }
 
 Function* Module::get_function(string key) {
+    // todo: here it assumes an aliasee must be a Function, which seems
+    // ok for now but may not always be true
     if (Alias* alias = get_alias(key)) {
         return dynamic_cast<Function*>(alias->aliasee());
     }
+
     if (_function_map.find(key) == _function_map.end()) {
         return NULL;
     } else {
