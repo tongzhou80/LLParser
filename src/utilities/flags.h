@@ -50,15 +50,17 @@
          "")                                                                              \
   develop(bool, NoParserWarning, 0,                                                       \
          "")                                                                              \
+  develop(std::string, FunctionCloneLog, "",                                              \
+         "")                                                                              \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG)
 
 
 struct Flag {
-    Flag(char t, void* v): type(t), value(v) {}
     char type;
     void* value;
+    Flag(char t, void* v): type(t), value(v) {}
 };
 
 class Flags {

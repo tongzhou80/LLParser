@@ -66,7 +66,11 @@ void ArgsParser::parse_args(SoptInitArgs* init_args) {
                 Flags::set_flag(_word.substr(xx_len+1), false);
             }
             else {
-                guarantee(0, "Bad formatted option: %s (miss a '+' or '-'?)", _text.c_str());
+                string opt = _word.substr(xx_len);
+                int pos = opt.find('=');
+                guarantee(pos != string::npos, "Bad formatted option: %s, expect a `=`", _word.c_str());
+                Flags::set_flag(opt.substr(0, pos), opt.substr(pos+1));
+                //guarantee(0, "Bad formatted option: %s (miss a '+' or '-'?)", _text.c_str());
             }
         }
         else if (Strings::startswith(_word, "-")) {

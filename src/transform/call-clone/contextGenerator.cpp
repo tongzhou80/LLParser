@@ -36,7 +36,7 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         _paths.push_back(path);
     }
 
-    /* discard all contexts whose depth is less than nlevel */
+    /* keep all contexts whose depth is less than nlevel */
     while (--nlevel) {
         std::vector<XPath*> new_paths;
         for (auto xpath: _paths) {
@@ -67,6 +67,8 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         }
         _paths = new_paths;
     }
+
+    zpl("get all paths of %d layers of %s call chain, write to file...", nlevel, alloc.c_str())
 
     srand(time(NULL));
     double p = (double)rand() / (double)RAND_MAX;

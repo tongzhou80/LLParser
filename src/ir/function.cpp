@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <utilities/strings.h>
 #include <asmParser/sysDict.h>
-#include "irEssential.h"
+#include <utilities/flags.h>
 
 Function::Function(): Value() {
     _is_external = false;
@@ -67,6 +67,7 @@ std::size_t Function::instruction_count() {
  * 2. it has no users
  * 3. the name of the copy would be the old name + "." + a number, indicated by _copy_cnt
  * 4. the subprogram debug info is stripped, if any (llvm 4 does not allow two functions have the same DISubproggram)
+ * 5. some other info are also stripped to avoid collision
  *
  * Function cloning is a process that could have multiple side effects. The cloned function
  * may or may not be inserted to the module immediately after creation. It will not affect
@@ -97,7 +98,8 @@ Function* Function::clone(string new_name) {
     }
 
     if (new_name.empty()) {
-        new_name = name()+'.'+std::to_string((long long)++_copy_cnt);
+        new_name = name()+'.'+std::to_string(++_copy_cnt);
+        //new_name = name()+".c."+std::to_string(++_copy_cnt);  // ".c" is inserted
     }
     f->rename(new_name);
 

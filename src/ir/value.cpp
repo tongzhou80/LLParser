@@ -9,7 +9,7 @@
 
 Value::Value(): Shadow() {
     _name = "";
-    _copy_cnt = 0;
+    _copy_cnt = 1000;  // use a large number to avoid collision with llvm's renaming scheme
     _copy_prototype = NULL;
 }
 //

@@ -53,6 +53,11 @@ Flag* Flags::get_flag(std::string key) {
     }
 }
 
+/**@brief Set boolean flags such as -XX:+MyFlag.
+ *
+ * @param key
+ * @param v
+ */
 void Flags::set_flag(std::string key, bool v) {
     Flag* f = get_flag(key);
     if (f == NULL) {
@@ -67,24 +72,46 @@ void Flags::set_flag(std::string key, bool v) {
     }
 }
 
-void Flags::set_flag(std::string key, int v) {
-    Flag* f = get_flag(key);
-    if (f == NULL) {
-        fprintf(stderr, "Unrecognized option: %s\n", key.c_str());
-        std::terminate();
-    }
-    assert(f->type == 'i' && "option type must be int");
-    *(int*)(f->value) = v;
-}
+//void Flags::set_flag(std::string key, int v) {
+//    Flag* f = get_flag(key);
+//    if (f == NULL) {
+//        fprintf(stderr, "Unrecognized option: %s\n", key.c_str());
+//        std::terminate();
+//    }
+//    assert(f->type == 'i' && "option type must be int");
+//    *(int*)(f->value) = v;
+//}
 
+/**@brief Set flags that have a value such as -XX:MyFlag=value
+ *
+ * @param key
+ * @param value
+ */
 void Flags::set_flag(std::string key, std::string value) {
     Flag* f = get_flag(key);
     if (f == NULL) {
         fprintf(stderr, "Unrecognized option: %s\n", key.c_str());
         std::terminate();
     }
-    assert(f->type == 's' && "option type must be std::string");
-    *(std::string*)(f->value) = value;
+    char type = f->type;
+    void* v = f->value;
+    switch (type) {
+        case 's':
+            *(std::string*)v = value;
+            break;
+        case 'i':
+            *(int*)v = std::stoi(value);
+            break;
+        default:
+            fprintf(stderr, "Unsupported flag type: %c", type);
+            std::terminate();
+    }
+
+
+//    assert(f->type == 's' && "option type must be std::string");
+//    *(std::string*)(f->value) = value;
+
+
 //    else {
 //        std::string& type = f->type;
 //        void* v;

@@ -47,6 +47,8 @@ class CallClonePass: public Pass {
     int _min_cxt;
     bool _done;
     bool _skip;
+    bool _logclone;
+    std::ofstream _clone_log;
 
     /* statistics */
     int _hot_counter;
@@ -69,10 +71,11 @@ public:
         CloneVerbose = false;
         MatchVerbose = false;
         PathCheck = false;
+        _skip = false;
+        _logclone = false;
         _min_cxt = 1;
         _path_counter = 1;
         _cxt_counter = 0;
-        _skip = false;
         _recursive = 0;
         _cloned = 0;
 
@@ -84,7 +87,9 @@ public:
     }
 
     ~CallClonePass() {
-
+        if (_logclone) {
+            _clone_log.close();
+        }
     }
 
     CallInstFamily* get_element_in_call_path(std::vector<CallInstFamily*>& path, int pos) {
@@ -130,12 +135,26 @@ public:
                     }
                 }
                 guarantee(i > 0, "");
-                /* i is the position that divergence starts */
-                auto root = paths[0]->path[i-1];  // the last shared ins
+
+                /* paths is a set of XPS_Paths that share i common items, for example
+                 * p1: I1 < I2 < I3
+                 * p2: I1 < I2 < I4
+                 *
+                 * paths: {p1, p2}
+                 * i is the position where divergence starts, which would be 2 in this example.
+                 * i-1 (1) points to the last shared item
+                 */
+                auto root = paths[0]->path[i-1];  // the last shared instruction
                 auto callee = root->function();
+
+                /* always let the first path remain the same and rewrite other paths
+                 */
                 for (int j = 1; j < paths.size(); ++j) {
                     auto& this_path = paths[j]->path;
                     auto cloned_callee = callee->clone();
+                    if (_logclone) {
+                        _clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
+                    }
                     SysDict::module()->append_new_function(cloned_callee);
                     _cloned++;
                     update_callee_in_all_paths(this_path[i], cloned_callee);
@@ -163,8 +182,14 @@ public:
                             zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
                         }
 
+                        if (_logclone) {
+                            _clone_log << "update: " << I->function()->name() << "+" << I->get_position_in_function() << ":"
+                                       << I->called_function()->name() + " -> " + new_callee->name() << "\n\n";
+                        }
+
                         I->replace_callee(new_callee->name());
                         is_replaced = true;
+
                     }
                     auto callee_call = stack[i-1];
                     int i_index = callee_call->get_index_in_block();
@@ -439,6 +464,10 @@ public:
         int nlevel = 2;
         if (has_argument("nlevel")) {
             nlevel = std::stoi(get_argument("nlevel"));
+        }
+        if (has_argument("logclone")) {
+            _logclone = true;
+            _clone_log.open("clone.log");
         }
 
         ContextGenerator cg;
