@@ -19,7 +19,6 @@ Pass::Pass() {
     _is_parse_time = false;
 
     _unloader = NULL;
-    _args["a"] = "b";
 }
 
 void Pass::unload() {

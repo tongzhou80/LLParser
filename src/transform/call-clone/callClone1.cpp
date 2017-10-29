@@ -152,9 +152,10 @@ public:
                 for (int j = 1; j < paths.size(); ++j) {
                     auto& this_path = paths[j]->path;
                     auto cloned_callee = callee->clone();
+
                     if (_logclone) {
                         //_clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
-
+                        record_clone(callee, cloned_callee);
                     }
                     SysDict::module()->append_new_function(cloned_callee);
                     _cloned++;
@@ -170,7 +171,19 @@ public:
     }
 
     void record_clone(Function* host, Function* cloned) {
-        //string host_log_name = host->sub
+        auto sp = host->di_subprogram();
+        guarantee(sp, "Function %s has no debug info", host->name_as_c_str());
+        string host_log_name = sp->to_string();
+        string cloned_log_name = cloned->name();
+        _clone_log << "clone: " << host_log_name << " " << cloned_log_name << '\n';
+    }
+
+    void record_callee_update(Instruction* caller, Function* new_callee) {
+        auto sp = caller->function()->di_subprogram();
+        guarantee(sp, "Function %s has no debug info", caller->function()->name_as_c_str());
+        string caller_log_name = sp->to_string();
+        _clone_log << "update: " << caller_log_name << "+" << caller->get_position_in_function()
+                   << " " + new_callee->name() << "\n\n";
     }
 
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
@@ -188,8 +201,9 @@ public:
                         }
 
                         if (_logclone) {
-                            _clone_log << "update: " << I->function()->name() << "+" << I->get_position_in_function() << ":"
-                                       << I->called_function()->name() + " -> " + new_callee->name() << "\n\n";
+                            record_callee_update(I, new_callee);
+                            //_clone_log << "update: " << I->function()->name() << "+" << I->get_position_in_function() << ":"
+                            //           << I->called_function()->name() + " -> " + new_callee->name() << "\n\n";
                         }
 
                         I->replace_callee(new_callee->name());
@@ -525,9 +539,14 @@ public:
         string out = SysArgs::get_option("output");
         if (out.empty()) {
             out = SysDict::filename();
-            Strings::replace(out, ".ll", ".clone.ll");
-            //out = SysDict::filename() + '.' + name();
+            if (Strings::contains(out, ".ll")) {
+                Strings::replace(out, ".ll", ".clone.ll");
+            }
+            else {
+                out += ".clone.ll";
+            }
         }
+        zpl("output to %s", out.c_str())
         SysDict::module()->print_to_file(out);
 
         check_all_paths();
@@ -551,7 +570,7 @@ public:
             string old_callee = ci->called_function()->name();
             //zps(old_callee)
 
-            guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", " ");
+            guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", "old callee: %s", old_callee.c_str());
             ci->replace_callee("ben_"+old_callee);
             _ben_num++;
             string new_args = "i32 " + std::to_string(id++) + ", " + ci->get_raw_field("args");

@@ -83,9 +83,9 @@ void PassManager::initialize_passes() {
 //    }
 //
     if (DebugRun) {
-        CallClonePass* p = new CallClonePass();
-        p->set_name("CallClonePass");
-        add_pass(p);
+//        CallClonePass* p = new CallClonePass();
+//        p->set_name("CallClonePass");
+//        add_pass(p);
     }
 
     for (auto p: SysArgs::passes()) {

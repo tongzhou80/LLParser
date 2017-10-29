@@ -18,7 +18,9 @@ class Module;
 class Instruction;
 class CallInst;
 
-class Function;
+class DISubprogram;
+
+
 class Function: public Value {
     Module* _parent;
     std::vector<BasicBlock*> _basic_block_list;
@@ -26,6 +28,7 @@ class Function: public Value {
     bool _is_defined; // a function is either external or defined in current module, or else it is unresolved
     BasicBlock* _entry_block;
     int _dbg_id;
+    DISubprogram* _di_subprogram;
 
     bool _is_copy;
 public:
@@ -47,8 +50,10 @@ public:
     Module* parent()                                       { return _parent; }
     void set_parent(Module* m)                             { _parent = m; }
 
+    /* debug info */
     int dbg_id()                                           { return _dbg_id; }
     void set_dbg_id(int i)                                 { _dbg_id = i; }
+    DISubprogram* di_subprogram();
 
     BasicBlock* create_basic_block(string label);
     BasicBlock* create_basic_block();

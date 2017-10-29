@@ -25,3 +25,7 @@ void DISubprogram::resolve_refs() {
     //DI_SET_REF_FIELD(scope, DIScope); // need to parse DICompositeType
     DI_SET_REF_FIELD(file, DIFile);
 }
+
+string DISubprogram::to_string() {
+    return name()+":"+filename();
+}

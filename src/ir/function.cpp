@@ -6,6 +6,7 @@
 #include <utilities/strings.h>
 #include <asmParser/sysDict.h>
 #include <utilities/flags.h>
+#include <di/diSubprogram.h>
 
 Function::Function(): Value() {
     _is_external = false;
@@ -13,6 +14,7 @@ Function::Function(): Value() {
     _parent = NULL;
     _entry_block = NULL;
     _dbg_id = -1;
+    _di_subprogram = NULL;
     _is_copy = false;
 }
 
@@ -174,4 +176,13 @@ void Function::print_to_stream(std::ostream& os) {
         }
         os << "}\n";
     }
+}
+
+DISubprogram* Function::di_subprogram() {
+    if (!_di_subprogram) {
+        MetaData* md = SysDict::module()->get_debug_info(_dbg_id);
+        _di_subprogram = dynamic_cast<DISubprogram*>(md);
+    }
+
+    return _di_subprogram;
 }
