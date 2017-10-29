@@ -153,7 +153,8 @@ public:
                     auto& this_path = paths[j]->path;
                     auto cloned_callee = callee->clone();
                     if (_logclone) {
-                        _clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
+                        //_clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
+
                     }
                     SysDict::module()->append_new_function(cloned_callee);
                     _cloned++;
@@ -166,6 +167,10 @@ public:
         if (!replaced) {
             _done = true;
         }
+    }
+
+    void record_clone(Function* host, Function* cloned) {
+        //string host_log_name = host->sub
     }
 
     void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
