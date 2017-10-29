@@ -207,7 +207,7 @@ void LLParser::parse_aliases() {
             string aliasee_ty_p = parse_compound_type();
             parser_assert(aliasee_ty_p == aliasee_ty + '*', "sanity check");
         }
-        inc_intext_pos();
+        
         match('@');
         get_word();
         alias->set_raw_field("aliasee", _word);

@@ -35,7 +35,7 @@ public:
                 if (!F->is_defined()) {
                     continue;
                 }
-                
+
                 if (_functions.find(F->name()) != _functions.end()) {
                     fprintf(stderr, "name collision:\n");
                     fprintf(stderr, "function %s appears in both %s and %s! Exit.",
