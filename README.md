@@ -56,6 +56,10 @@ Below is an incomplete list of advantages LLParser could have over LLVM's librar
 - Especially handy for simple transformations such as inserting an instruction, adding an argument, etc.
 - No complex data structures, mostly raw STL, which is easy to handle.
 
+It also has some interfaces that are not directly available in LLVM's pass framework:
+- Get a function's debug information
+- Support for inter-modular pass
+
 LLParser also implements hot-pluggable passes, so that your pass can be loaded at run time by specifying in the command line.
 
 LLParser operates on LLVM assembly level and leverages existing standard LLVM tool chain. Any inputs

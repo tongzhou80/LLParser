@@ -54,6 +54,7 @@ public:
     int dbg_id()                                           { return _dbg_id; }
     void set_dbg_id(int i)                                 { _dbg_id = i; }
     DISubprogram* di_subprogram();
+    void set_di_subprogram(DISubprogram* sp)               { _di_subprogram = sp; }
 
     BasicBlock* create_basic_block(string label);
     BasicBlock* create_basic_block();

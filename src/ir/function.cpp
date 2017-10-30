@@ -71,6 +71,13 @@ std::size_t Function::instruction_count() {
  * 4. the subprogram debug info is stripped, if any (llvm 4 does not allow two functions have the same DISubproggram)
  * 5. some other info are also stripped to avoid collision
  *
+ * A pseudo debug info will be created for the new function, that is,
+ * the new function's debug_id will be set to -1, but its _di_subprogram will be set
+ * to an object that only has "name" and "file" fields.
+ *
+ * All instruction's debug info stay the same, so they will share a same debug info entry
+ * with the old instructions in the old function.
+ *
  * Function cloning is a process that could have multiple side effects. The cloned function
  * may or may not be inserted to the module immediately after creation. It will not affect
  * the call graph until it is inserted.
@@ -85,43 +92,50 @@ std::size_t Function::instruction_count() {
  */
 //todo: may need to create a Function from scratch
 Function* Function::clone(string new_name) {
-    Function* f = new Function(*this);
-    f->set_parent(NULL);
-    f->user_set().clear();
+    Function* copy = new Function(*this);
+    copy->set_parent(NULL);
+    copy->user_set().clear();
     if (is_defined()) {
-        for (iterator it = f->begin(); it != f->end(); ++it) {
+        for (auto it = copy->begin(); it != copy->end(); ++it) {
             // don't delete the old basic block, it is still used by the original function
             BasicBlock* old = *it;
             BasicBlock* neu = old->clone();
             *it = neu;
-            neu->set_parent(f);
+            neu->set_parent(copy);
         }
-        _entry_block = *(f->begin());
+        _entry_block = *(copy->begin());
     }
 
     if (new_name.empty()) {
         new_name = name()+'.'+std::to_string(++_copy_cnt);
         //new_name = name()+".c."+std::to_string(++_copy_cnt);  // ".c" is inserted
     }
-    f->rename(new_name);
+    copy->rename(new_name);
 
-    //zpl("cloned %s to %s", name_as_c_str(), f->name_as_c_str())
+    //zpl("cloned %s to %s", name_as_c_str(), copy->name_as_c_str())
 
     /* strip DISubprogram info */
-    int dipos = f->raw_text().find("!dbg");
+    int dipos = copy->raw_text().find("!dbg");
     if (dipos != string::npos) {
-        string new_header = f->raw_text().substr(0, dipos);
-        f->set_raw_text(new_header);
-        f->set_dbg_id(-1);
+        string new_header = copy->raw_text().substr(0, dipos);
+        copy->set_raw_text(new_header);
+        copy->set_dbg_id(-1);
     }
 
-    Strings::replace(f->raw_text(), " comdat ", " ");  // todo
+    Strings::replace(copy->raw_text(), " comdat ", " ");  // todo
 
-    f->set_is_copy();
-    f->set_copy_cnt(0);
-    f->set_copy_prototype(this);
+    /* create new debug info for the cloned function
+     * except the name, other fields remain the same for now
+     */
+    auto dbg_copy = new DISubprogram(*(this->di_subprogram()));
+    dbg_copy->set_name(copy->name());
+    copy->set_di_subprogram(dbg_copy);
 
-    return f;
+    copy->set_is_copy();
+    copy->set_copy_cnt(0);
+    copy->set_copy_prototype(this);
+
+    return copy;
 }
 
 
