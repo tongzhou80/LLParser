@@ -112,6 +112,7 @@ Function* Function::clone(string new_name) {
     if (dipos != string::npos) {
         string new_header = f->raw_text().substr(0, dipos);
         f->set_raw_text(new_header);
+        f->set_dbg_id(-1);
     }
 
     Strings::replace(f->raw_text(), " comdat ", " ");  // todo
