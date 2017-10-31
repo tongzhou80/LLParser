@@ -513,7 +513,7 @@ public:
         }
 //
         get_distinct_all_paths();
-        check_all_paths();
+        check_all_paths(true);
 
 
         int round = 0;
@@ -526,7 +526,7 @@ public:
             round++;
         }
 
-        replace_malloc();
+        replace_alloc();
         replace_free();
 
         string out = SysArgs::get_option("output");
@@ -565,7 +565,7 @@ public:
         }
     }
 
-    void replace_malloc() {
+    void replace_alloc() {
         int id = 1;
         for (auto p: _all_paths) {
             auto path = p->path;
@@ -573,15 +573,15 @@ public:
             string old_callee = ci->called_function()->name();
 
             //guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", "old callee: %s", old_callee.c_str());
-            bool match = false;
+            string new_name = "";
             for (auto t: _alloc_set) {
                 if (old_callee == t->old_name) {
-                    match = true;
+                    new_name = t->new_name;
                 }
             }
-            guarantee(match, "old callee: %s", old_callee.c_str());
+            guarantee(new_name != "", "bad old callee to replace: %s", old_callee.c_str());
 
-            ci->replace_callee("ben_"+old_callee);
+            ci->replace_callee(new_name);
             _ben_num++;
             string new_args = "i32 " + std::to_string(id++) + ", " + ci->get_raw_field("args");
             ci->replace_args(new_args);
