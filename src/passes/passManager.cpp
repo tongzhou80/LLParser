@@ -126,8 +126,7 @@ void PassManager::add_pass(Pass *p) {
     }
 }
 
-/// The loaded passes will be deleted in PassManager's destructor
-void PassManager::add_pass(string name) {
+Pass* PassManager::load_pass(string name) {
     string ld_path = SysArgs::get_property("ld-pass-path");
     if (ld_path != "") {
         _pass_lib_path = ld_path;
@@ -175,12 +174,13 @@ void PassManager::add_pass(string name) {
 
     zpl("load pass from %s", path);
     void *passso = dlopen(path, RTLD_NOW);
+
     if (passso) {
         pass_loader ldp = (pass_loader)dlsym(passso, loader);
         pass_unloader unldp = (pass_unloader)dlsym(passso, unloader);
         if (ldp == NULL || unldp == NULL) {
             throw PassNotRegisteredError("pass " + pass_name + " does not have a loader or an unloader.\n"
-                                                                       "Please add 'REGISTER_PASS(yourclassname)' at the end of your pass source file");
+                    "Please add 'REGISTER_PASS(yourclassname)' at the end of your pass source file");
         }
 
         Pass* pass_obj = ldp();
@@ -189,11 +189,16 @@ void PassManager::add_pass(string name) {
         if (!args.empty()) {
             pass_obj->parse_arguments(args);
         }
-        add_pass(pass_obj);
+        return pass_obj;
+
     } else {
         throw PassOpenFailedError("dlopen failed: " + string(dlerror()));
     }
+}
 
+/// The loaded passes will be deleted in PassManager's destructor
+void PassManager::add_pass(string name) {
+    add_pass(load_pass(name));
 }
 
 

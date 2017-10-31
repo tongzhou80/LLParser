@@ -14,7 +14,6 @@
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
 
-#include "contextGenerator.h"
 
 struct MFunc {
     string old_name;
@@ -25,20 +24,59 @@ struct MFunc {
             old_name(oldname), new_name(newname), add_id(addid) {}
 };
 
-class AddDeclarePass: public Pass {
+/**@brief This class don't use SysDict::module()
+ * 
+ */
+class LSDAPass: public Pass {
+    /* language specific stuff */
     string _lang;
+    std::vector<MFunc*> _alloc_set;
+    std::vector<MFunc*> _free_set;
     bool _use_indi;
 public:
-    AddDeclarePass() {
+    LSDAPass() {
         set_is_module_pass();
 
         _lang = "all";
+        _use_indi = false;
     }
 
-    ~AddDeclarePass() {
+    ~LSDAPass() {
 
     }
 
+    const std::vector<MFunc *> &alloc_set() const {
+        return _alloc_set;
+    }
+
+    void set_alloc_set(const std::vector<MFunc *> &_alloc_set) {
+        LSDAPass::_alloc_set = _alloc_set;
+    }
+
+    const std::vector<MFunc *> &free_set() const {
+        return _free_set;
+    }
+
+    void set_free_set(const std::vector<MFunc *> &_free_set) {
+        LSDAPass::_free_set = _free_set;
+    }
+
+    bool use_indi() const {
+        return _use_indi;
+    }
+
+    void set_use_indi(bool _use_indi) {
+        LSDAPass::_use_indi = _use_indi;
+    }
+
+    void set_lang(string lang) {
+        guarantee(lang == "c" || lang == "cpp" || lang == "fortran", "");
+        _lang = lang;
+    }
+
+    const string& lang() {
+        return _lang;
+    }
 
     void init_lang(Module* module) {
         if (_lang == "c" || _lang == "cpp" || _lang == "all") {
@@ -55,24 +93,7 @@ public:
             _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
         }
 
-        Module* cur_module = SysDict::module();
-        for (auto t: _alloc_set) {
-            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
-            if (_use_indi) {
-                string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(cur_module, t->old_name, indi_name, false);
-            }
-        }
-
-        for (auto t: _free_set) {
-            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
-            if (_use_indi) {
-                string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(cur_module, t->old_name, indi_name, false);
-            }
-        }
+        
 //
 //        insert_declaration("malloc", "ben_malloc", true);
 //        insert_declaration("calloc", "ben_calloc", true);
@@ -85,28 +106,37 @@ public:
 //        insert_declaration("free", "indi_free", false);
 
     }
+    
+    void insert_lsd(Module* module) {
+        for (auto t: _alloc_set) {
+            insert_declaration(module, t->old_name, t->new_name, t->add_id);
+            if (_use_indi) {
+                string indi_name = t->new_name;
+                Strings::replace(indi_name, "ben_", "indi_");
+                insert_declaration(module, t->old_name, indi_name, false);
+            }
+        }
+
+        for (auto t: _free_set) {
+            insert_declaration(module, t->old_name, t->new_name, t->add_id);
+            if (_use_indi) {
+                string indi_name = t->new_name;
+                Strings::replace(indi_name, "ben_", "indi_");
+                insert_declaration(module, t->old_name, indi_name, false);
+            }
+        }
+    }
 
     bool run_on_module(Module* module) override {
-        init_lang(module);
-
-        int nlevel = 2;
-        if (has_argument("nlevel")) {
-            nlevel = std::stoi(get_argument("nlevel"));
-        }
-        if (has_argument("logclone")) {
-            _logclone = true;
-            _clone_log.open("clone.log");
-        }
-        if (has_argument("min-cxt")) {
-            _min_cxt = std::stoi(get_argument("min-cxt"));
-            zpd(_min_cxt)
-        }
         if (has_argument("lang")) {
             _lang = get_argument("lang");
         }
         if (has_argument("indi")) {
             _use_indi = true;
         }
+
+        init_lang(module);
+        insert_lsd(module);
     }
 //
 //    void replace_free() {
@@ -176,4 +206,4 @@ public:
 };
 
 
-REGISTER_PASS(AddDeclarePass);
+REGISTER_PASS(LSDAPass);

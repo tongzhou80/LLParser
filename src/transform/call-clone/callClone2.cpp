@@ -13,6 +13,7 @@
 #include <peripheral/sysArgs.h>
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
+#include <passes/passManager.h>
 
 #include "contextGenerator.h"
 
@@ -426,52 +427,6 @@ public:
         return false;
     }
 
-    void init_lang(Module* module) {
-        if (_lang == "c" || _lang == "cpp" || _lang == "all") {
-            _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
-            _alloc_set.push_back(new MFunc("calloc", "ben_calloc", true));
-            _alloc_set.push_back(new MFunc("realloc", "ben_realloc", true));
-            _free_set.push_back(new MFunc("free", "ben_free", false));
-        }
-
-        if (_lang == "cpp" || _lang == "all") {
-            _alloc_set.push_back(new MFunc("_Znam", "ben_malloc", true));
-            _alloc_set.push_back(new MFunc("_Znwm", "ben_malloc", true));
-            _free_set.push_back(new MFunc("_ZdaPv", "ben_free", false));
-            _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
-        }
-
-        Module* cur_module = SysDict::module();
-        for (auto t: _alloc_set) {
-            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
-            if (_use_indi) {
-                string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(cur_module, t->old_name, indi_name, false);
-            }
-        }
-
-        for (auto t: _free_set) {
-            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
-            if (_use_indi) {
-                string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(cur_module, t->old_name, indi_name, false);
-            }
-        }
-//
-//        insert_declaration("malloc", "ben_malloc", true);
-//        insert_declaration("calloc", "ben_calloc", true);
-//        insert_declaration("realloc", "ben_realloc", true);
-//        insert_declaration("free", "ben_free", false);
-//
-//        insert_declaration("malloc", "indi_malloc", false);
-//        insert_declaration("calloc", "indi_calloc", false);
-//        insert_declaration("realloc", "indi_realloc", false);
-//        insert_declaration("free", "indi_free", false);
-
-    }
-
     void generate(Module* module, int nlevel) {
         ContextGenerator cg;
 
@@ -482,8 +437,6 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        init_lang(module);
-
         int nlevel = 2;
         if (has_argument("nlevel")) {
             nlevel = std::stoi(get_argument("nlevel"));
@@ -502,6 +455,10 @@ public:
         if (has_argument("indi")) {
             _use_indi = true;
         }
+
+        Pass* declaration_adder = PassManager::pass_manager->load_pass("LSDA:lang="+_lang+":use_indi="+_u);
+        declaration_adder->run_on_module(module);
+        init_lang(module);
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {

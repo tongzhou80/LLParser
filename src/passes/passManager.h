@@ -35,6 +35,7 @@ public:
     void add_parse_time_pass(Pass* p);
     void add_pass(Pass* p);
     void add_pass(string name);
+    Pass* load_pass(string name);
 
     int insert_with_priority(std::vector<Pass*>& list, Pass* p);
 
