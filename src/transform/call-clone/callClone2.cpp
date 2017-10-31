@@ -489,7 +489,7 @@ public:
         if (out.empty()) {
             out = SysDict::filename();
             if (Strings::contains(out, ".ll")) {
-                Strings::replace(out, ".ll", ".clone.ll");
+                Strings::ireplace(out, ".ll", ".clone.ll");
             }
             else {
                 out += ".clone.ll";
@@ -567,13 +567,13 @@ public:
                         for (auto& t: _alloc_set) {
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
                             }
                         }
                         for (auto& t: _free_set) {
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
                             }
                         }
                     }

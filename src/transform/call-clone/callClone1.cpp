@@ -540,7 +540,7 @@ public:
         if (out.empty()) {
             out = SysDict::filename();
             if (Strings::contains(out, ".ll")) {
-                Strings::replace(out, ".ll", ".clone.ll");
+                Strings::ireplace(out, ".ll", ".clone.ll");
             }
             else {
                 out += ".clone.ll";
@@ -595,7 +595,7 @@ public:
                         for (auto& t: targets) {
                             string old = "@"+t+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@indi_"+t+suf);
+                                Strings::ireplace(I->raw_text(), old, "@indi_"+t+suf);
                             }
                         }
                     }
@@ -626,7 +626,7 @@ public:
             new_call = newname + '(';
         }
 
-        Strings::replace(text, old_call, new_call);
+        Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         SysDict::module()->insert_function_after(func, newfunc);
     }

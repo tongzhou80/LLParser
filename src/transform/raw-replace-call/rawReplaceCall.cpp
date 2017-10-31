@@ -34,7 +34,7 @@ public:
         string out = SysArgs::get_option("output");
         if (out.empty()) {
             out = SysDict::filename();
-            Strings::replace(out, ".ll", "." + _prefix + ".ll");
+            Strings::ireplace(out, ".ll", "." + _prefix + ".ll");
         }
         SysDict::module()->print_to_file(out);
         return true;
@@ -51,7 +51,7 @@ public:
                         for (auto& t: targets) {
                             string old = "@"+t+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@"+_prefix+t+suf);
+                                Strings::ireplace(I->raw_text(), old, "@"+_prefix+t+suf);
                             }
                         }
                     }
@@ -82,7 +82,7 @@ public:
             new_call = newname + '(';
         }
 
-        Strings::replace(text, old_call, new_call);
+        Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         SysDict::module()->insert_function_after(func, newfunc);
     }

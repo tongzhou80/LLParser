@@ -165,7 +165,7 @@ public:
             new_call = newname + '(';
         }
 
-        Strings::replace(text, old_call, new_call);
+        Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         SysDict::module()->insert_function_after(func, newfunc);
     }
@@ -235,7 +235,7 @@ public:
 //            zpl("new sig: %s", new_sig.c_str());
 
                 new_sig.insert(1, "i32, ");
-                Strings::replace(ci->raw_text(), args_sig, new_sig);
+                Strings::ireplace(ci->raw_text(), args_sig, new_sig);
             }
         }
 
@@ -303,7 +303,7 @@ public:
 
         /* manipulate the text */
         string text = old->raw_text();
-        Strings::replace(text, old_callee, new_call);
+        Strings::ireplace(text, old_callee, new_call);
 
         if (ci->is_varargs()) {
             if (add_id) {
@@ -314,7 +314,7 @@ public:
 //            zpl("new sig: %s", new_sig.c_str());
 
                 new_sig.insert(1, "i32, ");
-                Strings::replace(text, args_sig, new_sig);
+                Strings::ireplace(text, args_sig, new_sig);
             }
         }
         Instruction* newinst = IRBuilder::create_instruction(text);
@@ -356,14 +356,14 @@ public:
         string text = old->raw_text();
         string old_value = bci->get_raw_field("value");
         new_value = '@' + new_value;
-        Strings::replace(text, old_value, new_value);
+        Strings::ireplace(text, old_value, new_value);
 
         if (add_id) {
             string old_casted_ty = bci->get_raw_field("ty2");
             string new_casted_ty = old_casted_ty;
             int insert_pos = new_casted_ty.find('(');
             new_casted_ty.insert(insert_pos+1, "i32, ");
-            Strings::replace(text, old_casted_ty, new_casted_ty);
+            Strings::ireplace(text, old_casted_ty, new_casted_ty);
         }
 
         Instruction* newinst = IRBuilder::create_instruction(text);

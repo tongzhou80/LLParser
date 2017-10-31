@@ -152,7 +152,7 @@ public:
             insert_declaration(module, t->old_name, t->new_name, t->add_id);
             if (_use_indi) {
                 string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
+                Strings::ireplace(indi_name, "ben_", "indi_");
                 insert_declaration(module, t->old_name, indi_name, false);
             }
         }
@@ -161,7 +161,7 @@ public:
             insert_declaration(module, t->old_name, t->new_name, t->add_id);
             if (_use_indi) {
                 string indi_name = t->new_name;
-                Strings::replace(indi_name, "ben_", "indi_");
+                Strings::ireplace(indi_name, "ben_", "indi_");
                 insert_declaration(module, t->old_name, indi_name, false);
             }
         }
@@ -202,13 +202,13 @@ public:
 //                        for (auto& t: _alloc_set) {
 //                            string old = "@"+t->old_name+suf;
 //                            if (I->raw_text().find(old) != string::npos) {
-//                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+//                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
 //                            }
 //                        }
 //                        for (auto& t: _free_set) {
 //                            string old = "@"+t->old_name+suf;
 //                            if (I->raw_text().find(old) != string::npos) {
-//                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+//                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
 //                            }
 //                        }
 //                    }
@@ -238,9 +238,10 @@ public:
             new_call = newname + '(';
         }
 
-        Strings::replace(text, old_call, new_call);
+        Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         m->insert_function_after(func, newfunc);
+        printf("<lsda>: insert %s to module %s\n", newfunc->name_as_c_str(), m->name_as_c_str());
     }
 
 };

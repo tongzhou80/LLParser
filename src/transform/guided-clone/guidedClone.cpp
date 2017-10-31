@@ -16,22 +16,27 @@ class GuidedClonePass: public Pass {
     string _log_dir;
     string _src_dir;
     LSDAPass* _lsda;
+
+    /* statistics */
+    int _clone_num;
 public:
     GuidedClonePass() {
         set_is_global_pass();
         _log_dir = ".";
         _src_dir = ".";
         _lsda = new LSDAPass();
+
+        _clone_num = 0;
     }
 
     Module* get_module(string& src_filename) {
         int pos = src_filename.rfind('.');
         guarantee(pos != string::npos, "");
-        string ir_name = src_filename.substr(0, pos) + ".o.ll";
+        string ir_name = _src_dir+src_filename.substr(0, pos) + ".o.ll";
         Module* m = SysDict::get_module(ir_name);
         if (!m) {
-            zpl("to parse %s...", ir_name.c_str())
             m = SysDict::parser->parse(ir_name);
+            zpl("parsed %s", m->name_as_c_str())
             guarantee(m, "");
         }
         _lsda->run_on_module(m);
@@ -61,6 +66,7 @@ public:
             Module* callee_m = get_module(callee_file);
             Function* callee_f = callee_m->get_function(callee);
             Function* callee_clone = callee_f->clone();
+            _clone_num++;
             callee_m->append_new_function(callee_clone);
             Module* user_m = get_module(user_file);
             Function* user_f = user_m->get_function(user);
@@ -69,11 +75,20 @@ public:
 
             /* need to insert declaration if inter-procedural */
             if (user_m != callee_m) {
-                _lsda->insert_declaration()
+                _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name());
+                if (callee_clone->name() == "sgfOverwritePropertyInt.1003") {
+                    printf("insert %s to module %s\n", callee_clone->name_as_c_str(), user_m->name_as_c_str());
+                }
+
             }
             user_i->replace_callee(callee_clone->name());
+            printf("replaced %s\n", callee_clone->name_as_c_str());
         }
 
+        for (auto it: SysDict::module_table()) {
+            Module* m = it.second;
+            m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
+        }
     }
 };
 

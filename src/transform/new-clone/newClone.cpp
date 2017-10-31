@@ -385,7 +385,7 @@ public:
             new_call = newname + '(';
         }
 
-        Strings::replace(text, old_call, new_call);
+        Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         SysDict::module()->insert_function_after(func, newfunc);
     }
@@ -493,7 +493,7 @@ public:
 //            zpl("new sig: %s", new_sig.c_str());
 
                 new_sig.insert(1, "i32, ");
-                Strings::replace(ci->raw_text(), args_sig, new_sig);
+                Strings::ireplace(ci->raw_text(), args_sig, new_sig);
             }
         }
 

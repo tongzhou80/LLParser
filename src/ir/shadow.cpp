@@ -19,7 +19,7 @@
 void Shadow::update_raw_field(string field, string new_value) {
     if (has_raw_field(field)) {
         string old_value = get_raw_field(field);
-        Strings::replace(_raw_text, old_value, new_value);
+        Strings::ireplace(_raw_text, old_value, new_value);
         set_raw_field(field, new_value);
     }
 }

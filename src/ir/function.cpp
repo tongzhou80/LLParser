@@ -127,7 +127,7 @@ Function* Function::clone(string new_name) {
         copy->set_dbg_id(-1);
     }
 
-    Strings::replace(copy->raw_text(), " comdat ", " ");  // todo
+    Strings::ireplace(copy->raw_text(), " comdat ", " ");  // todo
 
     /* create new debug info for the cloned function
      * except the name, other fields remain the same for now
@@ -156,7 +156,7 @@ void Function::rename(string name) {
         string& raw = raw_text();
         string old = '@' + _name;
         string neu = '@' + name;
-        Strings::replace(raw, old, neu);
+        Strings::ireplace(raw, old, neu);
         _name = name;
     }
     else {

@@ -50,7 +50,7 @@ void CallInstFamily::replace_callee(string callee) {
         throw FunctionNotFoundError(callee);
     }
     string old = called_function()->name();
-    Strings::replace(_raw_text, old, callee);  // todo: this should be fine, but I am not sure
+    Strings::ireplace(_raw_text, old, callee);  // todo: this should be fine, but I am not sure
     set_called_function(new_callee);
 
     new_callee->append_user(this);
@@ -65,7 +65,7 @@ void CallInstFamily::replace_callee(string callee) {
 
 void CallInstFamily::replace_args(string newargs) {
     string oldargs = get_raw_field("args");
-    Strings::replace(_raw_text, oldargs, newargs);
+    Strings::ireplace(_raw_text, oldargs, newargs);
     set_raw_field("args", newargs);
 }
 

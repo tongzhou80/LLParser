@@ -78,7 +78,7 @@ bool Strings::is_number(const std::string &s) {
     return !s.empty() && it == s.end();
 }
 
-bool Strings::replace(std::string  &s, std::string oldsub, std::string newsub) {
+bool Strings::ireplace(std::string  &s, std::string oldsub, std::string newsub) {
     int pos = s.find(oldsub);
     if (pos == s.npos) {
         return false;
@@ -89,20 +89,26 @@ bool Strings::replace(std::string  &s, std::string oldsub, std::string newsub) {
     }
 }
 
-bool Strings::replace(std::string  &s, const char *oldsub, std::string &newsub) {
+bool Strings::ireplace(std::string  &s, const char *oldsub, std::string &newsub) {
     std::string o = oldsub;
-    return replace(s, o, newsub);
+    return ireplace(s, o, newsub);
 }
 
-bool Strings::replace(std::string  &s, std::string &oldsub, const char *newsub) {
+bool Strings::ireplace(std::string  &s, std::string &oldsub, const char *newsub) {
     std::string n = newsub;
-    return replace(s, oldsub, n);
+    return ireplace(s, oldsub, n);
 }
 
-bool Strings::replace(std::string  &s, const char *oldsub, const char *newsub) {
+bool Strings::ireplace(std::string  &s, const char *oldsub, const char *newsub) {
     std::string o = oldsub;
     std::string n = newsub;
-    return replace(s, o, n);
+    return ireplace(s, o, n);
+}
+
+std::string Strings::replace(const std::string &s, const char *oldsub, const char *newsub) {
+    std::string ret = s;
+    ireplace(ret, oldsub, newsub);
+    return ret;
 }
 
 bool Strings::strip(std::string& str, const char *chars) {
