@@ -513,7 +513,7 @@ public:
         }
 //
         get_distinct_all_paths();
-        check_all_paths(true);
+        check_all_paths();
 
 
         int round = 0;
