@@ -53,7 +53,7 @@ bool Pass::has_argument(string key) {
 
 string Pass::get_argument(string key) {
     if (!has_argument(key)) {
-        return "";
+        return "1";  // default value for options that have no value
     }
     else {
         return _args[key];

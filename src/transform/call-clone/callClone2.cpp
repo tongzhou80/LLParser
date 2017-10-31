@@ -442,7 +442,7 @@ public:
             nlevel = std::stoi(get_argument("nlevel"));
         }
         if (has_argument("logclone")) {
-            _logclone = true;
+            _logclone = (bool)std::stoi(get_argument("logclone"));
             _clone_log.open("clone.log");
         }
         if (has_argument("min-cxt")) {
@@ -453,12 +453,11 @@ public:
             _lang = get_argument("lang");
         }
         if (has_argument("indi")) {
-            _use_indi = true;
+            _use_indi = (bool)std::stoi(get_argument("indi"));
         }
 
-        Pass* declaration_adder = PassManager::pass_manager->load_pass("LSDA:lang="+_lang+":use_indi="+_u);
+        Pass* declaration_adder = PassManager::pass_manager->load_pass("LSDA:lang="+_lang+":use_indi="+std::to_string((int)_use_indi));
         declaration_adder->run_on_module(module);
-        init_lang(module);
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
