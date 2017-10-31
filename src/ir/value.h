@@ -25,8 +25,8 @@ protected:
     InstSet _users;
 public:
     Value();
-    virtual string name()                                { return _name; }
-    virtual const char* name_as_c_str()                  { return _name.c_str(); };
+    virtual string name() const                          { return _name; }
+    virtual const char* name_as_c_str() const            { return _name.c_str(); };
     virtual void set_name(string name)                   { _name = name; }
 
     int copy_cnt()                                       { return _copy_cnt; }

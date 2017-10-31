@@ -33,11 +33,16 @@ public:
     void set_line(int line)                           { _line = line; }
 
     const string &linkageName() const {
-        return _linkageName;
+        if (has_raw_field("linkageName")) {
+            return _linkageName;
+        }
+        else {
+            return name();
+        }
     }
 
-    void set_linkageName(const string &_linkageName) {
-        DISubprogram::_linkageName = _linkageName;
+    void set_linkageName(const string &linkageName) {
+        _linkageName = linkageName;
     }
 
     void resolve_non_refs() override ;

@@ -33,7 +33,7 @@ public:
 
     virtual void init_raw_field()                                 {}
     void set_raw_field(string field, string value)                { _raw_fields[field] = value; }
-    bool has_raw_field(string field)                              { return _raw_fields.find(field) != _raw_fields.end(); }
+    bool has_raw_field(string field) const                        { return _raw_fields.find(field) != _raw_fields.end(); }
     string get_raw_field(string field)                            { return _raw_fields[field]; }
     void update_raw_field(string field, string new_value);
 
