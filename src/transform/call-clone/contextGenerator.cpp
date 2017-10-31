@@ -20,13 +20,13 @@ ContextGenerator::~ContextGenerator() {
     _ofs.close();
 }
 
-void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
+std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     _paths.clear();
     _stack.clear();
     Function* alloc_f = module->get_function(alloc);
 
     if (!alloc_f) {
-        return;
+        return std::vector<XPath*>();
     }
     
     for (auto ci: alloc_f->caller_list()) {
@@ -88,6 +88,8 @@ void ContextGenerator::generate(Module* module, string alloc, int nlevel) {
         }
         _ofs << std::endl;
     }
+
+    return _paths;
 }
 
 void ContextGenerator::traverse() {

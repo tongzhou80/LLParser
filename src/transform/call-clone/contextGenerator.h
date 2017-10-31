@@ -20,7 +20,7 @@ class ContextGenerator {
 public:
     ContextGenerator();
     ~ContextGenerator();
-    void generate(Module* module, string alloc="malloc", int nlevel=1);
+    std::vector<XPath*> generate(Module* module, string alloc="malloc", int nlevel=1);
     void traverse();
     void reset();
 };

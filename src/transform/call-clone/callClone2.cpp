@@ -16,6 +16,15 @@
 
 #include "contextGenerator.h"
 
+struct MFunc {
+    string old_name;
+    string new_name;
+    bool add_id;
+
+    MFunc(string oldname, string newname, bool addid):
+            old_name(oldname), new_name(newname), add_id(addid) {}
+};
+
 class CallClonePass: public Pass {
     /* clone algorithm data structure */
     std::vector<XPath*> _all_paths;
@@ -32,6 +41,7 @@ class CallClonePass: public Pass {
     bool _path_check;
     bool _verbose_match;
     bool _verbose_clone;
+    bool _use_indi;
 
     /* statistics */
     int _hot_counter;
@@ -47,8 +57,10 @@ class CallClonePass: public Pass {
     Timer _timer;
     std::ofstream _clone_log;
     
-    std::vector<string> alloc_set;
-    std::vector<string> free_set;
+    /* language specific stuff */
+    string _lang;
+    std::vector<MFunc*> _alloc_set;
+    std::vector<MFunc*> _free_set;
 public:
     CallClonePass() {
         _timer.start();
@@ -62,6 +74,7 @@ public:
         _print_cloning = false;
         _skip = false;
         _logclone = false;
+        _use_indi = false;
         _min_cxt = 1;
         _path_counter = 1;
         _cxt_counter = 0;
@@ -73,6 +86,8 @@ public:
         _hot_counter = 0;
         _hot_cxt_counter = 0;
         _used_hot_cxt = 0;
+        
+        _lang = "all";
     }
 
     ~CallClonePass() {
@@ -405,17 +420,64 @@ public:
 
         return false;
     }
+    
+    void init_lang() {
+        if (_lang == "c" || _lang == "cpp" || _lang == "all") {
+            _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
+            _alloc_set.push_back(new MFunc("calloc", "ben_calloc", true));
+            _alloc_set.push_back(new MFunc("realloc", "ben_realloc", true));
+            _free_set.push_back(new MFunc("free", "ben_free", false));
+        }
+
+        if (_lang == "cpp" || _lang == "all") {
+            _alloc_set.push_back(new MFunc("_Znam", "ben_malloc", true));
+            _alloc_set.push_back(new MFunc("_Znwm", "ben_malloc", true));
+            _free_set.push_back(new MFunc("_ZdaPv", "ben_free", false));
+            _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
+        }
+
+        for (auto t: _alloc_set) {
+            insert_declaration(t->old_name, t->new_name, t->add_id);
+            if (_use_indi) {
+                string indi_name = t->new_name;
+                Strings::replace(indi_name, "ben_", "indi_");
+                insert_declaration(t->old_name, indi_name, false);
+            }
+        }
+
+        for (auto t: _free_set) {
+            insert_declaration(t->old_name, t->new_name, t->add_id);
+            if (_use_indi) {
+                string indi_name = t->new_name;
+                Strings::replace(indi_name, "ben_", "indi_");
+                insert_declaration(t->old_name, indi_name, false);
+            }
+        }
+//
+//        insert_declaration("malloc", "ben_malloc", true);
+//        insert_declaration("calloc", "ben_calloc", true);
+//        insert_declaration("realloc", "ben_realloc", true);
+//        insert_declaration("free", "ben_free", false);
+//
+//        insert_declaration("malloc", "indi_malloc", false);
+//        insert_declaration("calloc", "indi_calloc", false);
+//        insert_declaration("realloc", "indi_realloc", false);
+//        insert_declaration("free", "indi_free", false);
+
+    }
 
     void generate(Module* module, int nlevel) {
         ContextGenerator cg;
 
-        cg.generate(module, "malloc", nlevel); // todo other allocs
-        cg.generate(module, "calloc", nlevel); // todo other allocs
-        cg.generate(module, "realloc", nlevel); // todo other allocs
-
+        for (auto target: _alloc_set) {
+            auto paths = cg.generate(module, target->old_name, nlevel);
+            _all_paths.insert(_all_paths.end(), paths.begin(), paths.end());
+        }
     }
 
     bool run_on_module(Module* module) override {
+        init_lang();
+
         int nlevel = 2;
         if (has_argument("nlevel")) {
             nlevel = std::stoi(get_argument("nlevel"));
@@ -424,21 +486,16 @@ public:
             _logclone = true;
             _clone_log.open("clone.log");
         }
-
-
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));
             zpd(_min_cxt)
         }
-        insert_declaration("malloc", "ben_malloc", true);
-        insert_declaration("calloc", "ben_calloc", true);
-        insert_declaration("realloc", "ben_realloc", true);
-        insert_declaration("free", "ben_free", false);
-        insert_declaration("malloc", "indi_malloc", false);
-        insert_declaration("calloc", "indi_calloc", false);
-        insert_declaration("realloc", "indi_realloc", false);
-        insert_declaration("free", "indi_free", false);
-
+        if (has_argument("lang")) {
+            _lang = get_argument("lang");
+        }
+        if (has_argument("indi")) {
+            _use_indi = true;
+        }
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
@@ -446,7 +503,8 @@ public:
             load_hot_aps_file(hot_aps_file);
         }
         else {
-            load_hot_aps_file(SysDict::filedir() + "contexts.txt");
+            //load_hot_aps_file(SysDict::filedir() + "contexts.txt");
+            generate(module, nlevel);
         }
 //
         get_distinct_all_paths();
@@ -499,9 +557,16 @@ public:
             auto path = p->path;
             CallInstFamily* ci = path[0];
             string old_callee = ci->called_function()->name();
-            //zps(old_callee)
 
-            guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", "old callee: %s", old_callee.c_str());
+            //guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", "old callee: %s", old_callee.c_str());
+            bool match = false;
+            for (auto t: _alloc_set) {
+                if (old_callee == t->old_name) {
+                    match = true;
+                }
+            }
+            guarantee(match, "old callee: %s", old_callee.c_str());
+
             ci->replace_callee("ben_"+old_callee);
             _ben_num++;
             string new_args = "i32 " + std::to_string(id++) + ", " + ci->get_raw_field("args");
@@ -510,23 +575,35 @@ public:
     }
 
     void replace_free() {
-        if (Function* free_fp = SysDict::module()->get_function("free")) {
-            for (auto ci: free_fp->caller_list()) {
-                ci->replace_callee("ben_free");
+        for (auto t: _free_set) {
+            if (Function* free_fp = SysDict::module()->get_function(t->old_name)) {
+                for (auto ci: free_fp->caller_list()) {
+                    ci->replace_callee(t->new_name);
+                }
             }
         }
 
         //todo: non-dirty way
+        if (!_use_indi) {
+            return;
+        }
+
         string suffixes[3] = {" ", ",", ")"};
         for (auto F: SysDict::module()->function_list()) {
             for (auto B: F->basic_block_list()) {
                 for (auto I: B->callinst_list()) {
                     for (auto& suf: suffixes) {
-                        string targets[4] = {"malloc", "calloc", "realloc", "free"};
-                        for (auto& t: targets) {
-                            string old = "@"+t+suf;
+                        //string targets[4] = {"malloc", "calloc", "realloc", "free"};
+                        for (auto& t: _alloc_set) {
+                            string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::replace(I->raw_text(), old, "@indi_"+t+suf);
+                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                            }
+                        }
+                        for (auto& t: _free_set) {
+                            string old = "@"+t->old_name+suf;
+                            if (I->raw_text().find(old) != string::npos) {
+                                Strings::replace(I->raw_text(), old, "@indi_"+t->old_name+suf);
                             }
                         }
                     }
