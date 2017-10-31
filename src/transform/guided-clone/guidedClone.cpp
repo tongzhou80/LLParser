@@ -9,6 +9,7 @@
 #include <asmParser/llParser.h>
 #include <di/diSubprogram.h>
 #include <utilities/strings.h>
+#include <transform/lsda/lsda.cpp>
 
 class GuidedClonePass: public Pass {
     std::ofstream _ofs;
