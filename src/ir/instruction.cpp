@@ -48,7 +48,7 @@ void Instruction::copy_metadata_from(Instruction *i) {
 
 DILocation* Instruction::debug_loc() {
     if (!_debug_loc) {
-        MetaData* md = SysDict::module()->get_debug_info(_dbg_id);
+        MetaData* md = module()->get_debug_info(_dbg_id);
         _debug_loc = dynamic_cast<DILocation*>(md);
     }
 
