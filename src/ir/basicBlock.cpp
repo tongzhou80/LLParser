@@ -169,6 +169,10 @@ void BasicBlock::replace(Instruction *old, Instruction *neu) {
     replace(it, neu);
 }
 
+Module* BasicBlock::module() const {
+    return parent()->parent();
+}
+
 /**@brief Returns a clone of this block.
  * Each instruction will be a new object instead of pointing to the old object.
  *

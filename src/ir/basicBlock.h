@@ -52,8 +52,9 @@ public:
     int get_instruction_index(Instruction* inst);
     int get_index_in_function();
 
-    Function* parent()                                    { return _parent; }
+    Function* parent() const                              { return _parent; }
     void set_parent(Function* f)                          { _parent = f; }
+    Module* module() const;
 
     bool is_entry()                                       { return _is_entry; }
     bool set_is_entry(bool v=1)                           { _is_entry = v; }

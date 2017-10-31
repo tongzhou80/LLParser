@@ -62,8 +62,9 @@ public:
 
     DILocation* debug_loc();
 
-    BasicBlock* parent()                      { return _parent; }
+    BasicBlock* parent() const                { return _parent; }
     void set_parent(BasicBlock* bb)           { _parent = bb; }
+    Module* module() const;
 
     bool has_assignment()                     { return _has_assignment; }
     void set_has_assignment(bool v=true)      { _has_assignment = v; }

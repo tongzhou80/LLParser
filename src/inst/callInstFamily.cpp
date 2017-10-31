@@ -45,7 +45,7 @@ Function* CallInstFamily::called_function() {
  * The new callee will have one more caller.
  */
 void CallInstFamily::replace_callee(string callee) {
-    Function* new_callee = SysDict::module()->get_function(callee);
+    Function* new_callee = module()->get_function(callee);
     if (new_callee == NULL) {
         throw FunctionNotFoundError(callee);
     }
@@ -55,7 +55,7 @@ void CallInstFamily::replace_callee(string callee) {
 
     new_callee->append_user(this);
 
-    Function* old_callee = SysDict::module()->get_function(old);
+    Function* old_callee = module()->get_function(old);
     guarantee(old_callee, "callee %s not found", old.c_str());
     old_callee->remove_user(this);
 //    auto& vec = old_callee->user_set();
@@ -76,15 +76,15 @@ void CallInstFamily::resolve_direct_call() {
 }
 
 void CallInstFamily::resolve_callee_symbol(string fn_name) {
-    if (Alias* alias = SysDict::module()->get_alias(fn_name)) {
+    if (Alias* alias = module()->get_alias(fn_name)) {
         string aliasee = alias->get_raw_field("aliasee");
         fn_name = aliasee;
     }
 
-    Function* callee = SysDict::module()->get_function(fn_name);
+    Function* callee = module()->get_function(fn_name);
     guarantee(callee, "resolve_callee_symbol: function %s not found", fn_name.c_str());
 //    if (callee == NULL) {
-//        callee = SysDict::module()->create_child_function_symbol(fn_name);
+//        callee = module()->create_child_function_symbol(fn_name);
 //    }
 
     set_called_function(callee);

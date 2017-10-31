@@ -37,6 +37,10 @@ Point2D<int> Instruction::get_position_in_function() {
     return Point2D<int>(x, y);
 }
 
+Module* Instruction::module() const {
+    return parent()->module();
+}
+
 void Instruction::copy_metadata_from(Instruction *i) {
     //_properties = i->properties();
     _dbg_id = i->dbg_id();
