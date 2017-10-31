@@ -29,6 +29,8 @@ class CallClonePass: public Pass {
     bool PathCheck;
     bool MatchVerbose;
     bool CloneVerbose;
+    std::set<string> _black;
+    bool _has_overlapped_path;
     int _cloned;
     std::ofstream _ofs;
     //std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
@@ -59,8 +61,7 @@ class CallClonePass: public Pass {
     int _used_hot_cxt;
     Timer _timer;
 
-    std::vector<string> alloc_set;
-    std::vector<string> free_set;
+    //const int FUNC_MAX_LEN = 1024;
 public:
     CallClonePass() {
         _timer.start();
@@ -478,15 +479,6 @@ public:
         return false;
     }
 
-    void generate(Module* module, int nlevel) {
-        ContextGenerator cg;
-
-        cg.generate(module, "malloc", nlevel); // todo other allocs
-        cg.generate(module, "calloc", nlevel); // todo other allocs
-        cg.generate(module, "realloc", nlevel); // todo other allocs
-
-    }
-
     bool run_on_module(Module* module) override {
         int nlevel = 2;
         if (has_argument("nlevel")) {
@@ -497,6 +489,11 @@ public:
             _clone_log.open("clone.log");
         }
 
+        ContextGenerator cg;
+
+        cg.generate(module, "malloc", nlevel); // todo other allocs
+        cg.generate(module, "calloc", nlevel); // todo other allocs
+        cg.generate(module, "realloc", nlevel); // todo other allocs
 
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));

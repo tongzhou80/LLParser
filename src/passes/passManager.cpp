@@ -12,6 +12,7 @@
 #include <peripheral/sysArgs.h>
 #include <utilities/strings.h>
 #include <utilities/flags.h>
+#include <ir/function.h>
 #include "passManager.h"
 #include "pass.h"
 #include "../ir/instruction.h"
@@ -62,9 +63,9 @@ void PassManager::destroy() {
 
 /* for debug, addr2line can't show line numbers in a .so */
 //#include <transform/hot-call-clone/hotCallClone3.cpp>
-#include <transform/call-clone/callClone1.cpp>
-#include <transform/call-clone/contextGenerator.cpp>
-#include <transform/call-graph/callGraph.cpp>
+//#include <transform/call-clone/callClone1.cpp>
+//#include <transform/call-clone/contextGenerator.cpp>
+//#include <transform/call-graph/callGraph.cpp>
 #include <utilities/mutex.h>
 
 void PassManager::initialize_passes() {
@@ -86,6 +87,7 @@ void PassManager::initialize_passes() {
 //        CallClonePass* p = new CallClonePass();
 //        p->set_name("CallClonePass");
 //        add_pass(p);
+        //pass_obj->parse_arguments(args);
     }
 
     for (auto p: SysArgs::passes()) {
@@ -126,7 +128,6 @@ void PassManager::add_pass(Pass *p) {
 
 /// The loaded passes will be deleted in PassManager's destructor
 void PassManager::add_pass(string name) {
-
     string ld_path = SysArgs::get_property("ld-pass-path");
     if (ld_path != "") {
         _pass_lib_path = ld_path;

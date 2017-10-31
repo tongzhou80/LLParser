@@ -54,7 +54,7 @@ bool CallgraphPass::run_on_module(Module *module) {
 
     if (_bottoms.empty()) {
         for (auto F: module->function_list()) {
-            if (F->is_copy()) {
+            if (F->is_clone()) {
                 continue;
             }
 

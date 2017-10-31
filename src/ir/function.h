@@ -30,7 +30,7 @@ class Function: public Value {
     int _dbg_id;
     DISubprogram* _di_subprogram;
 
-    bool _is_copy;
+    bool _is_clone;
 public:
     Function();
 
@@ -66,7 +66,7 @@ public:
 
     int get_basic_block_index(BasicBlock* bb);
     Instruction* get_instruction(int bi, int ii);
-    Instruction* get_instruction(Point2D<int>& pos);
+    Instruction* get_instruction(Point2D<int> &pos);
     std::size_t instruction_count();
 
     std::vector<CallInstFamily*> caller_list();
@@ -77,8 +77,8 @@ public:
     void print_to_stream(FILE* fp);
     void print_to_stream(std::ostream& ofs);
 
-    bool is_copy()                                         { return _is_copy; }
-    bool set_is_copy(bool v=1)                             { _is_copy = 1; }
+    bool is_clone()                                         { return _is_clone; }
+    bool set_is_clone(bool v=1)                             { _is_clone = 1; }
 };
 
 

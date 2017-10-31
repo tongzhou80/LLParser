@@ -88,7 +88,6 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
         }
         _ofs << std::endl;
     }
-
     return _paths;
 }
 

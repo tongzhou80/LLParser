@@ -32,7 +32,7 @@ class CallClonePass: public Pass {
     string _caller;
     string _callee;
     int _min_cxt;
-    
+
     /* flags */
     bool _done;
     bool _skip;
@@ -56,7 +56,7 @@ class CallClonePass: public Pass {
 
     Timer _timer;
     std::ofstream _clone_log;
-    
+
     /* language specific stuff */
     string _lang;
     std::vector<MFunc*> _alloc_set;
@@ -86,7 +86,7 @@ public:
         _hot_counter = 0;
         _hot_cxt_counter = 0;
         _used_hot_cxt = 0;
-        
+
         _lang = "all";
     }
 
@@ -144,17 +144,22 @@ public:
 
                 /* always let the first path remain the same and rewrite other paths
                  */
+                Instruction* last_updated_caller = NULL;
                 for (int j = 1; j < paths.size(); ++j) {
                     auto& this_path = paths[j]->path;
-                    auto cloned_callee = callee->clone();
 
-                    if (_logclone) {
-                        //_clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
-                        record_clone(callee, cloned_callee);
+                    if (this_path[i] != last_updated_caller) {
+                        auto cloned_callee = callee->clone();
+
+                        if (_logclone) {
+                            //_clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
+                            record_clone(callee, cloned_callee);
+                        }
+                        SysDict::module()->append_new_function(cloned_callee);
+                        _cloned++;
+                        update_callee_in_all_paths(this_path[i], cloned_callee);
+                        last_updated_caller = this_path[i];
                     }
-                    SysDict::module()->append_new_function(cloned_callee);
-                    _cloned++;
-                    update_callee_in_all_paths(this_path[i], cloned_callee);
                 }
                 break;
             }
@@ -420,7 +425,7 @@ public:
 
         return false;
     }
-    
+
     void init_lang() {
         if (_lang == "c" || _lang == "cpp" || _lang == "all") {
             _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
@@ -510,8 +515,7 @@ public:
         get_distinct_all_paths();
         check_all_paths();
 
-//        if (_path_check)
-//            check_all_paths();
+
         int round = 0;
         while (!_done) {
             scan();
@@ -535,10 +539,11 @@ public:
                 out += ".clone.ll";
             }
         }
-        zpl("output to %s", out.c_str())
+        zpl("callclone2 output to %s", out.c_str())
         SysDict::module()->print_to_file(out);
 
         check_all_paths();
+        check_unused(module);
 
 //
 //        _timer.stop();
@@ -549,6 +554,15 @@ public:
 
         zpl("======== Summary ======");
         zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
+    }
+
+    void check_unused(Module* module) {
+        printf("unused clone check...\n");
+        for (auto F:module->function_list()) {
+            if (F->user_set().empty() && F->is_clone()) {
+                printf("Function %s is unused\n", F->name_as_c_str());
+            }
+        }
     }
 
     void replace_malloc() {

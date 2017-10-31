@@ -15,7 +15,7 @@ Function::Function(): Value() {
     _entry_block = NULL;
     _dbg_id = -1;
     _di_subprogram = NULL;
-    _is_copy = false;
+    _is_clone = false;
 }
 
 BasicBlock* Function::create_basic_block(string label) {
@@ -136,7 +136,7 @@ Function* Function::clone(string new_name) {
     dbg_copy->set_name(copy->name());
     copy->set_di_subprogram(dbg_copy);
 
-    copy->set_is_copy();
+    copy->set_is_clone();
     copy->set_copy_cnt(0);
     copy->set_copy_prototype(this);
 
