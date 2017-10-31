@@ -405,7 +405,7 @@ Function* LLParser::create_function(string &text) {
 
 void LLParser::parse_function_definition() {
     Function* func = parse_function_header();
-
+    SysDict::module()->append_new_function(func);
     get_real_line();
     /* parse basic blocks */
     while (1) {
@@ -428,8 +428,6 @@ void LLParser::parse_function_definition() {
             break;
         }
     }
-
-    SysDict::module()->append_new_function(func);
 }
 
 void LLParser::parse_basic_block_header(BasicBlock *bb, bool use_comment) {

@@ -37,7 +37,7 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
 
     /* side effects, check current module first */
     /* during parsing, this block's parent won't be inserted until the function body is parsed */
-    if (SysDict::module()->is_fully_resolved()) {
+    if (module()->is_fully_resolved()) {
         check_insertion_side_effects_on_module(ins);
     }
 }

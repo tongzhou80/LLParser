@@ -144,15 +144,13 @@ Function* Function::clone(string new_name) {
 }
 
 
-/**@brief change the name of a new created function
+/**@brief Change the name of a new created function
  *
+ * Will not check name collision because the function is not inserted yet
  * @param name
  */
 void Function::rename(string name) {
     if (parent() == NULL) {
-        if (SysDict::module()->get_function(name)) {
-            throw SymbolTableError("Cannot rename function '"+_name+"' to '"+name+"', this name already exists in the symbol table!");
-        }
         string& raw = raw_text();
         string old = '@' + _name;
         string neu = '@' + name;
@@ -200,7 +198,7 @@ void Function::print_to_stream(std::ostream& os) {
 
 DISubprogram* Function::di_subprogram() {
     if (!_di_subprogram) {
-        MetaData* md = SysDict::module()->get_debug_info(_dbg_id);
+        MetaData* md = module()->get_debug_info(_dbg_id);
         _di_subprogram = dynamic_cast<DISubprogram*>(md);
     }
 

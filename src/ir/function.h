@@ -47,8 +47,9 @@ public:
     bool is_defined()                                      { return _is_defined; }
     void set_is_defined(bool v=1)                          { _is_defined = v; }
 
-    Module* parent()                                       { return _parent; }
+    Module* parent() const                                 { return _parent; }
     void set_parent(Module* m)                             { _parent = m; }
+    Module* module() const                                 { return parent(); }
 
     /* debug info */
     int dbg_id()                                           { return _dbg_id; }

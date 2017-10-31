@@ -66,7 +66,7 @@ void Module::insert_new_function(int pos, Function *inserted) {
     guarantee(inserted != NULL, "inserted function is NULL");
     guarantee(inserted->parent() == NULL, "inserted function already belong to a module");
 
-    if (_function_map.find(inserted->name()) != _function_map.end()) {
+    if (get_function(inserted->name())) {
         string msg = "invalid redefinition of function "+ inserted->name();
         throw SymbolRedefinitionError(msg);
     }
