@@ -92,8 +92,48 @@ public:
             _free_set.push_back(new MFunc("_ZdaPv", "ben_free", false));
             _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
         }
+        
+        if (_lang == "fortran" || _lang == "all") {
+            _alloc_set.push_back(new MFunc("f90_alloc", "f90_ben_alloc", true));
+            _alloc_set.push_back(new MFunc("f90_alloc03", "f90_ben_alloc03", true));
+            _alloc_set.push_back(new MFunc("f90_alloc03_chk", "f90_ben_alloc03_chk", true));
+            _alloc_set.push_back(new MFunc("f90_alloc04", "f90_ben_alloc04", true));
+            _alloc_set.push_back(new MFunc("f90_alloc04_chk", "f90_ben_alloc04_chk", true));
 
+            _alloc_set.push_back(new MFunc("f90_kalloc", "f90_ben_kalloc", true));
+            _alloc_set.push_back(new MFunc("f90_calloc", "f90_ben_calloc", true));
+            _alloc_set.push_back(new MFunc("f90_calloc03", "f90_ben_calloc03", true));
+            _alloc_set.push_back(new MFunc("f90_calloc04", "f90_ben_calloc04", true));
+            _alloc_set.push_back(new MFunc("f90_kcalloc", "f90_ben_kcalloc", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_alloc", "f90_ben_ptr_alloc", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_alloc03", "f90_ben_ptr_alloc03", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_alloc04", "f90_ben_ptr_alloc04", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_src_alloc03", "f90_ben_ptr_src_alloc03", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_src_alloc04", "f90_ben_ptr_src_alloc04", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_src_calloc03", "f90_ben_ptr_src_calloc03", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_src_calloc04", "f90_ben_ptr_src_calloc04", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_kalloc", "f90_ben_ptr_kalloc", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_calloc", "f90_ben_ptr_calloc", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_calloc03", "f90_ben_ptr_calloc03", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_calloc04", "f90_ben_ptr_calloc04", true));
+            _alloc_set.push_back(new MFunc("f90_ptr_kcalloc", "f90_ben_ptr_kcalloc", true));
+            _alloc_set.push_back(new MFunc("f90_auto_allocv", "f90_ben_auto_allocv", true));
+            _alloc_set.push_back(new MFunc("f90_auto_alloc", "f90_ben_auto_alloc", true));
+            _alloc_set.push_back(new MFunc("f90_auto_alloc04", "f90_ben_auto_alloc04", true));
+            _alloc_set.push_back(new MFunc("f90_auto_calloc", "f90_ben_auto_calloc", true));
+            _alloc_set.push_back(new MFunc("f90_auto_calloc04", "f90_ben_auto_calloc04", true));
 
+            _free_set.push_back(new MFunc("f90_dealloc", "f90_ben_dealloc", false));
+            _free_set.push_back(new MFunc("f90_dealloc03", "f90_ben_dealloc03", false));
+            _free_set.push_back(new MFunc("f90_dealloc_mbr", "f90_ben_dealloc_mbr", false));
+            _free_set.push_back(new MFunc("f90_dealloc_mbr03", "f90_ben_dealloc_mbr03", false));
+            _free_set.push_back(new MFunc("f90_deallocx", "f90_ben_deallocx", false));
+            _free_set.push_back(new MFunc("f90_auto_dealloc", "f90_ben_auto_dealloc", false));
+            // todo
+        }
+
+        // Fortran
+      
 //
 //        insert_declaration("malloc", "ben_malloc", true);
 //        insert_declaration("calloc", "ben_calloc", true);
