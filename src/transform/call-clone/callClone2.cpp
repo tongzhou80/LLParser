@@ -426,7 +426,7 @@ public:
         return false;
     }
 
-    void init_lang() {
+    void init_lang(Module* module) {
         if (_lang == "c" || _lang == "cpp" || _lang == "all") {
             _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
             _alloc_set.push_back(new MFunc("calloc", "ben_calloc", true));
@@ -441,21 +441,22 @@ public:
             _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
         }
 
+        Module* cur_module = SysDict::module();
         for (auto t: _alloc_set) {
-            insert_declaration(t->old_name, t->new_name, t->add_id);
+            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
             if (_use_indi) {
                 string indi_name = t->new_name;
                 Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(t->old_name, indi_name, false);
+                insert_declaration(cur_module, t->old_name, indi_name, false);
             }
         }
 
         for (auto t: _free_set) {
-            insert_declaration(t->old_name, t->new_name, t->add_id);
+            insert_declaration(cur_module, t->old_name, t->new_name, t->add_id);
             if (_use_indi) {
                 string indi_name = t->new_name;
                 Strings::replace(indi_name, "ben_", "indi_");
-                insert_declaration(t->old_name, indi_name, false);
+                insert_declaration(cur_module, t->old_name, indi_name, false);
             }
         }
 //
@@ -481,7 +482,7 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        init_lang();
+        init_lang(module);
 
         int nlevel = 2;
         if (has_argument("nlevel")) {
@@ -626,31 +627,30 @@ public:
         }
     }
 
-    bool insert_declaration(string oldname, string newname, bool add_id=true) {
-        Function* func = SysDict::module()->get_function(oldname);
+    bool insert_declaration(Module* m, string oldname, string newname, bool add_id=true) {
+        Function* func = m->get_function(oldname);
 
         if (func == NULL) {
-            return 0;
+            return false;
         }
         guarantee(func->is_external(), "malloc family should be external");
-        //Function* newfunc = SysDict::module()->create_child_function(_new_malloc);
 
-        Function* existed = SysDict::module()->get_function(newname);
-        if (existed) {
-            return 0; // return if already inserted
+        if (m->get_function(newname)) {
+            return false; // return if already inserted
         }
 
         /* manipulate the text */
         string text = func->raw_text();
         string old_call = oldname + '(';
         string new_call = newname + "(i32, ";
-        if (!add_id || Strings::startswith(oldname, "f90_")) {  // a bit funky
+        //if (!add_id || Strings::startswith(oldname, "f90_")) {  // a bit funky
+        if (!add_id) {
             new_call = newname + '(';
         }
 
         Strings::replace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
-        SysDict::module()->insert_function_after(func, newfunc);
+        m->insert_function_after(func, newfunc);
     }
 
     void check_all_paths(bool do_print=false) {
