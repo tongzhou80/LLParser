@@ -182,7 +182,7 @@ public:
         auto sp = caller->function()->di_subprogram();
         guarantee(sp, "Function %s has no debug info", caller->function()->name_as_c_str());
         string caller_log_name = sp->to_string();
-        _clone_log << caller_log_name << "+" << caller->get_position_in_function()
+        _clone_log << caller_log_name << " " << caller->get_position_in_function()
                    << " " + new_callee->name() << "\n";
     }
 

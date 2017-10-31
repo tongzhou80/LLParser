@@ -95,7 +95,8 @@ const string SysDict::filedir() {
 void SysDict::add_module(Module* m) {
     Locks::module_list_lock->lock();
 
-    module_table()[basename(strdup(m->input_file().c_str()))] = m;
+    //module_table()[basename(strdup(m->input_file().c_str()))] = m;
+    module_table()[m->input_file()] = m;
     Locks::module_list_lock->unlock();
 
     Locks::thread_table_lock->lock();
@@ -130,8 +131,11 @@ Module* SysDict::get_module(string name) {
 
 /**@brief Merge SysDict::module_table into one module. This method should be called in the main thread.
  *
+ * The main thread calling module() will cause an error because main thread is not attached with any module.
  * The main thread merges modules parsed by all worker threads, and register the new module.
- * The merging is specific to the naming of sliced files. This method destroys all old modules.
+ * All modules are merged into a "head.sm" whose location is hardcoded to be the same directory as
+ * the running sopt command.
+ * This method destroys all old modules.
  */
 void SysDict::merge_modules() {
     Module* head = get_module("head.sm");

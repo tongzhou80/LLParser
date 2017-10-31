@@ -50,7 +50,9 @@
          "")                                                                              \
   develop(bool, NoParserWarning, 0,                                                       \
          "")                                                                              \
-  develop(std::string, FunctionCloneLog, "",                                              \
+  develop(bool, PrintFaultyFileName, 0,                                                   \
+         "")                                                                              \
+  develop(bool, FullBT, 0,                                                                \
          "")                                                                              \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)

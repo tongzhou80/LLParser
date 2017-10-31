@@ -27,5 +27,5 @@ void DISubprogram::resolve_refs() {
 }
 
 string DISubprogram::to_string() {
-    return filename()+":"+linkageName();
+    return filename()+" "+linkageName();
 }

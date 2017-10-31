@@ -28,7 +28,9 @@
 /** Print a demangled stack backtrace of the caller function to FILE* out. */
 void print_demangled_stacktrace(FILE *out = stdout, unsigned int max_frames = 63)
 {
-    fprintf(out, "[faulty file: %s]\n", SysDict::filename().c_str());
+    if (PrintFaultyFileName || FullBT) {
+        fprintf(out, "[faulty file: %s]\n", SysDict::filename().c_str());
+    }
     fprintf(out, "[thread: %llu]\n", pthread_self());
     fprintf(out, "=================== [stack trace] ===================\n");
 
