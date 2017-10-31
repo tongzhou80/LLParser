@@ -46,6 +46,11 @@ Instruction* Function::get_instruction(int bi, int ii) {
     return bb->instruction_list().at(ii);
 }
 
+Instruction* Function::get_instruction(Point2D<int> &pos) {
+    BasicBlock* bb = _basic_block_list.at(pos.x);
+    return bb->instruction_list().at(pos.y);
+}
+
 std::vector<CallInstFamily*> Function::caller_list() {
     std::vector<CallInstFamily*> callers;
     for (auto I: user_set()) {

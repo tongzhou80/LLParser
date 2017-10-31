@@ -66,6 +66,7 @@ public:
 
     int get_basic_block_index(BasicBlock* bb);
     Instruction* get_instruction(int bi, int ii);
+    Instruction* get_instruction(Point2D<int>& pos);
     std::size_t instruction_count();
 
     std::vector<CallInstFamily*> caller_list();

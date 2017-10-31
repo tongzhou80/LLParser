@@ -16,37 +16,22 @@
 
 #include "contextGenerator.h"
 
-#define FUNC_MAX_LEN 1024
-
-
-struct XPS_Caller {
-    CallInstFamily* caller;
-    XPath* xps_path;
-};
-
 class CallClonePass: public Pass {
-    bool PrintCloning;
-    bool PathCheck;
-    bool MatchVerbose;
-    bool CloneVerbose;
-    int _cloned;
-    std::ofstream _ofs;
-    //std::map<Function*, std::set<CallInstFamily*> > _callers;  // partial callers
+    /* clone algorithm data structure */
     std::vector<XPath*> _all_paths;
-    //std::vector<std::vector<CallInstFamily*>> _cold_paths;
-    //std::vector<std::vector<CallInstFamily*>> _hot_paths;
-    std::map<CallInstFamily*, std::vector<XPS_Caller*>> _callers_map;
-    std::map<CallInstFamily*, int> _dr_caller_freq;
-    CallInstFamily* _search_root;
-
     std::vector<CallInstFamily*> _stack;
     string _caller;
     string _callee;
     int _min_cxt;
+    
+    /* flags */
     bool _done;
     bool _skip;
     bool _logclone;
-    std::ofstream _clone_log;
+    bool _print_cloning;
+    bool _path_check;
+    bool _verbose_match;
+    bool _verbose_clone;
 
     /* statistics */
     int _hot_counter;
@@ -57,8 +42,11 @@ class CallClonePass: public Pass {
     int _ben_num;
     int _hot_cxt_counter;
     int _used_hot_cxt;
-    Timer _timer;
+    int _cloned;
 
+    Timer _timer;
+    std::ofstream _clone_log;
+    
     std::vector<string> alloc_set;
     std::vector<string> free_set;
 public:
@@ -67,9 +55,11 @@ public:
 
         set_is_module_pass();
 
-        CloneVerbose = false;
-        MatchVerbose = false;
-        PathCheck = false;
+        _done = false;
+        _verbose_clone = false;
+        _verbose_match = false;
+        _path_check = false;
+        _print_cloning = false;
         _skip = false;
         _logclone = false;
         _min_cxt = 1;
@@ -88,15 +78,6 @@ public:
     ~CallClonePass() {
         if (_logclone) {
             _clone_log.close();
-        }
-    }
-
-    CallInstFamily* get_element_in_call_path(std::vector<CallInstFamily*>& path, int pos) {
-        if (pos < path.size()) {
-            return path[pos];
-        }
-        else {
-            return NULL;
         }
     }
 
@@ -194,28 +175,27 @@ public:
             for (int i = 1; i < stack.size(); ++i) {
                 CallInstFamily* I = stack[i];
                 if (I == caller) {
+                    /* replace I's callee to new_callee */
                     if (!is_replaced) {
-                        if (CloneVerbose) {
+                        if (_verbose_clone) {
                             zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
                         }
 
                         if (_logclone) {
                             record_callee_update(I, new_callee);
-                            //_clone_log << "update: " << I->function()->name() << "+" << I->get_position_in_function() << ":"
-                            //           << I->called_function()->name() + " -> " + new_callee->name() << "\n\n";
                         }
 
                         I->replace_callee(new_callee->name());
                         is_replaced = true;
 
                     }
-                    auto callee_call = stack[i-1];
-                    int i_index = callee_call->get_index_in_block();
-                    int b_index = callee_call->parent()->get_index_in_function();
-                    //zpl("in %d path replace %p to %p", caller->xps_path->hotness, stack[i-1], new_callee->get_instruction(b_index, i_index));
-                    auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(b_index, i_index));
+
+                    /* replace the i-1th element with new_callee's inst in the stack */
+                    auto ci_to_replace = stack[i-1];
+                    auto call_pos = ci_to_replace->get_position_in_function();
+                    auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(call_pos));
                     stack[i-1] = ci_in_new_callee;
-                    if (CloneVerbose) {
+                    if (_verbose_clone) {
                         zpl("path pos %d to %s", i - 1, ci_in_new_callee->function()->name_as_c_str())
                     }
                     //check_path(stack);
@@ -275,7 +255,7 @@ public:
                         _path_counter++;
                     }
                     else {
-                        if (MatchVerbose)
+                        if (_verbose_match)
                         zpl("not match: %s", header.c_str())
                     }
                 }
@@ -306,85 +286,33 @@ public:
         }
 
     }
-//
-//    void check_all_paths() {
-//        for (auto v: _hot_paths) {
-//            string callee = v[0]->called_function()->name();
-//            printf("%s", callee.c_str());
-//            for (auto I: v) {
-//                guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
-//                printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
-//                callee = I->function()->name();
-//                // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
-//            }
-//            printf("\n");
-//        }
-//    }
 
     void get_distinct_all_paths() {
         std::vector<XPath*> distinct_set;
         std::set<string> contexts;
 
-        // for (auto v: _all_paths) {
-        //     if (1) {
-        //         string context;
-        //         for (auto I: v->path) {
-        //             char buf[128];
-        //             sprintf(buf, "%p", I);
-        //             context += string(buf) + ' ';
-        //         }
+        int hotnesses[2] = {1, 0}; // hot first, cold second
+        for (auto tp: hotnesses) {
+            for (auto v: _all_paths) {
+                if (v->hotness == tp) {
+                    string context;
+                    for (auto I: v->path) {
+                        char buf[128];
+                        sprintf(buf, "%p", I);
+                        context += string(buf) + ' ';
+                    }
 
-        //         if (contexts.find(context) != contexts.end()) {
-        //             zpd(v->hotness);
-        //         }
-        //         else {
-        //             contexts.insert(context);
-        //             distinct_set.push_back(v);
-        //         }
+                    if (contexts.find(context) != contexts.end()) {
 
-        //     }
-        // }
-
-        for (auto v: _all_paths) {
-            if (v->hotness == 1) {
-                string context;
-                for (auto I: v->path) {
-                    char buf[128];
-                    sprintf(buf, "%p", I);
-                    context += string(buf) + ' ';
-                }
-
-                if (contexts.find(context) != contexts.end()) {
+                    }
+                    else {
+                        contexts.insert(context);
+                        distinct_set.push_back(v);
+                    }
 
                 }
-                else {
-                    contexts.insert(context);
-                    distinct_set.push_back(v);
-                }
-
             }
         }
-
-        for (auto v: _all_paths) {
-            if (v->hotness == 0) {
-                string context;
-                for (auto I: v->path) {
-                    char buf[128];
-                    sprintf(buf, "%p", I);
-                    context += string(buf) + ' ';
-                }
-
-                if (contexts.find(context) != contexts.end()) {
-
-                }
-                else {
-                    contexts.insert(context);
-                    distinct_set.push_back(v);
-                }
-
-            }
-        }
-
 
         _all_paths = distinct_set;
     }
@@ -524,12 +452,12 @@ public:
         get_distinct_all_paths();
         check_all_paths();
 
-//        if (PathCheck)
+//        if (_path_check)
 //            check_all_paths();
         int round = 0;
         while (!_done) {
             scan();
-            if (CloneVerbose) {
+            if (_verbose_clone) {
                 zpl("one clone done.")
             }
 
