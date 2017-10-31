@@ -14,17 +14,10 @@
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
 #include <passes/passManager.h>
+#include <transform/lsda/lsda.cpp>
 
 #include "contextGenerator.h"
 
-struct MFunc {
-    string old_name;
-    string new_name;
-    bool add_id;
-
-    MFunc(string oldname, string newname, bool addid):
-            old_name(oldname), new_name(newname), add_id(addid) {}
-};
 
 class CallClonePass: public Pass {
     /* clone algorithm data structure */
@@ -442,6 +435,7 @@ public:
             nlevel = std::stoi(get_argument("nlevel"));
         }
         if (has_argument("logclone")) {
+            zps(get_argument("logclone"))
             _logclone = (bool)std::stoi(get_argument("logclone"));
             _clone_log.open("clone.log");
         }
@@ -453,11 +447,16 @@ public:
             _lang = get_argument("lang");
         }
         if (has_argument("indi")) {
+            zps(get_argument("indi"))
             _use_indi = (bool)std::stoi(get_argument("indi"));
         }
 
-        Pass* declaration_adder = PassManager::pass_manager->load_pass("LSDA:lang="+_lang+":use_indi="+std::to_string((int)_use_indi));
-        declaration_adder->run_on_module(module);
+        auto lsda = new LSDAPass();
+        lsda->set_lang(_lang);
+        lsda->set_use_indi(_use_indi);
+        lsda->run_on_module(module);
+        _alloc_set = lsda->alloc_set();
+        _free_set = lsda->free_set();
 
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
@@ -581,32 +580,6 @@ public:
                 }
             }
         }
-    }
-
-    bool insert_declaration(Module* m, string oldname, string newname, bool add_id=true) {
-        Function* func = m->get_function(oldname);
-
-        if (func == NULL) {
-            return false;
-        }
-        guarantee(func->is_external(), "malloc family should be external");
-
-        if (m->get_function(newname)) {
-            return false; // return if already inserted
-        }
-
-        /* manipulate the text */
-        string text = func->raw_text();
-        string old_call = oldname + '(';
-        string new_call = newname + "(i32, ";
-        //if (!add_id || Strings::startswith(oldname, "f90_")) {  // a bit funky
-        if (!add_id) {
-            new_call = newname + '(';
-        }
-
-        Strings::replace(text, old_call, new_call);
-        Function* newfunc = IRBuilder::create_function_declaration(text);
-        m->insert_function_after(func, newfunc);
     }
 
     void check_all_paths(bool do_print=false) {

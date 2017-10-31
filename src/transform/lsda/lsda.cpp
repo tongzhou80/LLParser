@@ -25,7 +25,7 @@ struct MFunc {
 };
 
 /**@brief This class don't use SysDict::module()
- * 
+ *
  */
 class LSDAPass: public Pass {
     /* language specific stuff */
@@ -70,7 +70,7 @@ public:
     }
 
     void set_lang(string lang) {
-        guarantee(lang == "c" || lang == "cpp" || lang == "fortran", "");
+        guarantee(lang == "c" || lang == "cpp" || lang == "fortran" || lang == "all", "");
         _lang = lang;
     }
 
@@ -93,7 +93,7 @@ public:
             _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
         }
 
-        
+
 //
 //        insert_declaration("malloc", "ben_malloc", true);
 //        insert_declaration("calloc", "ben_calloc", true);
@@ -106,7 +106,7 @@ public:
 //        insert_declaration("free", "indi_free", false);
 
     }
-    
+
     void insert_lsd(Module* module) {
         for (auto t: _alloc_set) {
             insert_declaration(module, t->old_name, t->new_name, t->add_id);

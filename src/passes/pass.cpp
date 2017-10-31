@@ -6,6 +6,7 @@
 #include <utilities/strings.h>
 #include "pass.h"
 
+#define ARG_DEFAULT_VALUE "1"
 
 Pass::Pass() {
     _is_dynamic = false;
@@ -17,7 +18,6 @@ Pass::Pass() {
     _is_instruction_pass = false;
 
     _is_parse_time = false;
-
     _unloader = NULL;
 }
 
@@ -31,7 +31,7 @@ void Pass::parse_arguments(string args) {
     for (int i = 0; i < pairs.size(); ++i) {
         auto pair = Strings::split(pairs[i], '=');
         if (pair.size() == 1) {
-            _args[pair[0]] = "";
+            _args[pair[0]] = ARG_DEFAULT_VALUE;
         }
         else if (pair.size() == 2) {
             _args[pair[0]] = pair[1];
@@ -53,7 +53,7 @@ bool Pass::has_argument(string key) {
 
 string Pass::get_argument(string key) {
     if (!has_argument(key)) {
-        return "1";  // default value for options that have no value
+        return ARG_DEFAULT_VALUE;  // default value for options that have no value
     }
     else {
         return _args[key];
