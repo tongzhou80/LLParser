@@ -22,8 +22,8 @@ class GuidedClonePass: public Pass {
 public:
     GuidedClonePass() {
         set_is_global_pass();
-        _log_dir = ".";
-        _src_dir = ".";
+        _log_dir = "./";
+        _src_dir = "./";
         _lsda = new LSDAPass();
 
         _clone_num = 0;
