@@ -3,7 +3,7 @@
 //
 
 #include <cstdio>
-#include <ir/function.h>
+#include <ir/irEssential.h>
 #include <passes/pass.h>
 #include <asmParser/sysDict.h>
 #include <asmParser/llParser.h>
@@ -15,11 +15,13 @@ class GuidedClonePass: public Pass {
     std::ofstream _ofs;
     string _log_dir;
     string _src_dir;
+    LSDAPass* _lsda;
 public:
     GuidedClonePass() {
         set_is_global_pass();
         _log_dir = ".";
         _src_dir = ".";
+        _lsda = new LSDAPass();
     }
 
     Module* get_module(string& src_filename) {
@@ -32,6 +34,7 @@ public:
             m = SysDict::parser->parse(ir_name);
             guarantee(m, "");
         }
+        _lsda->run_on_module(m);
         return m;
     }
 
@@ -44,7 +47,6 @@ public:
             _src_dir = get_argument("src_dir");
         }
 
-
         std::ifstream ifs(_log_dir+"/clone.log");
         string line;
         while (std::getline(ifs, line)) {
@@ -54,18 +56,24 @@ public:
             string user_file = fields.at(3);
             string user = fields.at(4);
             string use_loc = fields.at(5);
+            Point2D<int> point(use_loc);
 
             Module* callee_m = get_module(callee_file);
             Function* callee_f = callee_m->get_function(callee);
+            Function* callee_clone = callee_f->clone();
+            callee_m->append_new_function(callee_clone);
+            Module* user_m = get_module(user_file);
+            Function* user_f = user_m->get_function(user);
+            CallInstFamily* user_i = dynamic_cast<CallInstFamily*>(user_f->get_instruction(point));
+            guarantee(user_i, "");
 
+            /* need to insert declaration if inter-procedural */
+            if (user_m != callee_m) {
+                _lsda->insert_declaration()
+            }
+            user_i->replace_callee(callee_clone->name());
         }
-//        _ofs.open("function_to_file.txt");
-//        for (MetaData* md: module->unnamed_metadata_list()) {
-//            if (DISubprogram* sp = dynamic_cast<DISubprogram*>(md)) {
-//                _ofs << sp->name() << ": " << sp->filename() << '\n';
-//            }
-//        }
-//        _ofs.close();
+
     }
 };
 

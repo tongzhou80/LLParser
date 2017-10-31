@@ -76,6 +76,7 @@ public:
     T x;
     T y;
     Point2D(T xx, T yy): x(xx), y(yy) {}
+    Point2D(std::string s);
     const char* c_str() const {
         std::string ret = std::to_string(x) + "_" + std::to_string(y);
         return ret.c_str();
@@ -89,6 +90,8 @@ std::ostream& operator<<(std::ostream& os, const Point2D<T>& p) {
     os << p.c_str();
     return os;
 }
+
+
 
 
 
