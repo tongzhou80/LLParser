@@ -76,10 +76,6 @@ public:
             /* need to insert declaration if inter-procedural */
             if (user_m != callee_m) {
                 _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name());
-                if (callee_clone->name() == "sgfOverwritePropertyInt.1003") {
-                    printf("insert %s to module %s\n", callee_clone->name_as_c_str(), user_m->name_as_c_str());
-                }
-
             }
             user_i->replace_callee(callee_clone->name());
             printf("replaced %s\n", callee_clone->name_as_c_str());
