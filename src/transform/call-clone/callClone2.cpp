@@ -68,7 +68,7 @@ public:
         _print_cloning = false;
         _skip = false;
         _logclone = false;
-        _use_indi = false;
+        _use_indi = true;
         _min_cxt = 1;
         _path_counter = 1;
         _cxt_counter = 0;
