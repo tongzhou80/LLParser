@@ -34,6 +34,7 @@ void Pass::parse_arguments(string args) {
             _args[pair[0]] = ARG_DEFAULT_VALUE;
         }
         else if (pair.size() == 2) {
+            zps(pair[0])
             _args[pair[0]] = pair[1];
         }
         else {

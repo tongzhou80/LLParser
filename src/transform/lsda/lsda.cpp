@@ -41,6 +41,16 @@ public:
         _lang = "all";
         _use_indi = false;
         _apid = 1;
+        init();
+    }
+
+    LSDAPass(string lang) {
+        set_is_module_pass();
+
+        _lang = lang;
+        _use_indi = false;
+        _apid = 1;
+        init();
     }
 
     ~LSDAPass() {
@@ -80,7 +90,8 @@ public:
         return _lang;
     }
 
-    void init_lang(Module* module) {
+    void init_lang() {
+        zps(_lang)
         if (_lang == "c" || _lang == "cpp" || _lang == "all") {
             _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
             _alloc_set.push_back(new MFunc("calloc", "ben_calloc", true));
@@ -134,7 +145,7 @@ public:
             // todo
         }
 
-        // Fortran
+        zpd(_alloc_set.size())
       
 //
 //        insert_declaration("malloc", "ben_malloc", true);
@@ -216,7 +227,7 @@ public:
         }
     }
 
-    bool run_on_module(Module* module) override {
+    void init() {
         if (has_argument("lang")) {
             _lang = get_argument("lang");
         }
@@ -224,7 +235,10 @@ public:
             _use_indi = true;
         }
 
-        init_lang(module);
+        init_lang();
+    }
+
+    bool run_on_module(Module* module) override {
         insert_lsd(module);
     }
 //

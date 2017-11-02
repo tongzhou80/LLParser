@@ -57,8 +57,7 @@ void PassManager::init() {
 }
 
 void PassManager::destroy() {
-    if (pass_manager != NULL)
-        delete pass_manager;
+    delete pass_manager;
 }
 
 /* for debug, addr2line can't show line numbers in a .so */
@@ -187,6 +186,7 @@ Pass* PassManager::load_pass(string name) {
         pass_obj->set_unloader(unldp);
         pass_obj->set_is_dynamic();
         if (!args.empty()) {
+            zpl("kkkkk")
             pass_obj->parse_arguments(args);
         }
         return pass_obj;

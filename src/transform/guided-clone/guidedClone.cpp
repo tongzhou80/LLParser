@@ -15,6 +15,7 @@ class GuidedClonePass: public Pass {
     std::ofstream _ofs;
     string _log_dir;
     string _src_dir;
+    string _lang;
     bool _use_indi;
     LSDAPass* _lsda;
 
@@ -29,10 +30,32 @@ public:
         set_is_global_pass();
         _log_dir = "./";
         _src_dir = "./";
+        _lang = "all";
         _use_indi = true;
-        _lsda = new LSDAPass();
-
         _clone_num = 0;
+
+        parse_args();
+        _lsda = new LSDAPass(_lang);
+        _lsda->set_use_indi(_use_indi);
+    }
+
+    void parse_args() {
+        /* set source file dir */
+        zpl("kkk: %d", has_argument("lang"))
+        if (has_argument("log_dir")) {
+            _log_dir = get_argument("log_dir");
+        }
+        if (has_argument("src_dir")) {
+            _src_dir = get_argument("src_dir");
+        }
+        if (has_argument("lang")) {
+            zpl("get lang")
+            _lang = get_argument("lang");
+        }
+        if (has_argument("use_indi")) {
+            _use_indi = (bool)std::stoi(get_argument("use_indi"));
+        }
+        zps(_lang)
     }
 
     Module* get_module(string& src_filename) {
@@ -53,17 +76,6 @@ public:
     }
 
     bool run_on_global() override {
-        /* set source file dir */
-        if (has_argument("log_dir")) {
-            _log_dir = get_argument("log_dir");
-        }
-        if (has_argument("src_dir")) {
-            _src_dir = get_argument("src_dir");
-        }
-        if (has_argument("use_indi")) {
-            _use_indi = (bool)std::stoi(get_argument("use_indi"));
-        }
-
         std::ifstream ifs(_log_dir+"/clone.log");
         string line;
         while (std::getline(ifs, line)) {

@@ -450,8 +450,7 @@ public:
             _use_indi = (bool)std::stoi(get_argument("indi"));
         }
 
-        auto lsda = new LSDAPass();
-        lsda->set_lang(_lang);
+        auto lsda = new LSDAPass(_lang);
         lsda->set_use_indi(_use_indi);
         lsda->run_on_module(module);
         _alloc_set = lsda->alloc_set();
