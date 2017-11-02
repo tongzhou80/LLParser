@@ -480,8 +480,14 @@ public:
             round++;
         }
 
-        replace_alloc();
-        replace_free();
+        lsda->replace_alloc(module);
+        lsda->replace_free(module);
+        if (_use_indi) {
+            lsda->replace_indi(module);
+        }
+
+//        replace_alloc();
+//        replace_free();
 
         string out = SysArgs::get_option("output");
         if (out.empty()) {

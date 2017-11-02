@@ -110,7 +110,7 @@ public:
             _free_set.push_back(new MFunc("_ZdlPv", "ben_free", false));
         }
         
-        if (_lang == "fortran" || _lang == "all") {
+        if (_lang == "flang" || _lang == "all") {
             _alloc_set.push_back(new MFunc("f90_alloc", "f90_ben_alloc", true));
             _alloc_set.push_back(new MFunc("f90_alloc03", "f90_ben_alloc03", true));
             _alloc_set.push_back(new MFunc("f90_alloc03_chk", "f90_ben_alloc03_chk", true));
@@ -189,6 +189,9 @@ public:
                     I->replace_callee(t->new_name);
                     string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
                     I->replace_args(new_args);
+                    if (_lang == "flang") {
+                        I->dump();
+                    }
                 }
             }
         }
