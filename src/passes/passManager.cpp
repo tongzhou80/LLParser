@@ -33,6 +33,10 @@ PassManager::PassManager() {
 }
 
 PassManager::~PassManager() {
+    for (auto p: _module_passes) {
+        p->do_finalization();
+    }
+
     std::vector<std::vector<Pass*> > all_passes;
     all_passes.push_back(_global_passes);
     all_passes.push_back(_module_passes);
@@ -109,6 +113,7 @@ void PassManager::add_pass(Pass *p) {
         insert_with_priority(_global_passes, p);
     }
     if (p->is_module_pass()) {
+        p->do_initialization();
         insert_with_priority(_module_passes, p);
     }
 
@@ -186,7 +191,6 @@ Pass* PassManager::load_pass(string name) {
         pass_obj->set_unloader(unldp);
         pass_obj->set_is_dynamic();
         if (!args.empty()) {
-            zpl("kkkkk")
             pass_obj->parse_arguments(args);
         }
         return pass_obj;

@@ -53,10 +53,6 @@ public:
         init();
     }
 
-    ~LSDAPass() {
-
-    }
-
     const std::vector<MFunc *> &alloc_set() const {
         return _alloc_set;
     }
@@ -88,6 +84,17 @@ public:
 
     const string& lang() {
         return _lang;
+    }
+
+    bool do_initialization() override {
+        if (has_argument("lang")) {
+            _lang = get_argument("lang");
+        }
+        if (has_argument("indi")) {
+            _use_indi = true;
+        }
+
+        init_lang();
     }
 
     void init_lang() {
@@ -228,14 +235,7 @@ public:
     }
 
     void init() {
-        if (has_argument("lang")) {
-            _lang = get_argument("lang");
-        }
-        if (has_argument("indi")) {
-            _use_indi = true;
-        }
 
-        init_lang();
     }
 
     bool run_on_module(Module* module) override {

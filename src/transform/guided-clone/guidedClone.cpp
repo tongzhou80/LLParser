@@ -33,15 +33,10 @@ public:
         _lang = "all";
         _use_indi = true;
         _clone_num = 0;
-
-        parse_args();
-        _lsda = new LSDAPass(_lang);
-        _lsda->set_use_indi(_use_indi);
     }
 
-    void parse_args() {
+    void init() {
         /* set source file dir */
-        zpl("kkk: %d", has_argument("lang"))
         if (has_argument("log_dir")) {
             _log_dir = get_argument("log_dir");
         }
@@ -56,6 +51,9 @@ public:
             _use_indi = (bool)std::stoi(get_argument("use_indi"));
         }
         zps(_lang)
+        _lsda = new LSDAPass(_lang);
+        _lsda->do_initialization();
+        _lsda->set_use_indi(_use_indi);
     }
 
     Module* get_module(string& src_filename) {
@@ -68,7 +66,6 @@ public:
             if (_load_verbose) {
                 printf("parsed %s\n", m->name_as_c_str());
             }
-
             guarantee(m, "");
         }
         _lsda->run_on_module(m);
@@ -76,6 +73,7 @@ public:
     }
 
     bool run_on_global() override {
+        init();
         std::ifstream ifs(_log_dir+"/clone.log");
         string line;
         while (std::getline(ifs, line)) {

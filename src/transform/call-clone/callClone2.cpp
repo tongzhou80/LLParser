@@ -446,11 +446,11 @@ public:
             _lang = get_argument("lang");
         }
         if (has_argument("indi")) {
-            zps(get_argument("indi"))
             _use_indi = (bool)std::stoi(get_argument("indi"));
         }
 
         auto lsda = new LSDAPass(_lang);
+        lsda->do_initialization();
         lsda->set_use_indi(_use_indi);
         lsda->run_on_module(module);
         _alloc_set = lsda->alloc_set();
