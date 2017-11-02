@@ -44,13 +44,11 @@ public:
             _src_dir = get_argument("src_dir");
         }
         if (has_argument("lang")) {
-            zpl("get lang")
             _lang = get_argument("lang");
         }
         if (has_argument("use_indi")) {
             _use_indi = (bool)std::stoi(get_argument("use_indi"));
         }
-        zps(_lang)
         _lsda = new LSDAPass(_lang);
         _lsda->do_initialization();
         _lsda->set_use_indi(_use_indi);
@@ -107,15 +105,11 @@ public:
 
         for (auto it: SysDict::module_table()) {
             Module* m = it.second;
-            zpl("1");
             _lsda->replace_alloc(m);
-            zpl("2");
             _lsda->replace_free(m);
-            zpl("3");
             if (_use_indi) {
                 _lsda->replace_indi(m);
             }
-            zpl("4");
             m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
         }
     }

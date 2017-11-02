@@ -41,7 +41,6 @@ public:
         _lang = "all";
         _use_indi = false;
         _apid = 1;
-        init();
     }
 
     LSDAPass(string lang) {
@@ -50,7 +49,6 @@ public:
         _lang = lang;
         _use_indi = false;
         _apid = 1;
-        init();
     }
 
     const std::vector<MFunc *> &alloc_set() const {
@@ -98,7 +96,6 @@ public:
     }
 
     void init_lang() {
-        zps(_lang)
         if (_lang == "c" || _lang == "cpp" || _lang == "all") {
             _alloc_set.push_back(new MFunc("malloc", "ben_malloc", true));
             _alloc_set.push_back(new MFunc("calloc", "ben_calloc", true));
@@ -151,8 +148,6 @@ public:
             _free_set.push_back(new MFunc("f90_auto_dealloc", "f90_ben_auto_dealloc", false));
             // todo
         }
-
-        zpd(_alloc_set.size())
       
 //
 //        insert_declaration("malloc", "ben_malloc", true);
@@ -232,10 +227,6 @@ public:
                 }
             }
         }
-    }
-
-    void init() {
-
     }
 
     bool run_on_module(Module* module) override {
