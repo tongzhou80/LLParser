@@ -97,11 +97,15 @@ public:
 
         for (auto it: SysDict::module_table()) {
             Module* m = it.second;
+            zpl("1");
             _lsda->replace_alloc(m);
+            zpl("2");
             _lsda->replace_free(m);
+            zpl("3");
             if (_use_indi) {
                 _lsda->replace_indi(m);
             }
+            zpl("4");
             m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
         }
     }
