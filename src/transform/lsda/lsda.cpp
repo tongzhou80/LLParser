@@ -201,8 +201,7 @@ public:
                         guarantee(bci, "");
                         bci->update_raw_field("value", '@' + t->new_name);
                         string ty2 = bci->get_raw_field("ty2");
-                        int replace_pos = ty2.find('(');
-                        ty2.replace(replace_pos, 1, "(i32, ");
+                        insert_i32_to_type(ty2);
                         bci->update_raw_field("ty2", ty2);
                         bci->dump();
                     }
@@ -212,9 +211,20 @@ public:
 
                     string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
                     I->replace_args(new_args);
+
+                    if (_lang == "flang") {
+                        string fnty = I->get_raw_field("fnty");
+                        insert_i32_to_type(fnty);
+                        I->update_raw_field("fnty", fnty);
+                    }
                 }
             }
         }
+    }
+
+    void insert_i32_to_type(string& ty) {
+        int replace_pos = ty.find('(');
+        ty.replace(replace_pos, 1, "(i32, ");
     }
 
     void replace_free(Module* module) {
