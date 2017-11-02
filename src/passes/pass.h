@@ -147,13 +147,13 @@ public:
 
 #define REGISTER_PASS(classname) \
     extern "C" Pass* __load_pass_##classname() { \
-        printf("dynamically load pass " #classname "!\n"); \
+        /* printf("dynamically load pass " #classname "!\n"); */ \
         Pass* p = new classname(); \
         p->set_name(#classname); \
         return p; \
     } \
     extern "C" Pass* __unload_pass_##classname(classname* p) { \
-        printf("dynamically unload pass " #classname "!\n"); \
+        /* printf("dynamically unload pass " #classname "!\n"); */ \
         delete p; \
     } \
 

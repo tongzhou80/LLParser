@@ -110,7 +110,8 @@ public:
             if (_use_indi) {
                 _lsda->replace_indi(m);
             }
-            m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
+            //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
+            m->print_to_file(m->input_file());
         }
     }
 };
