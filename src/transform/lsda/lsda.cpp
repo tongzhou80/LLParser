@@ -167,6 +167,53 @@ public:
         }
     }
 
+    void replace_alloc(Module* module) {
+        int id = 1;
+        for (auto t: _alloc_set) {
+            Function* f = module->get_function(t->old_name);
+            for (auto I: f->caller_list()) {
+                I->replace_callee(t->new_name);
+                string new_args = "i32 " + std::to_string(id++) + ", " + I->get_raw_field("args");
+                I->replace_args(new_args);
+            }
+        }
+    }
+
+    void replace_free(Module* module) {
+        for (auto t: _free_set) {
+            if (Function* free_fp = module->get_function(t->old_name)) {
+                for (auto ci: free_fp->caller_list()) {
+                    ci->replace_callee(t->new_name);
+                }
+            }
+        }
+    }
+
+    void replace_indi(Module* module) {
+        string suffixes[3] = {" ", ",", ")"};
+        for (auto F: module->function_list()) {
+            for (auto B: F->basic_block_list()) {
+                for (auto I: B->callinst_list()) {
+                    for (auto& suf: suffixes) {
+                        //string targets[4] = {"malloc", "calloc", "realloc", "free"};
+                        for (auto& t: _alloc_set) {
+                            string old = "@"+t->old_name+suf;
+                            if (I->raw_text().find(old) != string::npos) {
+                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                            }
+                        }
+                        for (auto& t: _free_set) {
+                            string old = "@"+t->old_name+suf;
+                            if (I->raw_text().find(old) != string::npos) {
+                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     bool run_on_module(Module* module) override {
         if (has_argument("lang")) {
             _lang = get_argument("lang");
@@ -241,7 +288,7 @@ public:
         Strings::ireplace(text, old_call, new_call);
         Function* newfunc = IRBuilder::create_function_declaration(text);
         m->insert_function_after(func, newfunc);
-        printf("<lsda>: insert %s to module %s\n", newfunc->name_as_c_str(), m->name_as_c_str());
+        //printf("<lsda>: insert %s to module %s\n", newfunc->name_as_c_str(), m->name_as_c_str());
     }
 
 };

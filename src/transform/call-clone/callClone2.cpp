@@ -435,7 +435,6 @@ public:
             nlevel = std::stoi(get_argument("nlevel"));
         }
         if (has_argument("logclone")) {
-            zps(get_argument("logclone"))
             _logclone = (bool)std::stoi(get_argument("logclone"));
             _clone_log.open("clone.log");
         }

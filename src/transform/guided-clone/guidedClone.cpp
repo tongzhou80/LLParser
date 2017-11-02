@@ -17,6 +17,10 @@ class GuidedClonePass: public Pass {
     string _src_dir;
     LSDAPass* _lsda;
 
+    /* flags */
+    bool _load_verbose;
+    bool _replace_verbose;
+
     /* statistics */
     int _clone_num;
 public:
@@ -36,7 +40,10 @@ public:
         Module* m = SysDict::get_module(ir_name);
         if (!m) {
             m = SysDict::parser->parse(ir_name);
-            zpl("parsed %s", m->name_as_c_str())
+            if (_load_verbose) {
+                printf("parsed %s\n", m->name_as_c_str());
+            }
+
             guarantee(m, "");
         }
         _lsda->run_on_module(m);
@@ -70,7 +77,7 @@ public:
             callee_m->append_new_function(callee_clone);
             Module* user_m = get_module(user_file);
             Function* user_f = user_m->get_function(user);
-            CallInstFamily* user_i = dynamic_cast<CallInstFamily*>(user_f->get_instruction(point));
+            auto user_i = dynamic_cast<CallInstFamily*>(user_f->get_instruction(point));
             guarantee(user_i, "");
 
             /* need to insert declaration if inter-procedural */
@@ -78,7 +85,9 @@ public:
                 _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name());
             }
             user_i->replace_callee(callee_clone->name());
-            printf("replaced %s\n", callee_clone->name_as_c_str());
+            if (_replace_verbose) {
+                printf("replaced %s\n", callee_clone->name_as_c_str());
+            }
         }
 
         for (auto it: SysDict::module_table()) {
