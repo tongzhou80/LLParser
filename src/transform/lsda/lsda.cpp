@@ -186,12 +186,19 @@ public:
         for (auto t: _alloc_set) {
             if (Function* f = module->get_function(t->old_name)) {
                 for (auto I: f->caller_list()) {
-                    I->replace_callee(t->new_name);
-                    string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
-                    I->replace_args(new_args);
+                    /* flang always uses indirect call, so update the bitcast here
+                     * including both callee, and the type
+                     */
                     if (_lang == "flang") {
                         I->dump();
+                        I->target_inst()->dump();
                     }
+                    else {
+                        I->replace_callee(t->new_name);
+                    }
+
+                    string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
+                    I->replace_args(new_args);
                 }
             }
         }
