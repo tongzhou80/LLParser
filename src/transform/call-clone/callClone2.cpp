@@ -513,8 +513,11 @@ public:
 //        stat_ofs.close();
 
         zpl("======== Summary ======");
-        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
-            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
+        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d",
+            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round);
+
+//        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
+//            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
     }
 
     void check_unused(Module* module) {
