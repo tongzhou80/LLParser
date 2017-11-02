@@ -507,7 +507,8 @@ public:
 //        stat_ofs.close();
 
         zpl("======== Summary ======");
-        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d", _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
+        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
+            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
     }
 
     void check_unused(Module* module) {
@@ -556,6 +557,8 @@ public:
             return;
         }
 
+        int indi_alloc = 0;
+        int indi_free = 0;
         string suffixes[3] = {" ", ",", ")"};
         for (auto F: SysDict::module()->function_list()) {
             for (auto B: F->basic_block_list()) {
@@ -566,18 +569,22 @@ public:
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
                                 Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                                indi_alloc++;
                             }
                         }
                         for (auto& t: _free_set) {
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
                                 Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                                indi_free++;
                             }
                         }
                     }
                 }
             }
         }
+        zpd(indi_alloc)
+        zpd(indi_free)
     }
 
     void check_all_paths(bool do_print=false) {
@@ -626,7 +633,8 @@ public:
             printf("\n");
     }
 
-    //bool do_finalization(Module* module);
+    bool do_initialization() override {}
+    bool do_finalization() override {}
 };
 
 
