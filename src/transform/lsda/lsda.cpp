@@ -216,6 +216,7 @@ public:
                         string fnty = I->get_raw_field("fnty");
                         insert_i32_to_type(fnty);
                         I->update_raw_field("fnty", fnty);
+                        I->dump();
                     }
                 }
             }
