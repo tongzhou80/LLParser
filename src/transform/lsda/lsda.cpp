@@ -229,10 +229,18 @@ public:
     }
 
     void replace_free(Module* module) {
-        for (auto t: _free_set) {
-            if (Function* f = module->get_function(t->old_name)) {
-                for (auto ci: f->caller_list()) {
-                    ci->replace_callee(t->new_name);
+        string suffixes[3] = {" ", ",", ")"};
+        for (auto F: module->function_list()) {
+            for (auto B: F->basic_block_list()) {
+                for (auto I: B->instruction_list()) {
+                    for (auto& suf: suffixes) {
+                        for (auto& t: _free_set) {
+                            string old = "@"+t->old_name+suf;
+                            if (I->raw_text().find(old) != string::npos) {
+                                Strings::ireplace(I->raw_text(), old, "@"+t->new_name+suf);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -251,12 +259,12 @@ public:
                                 Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
                             }
                         }
-                        for (auto& t: _free_set) {
-                            string old = "@"+t->old_name+suf;
-                            if (I->raw_text().find(old) != string::npos) {
-                                Strings::ireplace(I->raw_text(), old, "@ben_"+t->old_name+suf);
-                            }
-                        }
+//                        for (auto& t: _free_set) {
+//                            string old = "@"+t->old_name+suf;
+//                            if (I->raw_text().find(old) != string::npos) {
+//                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+//                            }
+//                        }
                     }
                 }
             }
