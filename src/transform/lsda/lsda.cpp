@@ -164,7 +164,7 @@ public:
 
     void insert_lsd(Module* module) {
         for (auto t: _alloc_set) {
-            if (_lang == "flang") {
+            if (Strings::startswith(t->old_name, "f90_")) {
                 insert_declaration(module, t->old_name, t->new_name, false);
             }
             else {
@@ -195,7 +195,11 @@ public:
                     /* flang always uses indirect call, so update the bitcast here
                      * including both callee, and the type
                      */
-                    if (_lang == "flang") {
+                    bool flang_alloc = false;
+                    if (Strings::startswith(t->old_name, "f90_")) {
+                        flang_alloc = true;
+                    }
+                    if (flang_alloc) {
                         I->dump();
                         BitCastInst* bci = dynamic_cast<BitCastInst*>(I->target_inst());
                         guarantee(bci, "");
@@ -212,7 +216,7 @@ public:
                     string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
                     I->replace_args(new_args);
 
-                    if (_lang == "flang") {
+                    if (flang_alloc) {
                         string fnty = I->get_raw_field("fnty");
                         insert_i32_to_type(fnty);
                         I->update_raw_field("fnty", fnty);
