@@ -164,7 +164,13 @@ public:
 
     void insert_lsd(Module* module) {
         for (auto t: _alloc_set) {
-            insert_declaration(module, t->old_name, t->new_name, t->add_id);
+            if (_lang == "flang") {
+                insert_declaration(module, t->old_name, t->new_name, false);
+            }
+            else {
+                insert_declaration(module, t->old_name, t->new_name, t->add_id);
+            }
+
             if (_use_indi) {
                 string indi_name = t->new_name;
                 Strings::ireplace(indi_name, "ben_", "indi_");
@@ -191,7 +197,14 @@ public:
                      */
                     if (_lang == "flang") {
                         I->dump();
-                        I->target_inst()->dump();
+                        BitCastInst* bci = dynamic_cast<BitCastInst*>(I->target_inst());
+                        guarantee(bci, "");
+                        bci->update_raw_field("value", '@' + t->new_name);
+                        string ty2 = bci->get_raw_field("ty2");
+                        int replace_pos = ty2.find('(');
+                        ty2.replace(replace_pos, 1, "(i32, ");
+                        bci->update_raw_field("ty2", ty2);
+                        bci->dump();
                     }
                     else {
                         I->replace_callee(t->new_name);
