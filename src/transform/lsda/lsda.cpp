@@ -254,7 +254,7 @@ public:
                         for (auto& t: _free_set) {
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
-                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
+                                Strings::ireplace(I->raw_text(), old, "@ben_"+t->old_name+suf);
                             }
                         }
                     }
