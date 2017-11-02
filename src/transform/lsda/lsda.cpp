@@ -32,6 +32,7 @@ class LSDAPass: public Pass {
     string _lang;
     std::vector<MFunc*> _alloc_set;
     std::vector<MFunc*> _free_set;
+    int _apid;
     bool _use_indi;
 public:
     LSDAPass() {
@@ -39,6 +40,7 @@ public:
 
         _lang = "all";
         _use_indi = false;
+        _apid = 1;
     }
 
     ~LSDAPass() {
@@ -168,12 +170,11 @@ public:
     }
 
     void replace_alloc(Module* module) {
-        int id = 1;
         for (auto t: _alloc_set) {
             Function* f = module->get_function(t->old_name);
             for (auto I: f->caller_list()) {
                 I->replace_callee(t->new_name);
-                string new_args = "i32 " + std::to_string(id++) + ", " + I->get_raw_field("args");
+                string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
                 I->replace_args(new_args);
             }
         }
@@ -193,7 +194,7 @@ public:
         string suffixes[3] = {" ", ",", ")"};
         for (auto F: module->function_list()) {
             for (auto B: F->basic_block_list()) {
-                for (auto I: B->callinst_list()) {
+                for (auto I: B->instruction_list()) {
                     for (auto& suf: suffixes) {
                         //string targets[4] = {"malloc", "calloc", "realloc", "free"};
                         for (auto& t: _alloc_set) {

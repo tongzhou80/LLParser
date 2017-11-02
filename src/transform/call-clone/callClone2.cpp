@@ -560,7 +560,7 @@ public:
         string suffixes[3] = {" ", ",", ")"};
         for (auto F: SysDict::module()->function_list()) {
             for (auto B: F->basic_block_list()) {
-                for (auto I: B->callinst_list()) {
+                for (auto I: B->instruction_list()) {
                     for (auto& suf: suffixes) {
                         //string targets[4] = {"malloc", "calloc", "realloc", "free"};
                         for (auto& t: _alloc_set) {

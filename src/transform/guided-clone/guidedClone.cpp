@@ -15,6 +15,7 @@ class GuidedClonePass: public Pass {
     std::ofstream _ofs;
     string _log_dir;
     string _src_dir;
+    bool _use_indi;
     LSDAPass* _lsda;
 
     /* flags */
@@ -28,6 +29,7 @@ public:
         set_is_global_pass();
         _log_dir = "./";
         _src_dir = "./";
+        _use_indi = true;
         _lsda = new LSDAPass();
 
         _clone_num = 0;
@@ -57,6 +59,9 @@ public:
         }
         if (has_argument("src_dir")) {
             _src_dir = get_argument("src_dir");
+        }
+        if (has_argument("use_indi")) {
+            _use_indi = (bool)std::stoi(get_argument("use_indi"));
         }
 
         std::ifstream ifs(_log_dir+"/clone.log");
@@ -92,6 +97,11 @@ public:
 
         for (auto it: SysDict::module_table()) {
             Module* m = it.second;
+            _lsda->replace_alloc(m);
+            _lsda->replace_free(m);
+            if (_use_indi) {
+                _lsda->replace_indi(m);
+            }
             m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
         }
     }
