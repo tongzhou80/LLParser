@@ -172,19 +172,23 @@ public:
     void replace_alloc(Module* module) {
         for (auto t: _alloc_set) {
             Function* f = module->get_function(t->old_name);
-            for (auto I: f->caller_list()) {
-                I->replace_callee(t->new_name);
-                string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
-                I->replace_args(new_args);
+            if (f) {
+                for (auto I: f->caller_list()) {
+                    I->replace_callee(t->new_name);
+                    string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
+                    I->replace_args(new_args);
+                }
             }
         }
     }
 
     void replace_free(Module* module) {
         for (auto t: _free_set) {
-            if (Function* free_fp = module->get_function(t->old_name)) {
-                for (auto ci: free_fp->caller_list()) {
-                    ci->replace_callee(t->new_name);
+            if (Function* f = module->get_function(t->old_name)) {
+                if (f) {
+                    for (auto ci: f->caller_list()) {
+                        ci->replace_callee(t->new_name);
+                    }
                 }
             }
         }
