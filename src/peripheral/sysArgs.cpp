@@ -35,10 +35,10 @@ void SysArgs::init(SoptInitArgs* initArgs) {
         //benches.push_back("456.hmmer");
         //benches.push_back("astar");
         //benches.push_back("429.mcf");
-        //benches.push_back("445.gobmk");
+        benches.push_back("445.gobmk");
         //benches.push_back("h264ref");
         //benches.push_back("462.libquantum");
-        benches.push_back("403.gcc");
+        //benches.push_back("403.gcc");
         for (auto bench: benches) {
             string path = "../../benchmarks/cpu2006/" + bench + "/src/" + bench.substr(4) +".ll";
             //parser->parse("../../test/fortran/a.ll");

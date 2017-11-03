@@ -113,9 +113,10 @@ string IRParser::match_complex_constant() {
 }
 
 string IRParser::match_constant() {
-    get_lookahead();
+    get_lookahead(',');
     if (_lookahead == "zeroinitializer") {
-        return "zeroinitializer";
+        jump_ahead();
+        return _lookahead;
     }
     else if (_lookahead == "inttoptr"
              || _lookahead == "trunc"
@@ -251,7 +252,7 @@ string IRParser::parse_basic_type() {
             break;
         }
         default: {
-            parser_assert(0, "bad type!");
+            parser_assert(0, "bad type, _char: %c", _char);
         }
     }
 
