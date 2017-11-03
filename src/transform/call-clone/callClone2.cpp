@@ -485,6 +485,7 @@ public:
         if (_use_indi) {
             lsda->replace_indi(module);
         }
+        generate_post_contexts();
 
 //        replace_alloc();
 //        replace_free();
@@ -527,6 +528,29 @@ public:
                 printf("Function %s is unused\n", F->name_as_c_str());
             }
         }
+    }
+
+    string get_apid_from_args(string& args) {
+        int p1 = args.find(' ');
+        int p2 = args.find(',');
+        return args.substr(p1+1, p2-p1-1);
+    }
+
+    void generate_post_contexts() {
+        std::ofstream ofs(SysDict::filedir() + "post-contexts.txt");
+        for (auto xpath: _all_paths) {
+            CallInstFamily* alloc_caller = xpath->path[0];
+            string args = alloc_caller->get_raw_field("args");
+            ofs << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << std::endl;
+            //ofs << _counter++ << " " + hotness + " " << alloc << std::endl;
+            for (auto ci: xpath->path) {
+                DILocation* loc = ci->debug_loc();
+                ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
+                     << loc->filename() << ':' << loc->line() << std::endl;
+            }
+            ofs << std::endl;
+        }
+        ofs.close();
     }
 
     void replace_alloc() {

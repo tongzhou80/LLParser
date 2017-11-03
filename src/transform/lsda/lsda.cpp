@@ -34,21 +34,30 @@ class LSDAPass: public Pass {
     std::vector<MFunc*> _free_set;
     int _apid;
     bool _use_indi;
+    bool _print_stats;
+    int _new_allocs;
+    int _new_frees;
 public:
     LSDAPass() {
         set_is_module_pass();
 
         _lang = "all";
-        _use_indi = false;
-        _apid = 1;
+        init();
     }
 
     LSDAPass(string lang) {
         set_is_module_pass();
 
         _lang = lang;
+        init();
+    }
+
+    void init() {
         _use_indi = false;
         _apid = 1;
+        _print_stats = true;
+        _new_allocs = 0;
+        _new_frees = 0;
     }
 
     const std::vector<MFunc *> &alloc_set() const {
@@ -242,6 +251,7 @@ public:
                             string old = "@"+t->old_name+suf;
                             if (I->raw_text().find(old) != string::npos) {
                                 Strings::ireplace(I->raw_text(), old, "@"+t->new_name+suf);
+                                _new_frees++;
                             }
                         }
                     }
