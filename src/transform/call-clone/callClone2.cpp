@@ -436,7 +436,7 @@ public:
         }
         if (has_argument("logclone")) {
             _logclone = (bool)std::stoi(get_argument("logclone"));
-            _clone_log.open("clone.log");
+            _clone_log.open(SysDict::filedir()+"clone.log");
         }
         if (has_argument("min-cxt")) {
             _min_cxt = std::stoi(get_argument("min-cxt"));
@@ -559,11 +559,14 @@ public:
             ofs << std::endl;
         }
         ofs.close();
-        ofs.open(SysDict::filedir() + "ben.log");
-        for (auto f: alloc_files) {
-            ofs << f << std::endl;
+
+        if (_logclone) {
+            ofs.open(SysDict::filedir() + "ben.log");
+            for (auto f: alloc_files) {
+                ofs << f << std::endl;
+            }
+            ofs.close();
         }
-        ofs.close();
     }
 
     void replace_alloc() {
