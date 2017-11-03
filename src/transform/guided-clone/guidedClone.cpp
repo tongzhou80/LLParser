@@ -103,15 +103,25 @@ public:
             }
         }
 
+        use_ben_malloc();
+
         for (auto it: SysDict::module_table()) {
             Module* m = it.second;
+            //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
+            m->print_to_file(m->input_file());
+        }
+    }
+
+    void use_ben_malloc() {
+        std::ifstream ifs(_log_dir+"/ben.log");
+        string line;
+        while (std::getline(ifs, line)) {
+            Module* m = get_module(line);
             _lsda->replace_alloc(m);
             _lsda->replace_free(m);
             if (_use_indi) {
                 _lsda->replace_indi(m);
             }
-            //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
-            m->print_to_file(m->input_file());
         }
     }
 };

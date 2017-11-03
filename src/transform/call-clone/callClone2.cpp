@@ -538,17 +538,30 @@ public:
 
     void generate_post_contexts() {
         std::ofstream ofs(SysDict::filedir() + "post-contexts.txt");
+        std::set<string> alloc_files;
         for (auto xpath: _all_paths) {
             CallInstFamily* alloc_caller = xpath->path[0];
             string args = alloc_caller->get_raw_field("args");
             ofs << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << std::endl;
-            //ofs << _counter++ << " " + hotness + " " << alloc << std::endl;
+            //ofs1 << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << " ";
+            bool is_first_line = true;
             for (auto ci: xpath->path) {
                 DILocation* loc = ci->debug_loc();
                 ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
                      << loc->filename() << ':' << loc->line() << std::endl;
+                if (is_first_line) {
+                    //ofs1 << ci->function()->name() << " " << ci->get_position_in_function() << " " << loc->filename() << std::endl;
+                    if (ci->function()->name().find("__gnu_cxx") == string::npos)
+                        alloc_files.insert(loc->filename());
+                    is_first_line = false;
+                }
             }
             ofs << std::endl;
+        }
+        ofs.close();
+        ofs.open(SysDict::filedir() + "ben.log");
+        for (auto f: alloc_files) {
+            ofs << f << std::endl;
         }
         ofs.close();
     }
