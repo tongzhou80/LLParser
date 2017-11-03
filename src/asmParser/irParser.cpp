@@ -113,7 +113,7 @@ string IRParser::match_complex_constant() {
 }
 
 string IRParser::match_constant() {
-    get_lookahead(',');
+    get_lookahead_of(" ,");
     if (_lookahead == "zeroinitializer") {
         jump_ahead();
         return _lookahead;
