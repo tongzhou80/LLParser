@@ -562,7 +562,7 @@ public:
 
         if (_logclone) {
             ofs.open(SysDict::filedir() + "ben.log");
-            for (auto f: alloc_files) {
+            for (auto& f: alloc_files) {
                 ofs << f << std::endl;
             }
             ofs.close();
