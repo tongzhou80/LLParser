@@ -117,7 +117,21 @@ string IRParser::match_constant() {
     if (_lookahead == "zeroinitializer") {
         return "zeroinitializer";
     }
-    else if (_lookahead == "inttoptr") {
+    else if (_lookahead == "inttoptr"
+             || _lookahead == "trunc"
+             || _lookahead == "zext"
+             || _lookahead == "sext"
+             || _lookahead == "fptrunc"
+             || _lookahead == "fpext"
+             || _lookahead == "fptoui"
+             || _lookahead == "fptosi"
+             || _lookahead == "uitofp"
+             || _lookahead == "sitofp"
+             || _lookahead == "ptrtoint"
+             || _lookahead == "inttoptr"
+             || _lookahead == "bitcast"
+             || _lookahead == "addrspacecast"
+            ) {
         jump_ahead();
         return jump_to_end_of_scope();
     }
