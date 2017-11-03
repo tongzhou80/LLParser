@@ -103,7 +103,7 @@ string IRParser::match_simple_constant() {
     }
     else {
         string number = match_number();
-        syntax_check(!number.empty());
+        parser_assert(!number.empty(), "_char: %c", _char);
         return number;
     }
 }
@@ -113,6 +113,15 @@ string IRParser::match_complex_constant() {
 }
 
 string IRParser::match_constant() {
+    get_lookahead();
+    if (_lookahead == "zeroinitializer") {
+        return "zeroinitializer";
+    }
+    else if (_lookahead == "inttoptr") {
+        jump_ahead();
+        return jump_to_end_of_scope();
+    }
+
     if (_char == '{' || _char == '[' || _char == '<') {
         return match_complex_constant();
     }
@@ -165,7 +174,9 @@ string IRParser::match_decnum() {
             ndot++;
         }
         else if (_char == 'e') {
-            match("e+");  // exponential notation
+            inc_intext_pos();
+            syntax_check(_char == '+' || _char == '-'); // exponential notation
+            inc_intext_pos();
         }
         else {
             break;

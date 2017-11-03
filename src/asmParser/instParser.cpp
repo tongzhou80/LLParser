@@ -397,7 +397,7 @@ void InstParser::do_store(Instruction *ins) {
     set_optional_field(ins, "volatile");
 
     string ty = parse_compound_type();
-    zps(ty)
+    //zps(ty)
     get_lookahead();
     if (_lookahead == "getelementptr") {
         jump_ahead();
@@ -416,14 +416,11 @@ void InstParser::do_store(Instruction *ins) {
     }
     else {
         string value = match_value();
-        zps(value)
+        //zps(value)
         di->set_raw_field("value", value);
     }
 
-
-
-    //zps(ins->raw_text())
-    inc_intext_pos(1);
+    inc_intext_pos();
     string ty_p = parse_compound_type();
     if (ty_p != ty + '*') {
         syntax_check(ty_p == ty + '*');

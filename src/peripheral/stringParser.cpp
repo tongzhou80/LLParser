@@ -379,7 +379,7 @@ string StringParser::jump_to_end_of_scope() {
         right = '>';
     }
     else {
-        guarantee(0, "Bad scope start with %c", left);
+        parser_assert(0, "Bad scope start with %c", left);
     }
 
     string text;
