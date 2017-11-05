@@ -209,14 +209,14 @@ public:
                         flang_alloc = true;
                     }
                     if (flang_alloc) {
-                        I->dump();
+                        //I->dump();
                         BitCastInst* bci = dynamic_cast<BitCastInst*>(I->target_inst());
                         guarantee(bci, "");
                         bci->update_raw_field("value", '@' + t->new_name);
                         string ty2 = bci->get_raw_field("ty2");
                         insert_i32_to_type(ty2);
                         bci->update_raw_field("ty2", ty2);
-                        bci->dump();
+                        //bci->dump();
                     }
                     else {
                         I->replace_callee(t->new_name);
@@ -229,7 +229,7 @@ public:
                         string fnty = I->get_raw_field("fnty");
                         insert_i32_to_type(fnty);
                         I->update_raw_field("fnty", fnty);
-                        I->dump();
+                        //I->dump();
                     }
                 }
             }
