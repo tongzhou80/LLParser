@@ -485,7 +485,7 @@ public:
             round++;
         }
 
-        if (_noben) {
+        if (!_noben) {
             lsda->replace_alloc(module);
             lsda->replace_free(module);
             if (_use_indi) {
