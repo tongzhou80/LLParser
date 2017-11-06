@@ -36,6 +36,7 @@ class CallClonePass: public Pass {
     bool _verbose_match;
     bool _verbose_clone;
     bool _use_indi;
+    bool _noben;
 
     /* statistics */
     int _hot_counter;
@@ -69,6 +70,7 @@ public:
         _skip = false;
         _logclone = false;
         _use_indi = true;
+        _noben = false;
         _min_cxt = 1;
         _path_counter = 1;
         _cxt_counter = 0;
@@ -448,6 +450,9 @@ public:
         if (has_argument("indi")) {
             _use_indi = (bool)std::stoi(get_argument("indi"));
         }
+        if(has_argument("noben")) {
+            _noben = true;
+        }
 
         auto lsda = new LSDAPass(_lang);
         lsda->do_initialization();
@@ -480,11 +485,14 @@ public:
             round++;
         }
 
-        lsda->replace_alloc(module);
-        lsda->replace_free(module);
-        if (_use_indi) {
-            lsda->replace_indi(module);
+        if (_noben) {
+            lsda->replace_alloc(module);
+            lsda->replace_free(module);
+            if (_use_indi) {
+                lsda->replace_indi(module);
+            }
         }
+
         generate_post_contexts();
 
 //        replace_alloc();
@@ -500,6 +508,11 @@ public:
                 out += ".clone.ll";
             }
         }
+
+        if (_noben) {
+            Strings::ireplace(out, ".clone", ".expand");
+        }
+
         zpl("callclone2 output to %s", out.c_str())
         SysDict::module()->print_to_file(out);
 
