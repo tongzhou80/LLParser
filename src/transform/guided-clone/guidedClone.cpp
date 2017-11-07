@@ -90,7 +90,7 @@ public:
             callee_m->append_new_function(callee_clone);
             Module* user_m = get_module(user_file);
             //Function* user_f = user_m->get_function(user);
-            Function* user_f = user_m->get_function_by_linkageName(user);
+            Function* user_f = user_m->get_function_by_orig_name(user);
             guarantee(user_f, "Function %s not found", user.c_str());
             auto user_i = dynamic_cast<CallInstFamily*>(user_f->get_instruction(point));
             guarantee(user_i, "");

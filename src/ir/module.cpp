@@ -32,7 +32,7 @@ Function* Module::get_function(string key) {
     }
 }
 
-Function* Module::get_function_by_linkageName(string key) {
+Function* Module::get_function_by_orig_name(string key) {
     // todo: here it assumes an aliasee must be a Function, which seems
     // ok for now but may not always be true
     if (Alias* alias = get_alias(key)) {
@@ -41,8 +41,9 @@ Function* Module::get_function_by_linkageName(string key) {
 
     for (auto F: _function_list) {
         DISubprogram* sp = F->di_subprogram();
+        zps(sp->name())
         guarantee(sp, "Module::get_function_by_linkageName requires DISubprogram debug info");
-        if (sp->linkageName() == key) {
+        if (sp->name() == key) {
             return F;
         }
     }
