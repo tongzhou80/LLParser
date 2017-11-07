@@ -125,6 +125,7 @@ public:
     MetaData* get_debug_info(int i);
 
     Function* get_function(string key);
+    Function* get_function_by_linkageName(string key);
     Function* create_child_function_symbol(string name);
     Function* create_child_function(string name);
 

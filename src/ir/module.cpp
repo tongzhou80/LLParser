@@ -32,6 +32,22 @@ Function* Module::get_function(string key) {
     }
 }
 
+Function* Module::get_function_by_linkageName(string key) {
+    // todo: here it assumes an aliasee must be a Function, which seems
+    // ok for now but may not always be true
+    if (Alias* alias = get_alias(key)) {
+        return dynamic_cast<Function*>(alias->aliasee());
+    }
+
+    for (auto F: _function_list) {
+        DISubprogram* sp = F->di_subprogram();
+        guarantee(sp, "Module::get_function_by_linkageName requires DISubprogram debug info");
+        if (sp->linkageName() == key) {
+            return F;
+        }
+    }
+}
+
 Function* Module::create_child_function_symbol(string name) {
     Function* f = new Function();
     f->set_name(name);
