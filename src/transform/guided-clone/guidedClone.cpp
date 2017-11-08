@@ -90,7 +90,7 @@ public:
             if (!callee_m) {
                 continue;
             }
-            Function* callee_f = callee_m->get_function(callee);
+            Function* callee_f = callee_m->get_function_by_orig_name(callee);
             Function* callee_clone = callee_f->clone();
             _clone_num++;
             callee_m->append_new_function(callee_clone);
