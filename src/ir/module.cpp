@@ -40,11 +40,10 @@ Function* Module::get_function_by_orig_name(string key) {
     }
 
     for (auto F: _function_list) {
-        DISubprogram* sp = F->di_subprogram();
-        zps(sp->name())
-        guarantee(sp, "Module::get_function_by_linkageName requires DISubprogram debug info");
-        if (sp->name() == key) {
-            return F;
+        if (DISubprogram* sp = F->di_subprogram()) { // only consider those that have debug id
+            if (sp->name() == key) {
+                return F;
+            }
         }
     }
 }
@@ -298,15 +297,18 @@ void Module::print_to_stream(FILE *fp) {
 }
 
 void Module::check_after_parse() {
-    if (_function_map.size() != _function_list.size()) {
-        printf("map size: %d, list size: %d\n", _function_map.size(), _function_list.size());
-    }
+    guarantee(_function_map.size() == _function_list.size(),
+              "map size: %d, list size: %d\n", _function_map.size(), _function_list.size());
 
-    auto& m = _function_map;
-    for (auto it = m.begin(); it != m.end(); ++it) {
-        Function* f = it->second;
-        if (!f->is_defined() && !f->is_external()) {
-            printf("unresolved function: %s\n", f->name().c_str());
+    for (auto F: _function_list) {
+//        if (!F->is_defined() && !F->is_external()) {
+//            printf("unresolved function: %s\n", F->name().c_str());
+//        }
+        if (CheckDebugInfo) {
+//            if (F->is_defined()) {
+//                guarantee(F->di_subprogram(), "Function %s does not have debug info", F->name_as_c_str());  // wrong assumption
+//            }
         }
     }
+
 }

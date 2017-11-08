@@ -393,6 +393,10 @@ Function* LLParser::create_function(string &text) {
         func->set_dbg_id(dbg);
     }
 
+    if (CheckDebugInfo && func->is_defined()) {
+        parser_assert(dbg != -1, "should have debug info");
+    }
+
     if (FunctionParsingVerbose) {
         printf("  name: |%s|\n"
                        "  args: |%s|\n",
@@ -741,6 +745,7 @@ Module* LLParser::parse() {
     // DILocation is slightly more complicated, so resolve some data in advance
     // Update: now resolve all types of DIXXX
     module()->resolve_after_parse();
+    module()->check_after_parse();
 
 #ifndef PRODUCTION
     /* perform post check */
