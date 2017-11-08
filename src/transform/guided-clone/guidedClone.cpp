@@ -64,9 +64,12 @@ public:
             if (_load_verbose) {
                 printf("parsed %s\n", m->name_as_c_str());
             }
-            guarantee(m, "");
+            //guarantee(m, "");
         }
-        _lsda->run_on_module(m);
+        if (m) {
+            _lsda->run_on_module(m);
+        }
+
         return m;
     }
 
@@ -89,6 +92,9 @@ public:
             _clone_num++;
             callee_m->append_new_function(callee_clone);
             Module* user_m = get_module(user_file);
+            if (!user_m) {
+                continue;
+            }
             //Function* user_f = user_m->get_function(user);
             Function* user_f = user_m->get_function_by_orig_name(user);
             guarantee(user_f, "Function %s not found", user.c_str());
