@@ -197,6 +197,10 @@ void Function::print_to_stream(std::ostream& os) {
 }
 
 DISubprogram* Function::di_subprogram() {
+    if (dbg_id() < 0) {
+        return NULL;
+    }
+
     if (!_di_subprogram) {
         MetaData* md = module()->get_debug_info(_dbg_id);
         _di_subprogram = dynamic_cast<DISubprogram*>(md);
