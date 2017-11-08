@@ -69,7 +69,7 @@ public:
         _print_cloning = false;
         _skip = false;
         _logclone = false;
-        _use_indi = true;
+        _use_indi = false;
         _noben = false;
         _min_cxt = 1;
         _path_counter = 1;

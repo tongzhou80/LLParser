@@ -31,7 +31,7 @@ public:
         _log_dir = "./";
         _src_dir = "./";
         _lang = "all";
-        _use_indi = true;
+        _use_indi = false;
         _clone_num = 0;
     }
 
@@ -46,8 +46,8 @@ public:
         if (has_argument("lang")) {
             _lang = get_argument("lang");
         }
-        if (has_argument("use_indi")) {
-            _use_indi = (bool)std::stoi(get_argument("use_indi"));
+        if (has_argument("indi")) {
+            _use_indi = (bool)std::stoi(get_argument("indi"));
         }
         _lsda = new LSDAPass(_lang);
         _lsda->do_initialization();
