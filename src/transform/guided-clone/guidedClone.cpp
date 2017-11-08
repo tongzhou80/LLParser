@@ -87,6 +87,9 @@ public:
             Point2D<int> point(use_loc);
 
             Module* callee_m = get_module(callee_file);
+            if (!callee_m) {
+                continue;
+            }
             Function* callee_f = callee_m->get_function(callee);
             Function* callee_clone = callee_f->clone();
             _clone_num++;
