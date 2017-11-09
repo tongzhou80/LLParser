@@ -40,12 +40,13 @@ Function* Module::get_function_by_orig_name(string key) {
     }
 
     for (auto F: _function_list) {
-        if (DISubprogram* sp = F->di_subprogram()) { // only consider those that have debug id
-            if (sp->name() == key) {
+        if (DISubprogram* sp = F->di_subprogram()) { // only consider those that have debug id            
+            if (sp->linkageName() == key) {
                 return F;
             }
         }
     }
+    throw FunctionNotFoundError(key);
 }
 
 Function* Module::create_child_function_symbol(string name) {
