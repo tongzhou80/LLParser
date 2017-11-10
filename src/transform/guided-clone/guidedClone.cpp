@@ -65,9 +65,10 @@ public:
                 printf("parsed %s\n", m->name_as_c_str());
             }
             //guarantee(m, "");
-        }
-        if (m) {
-            _lsda->run_on_module(m);
+
+            if (m) {
+                _lsda->run_on_module(m);
+            }
         }
 
         return m;
