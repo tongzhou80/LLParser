@@ -66,9 +66,9 @@ public:
             }
             //guarantee(m, "");
 
-            if (m) {
-                _lsda->run_on_module(m);
-            }
+//            if (m) {
+//                _lsda->run_on_module(m);
+//            }
         }
 
         return m;
@@ -128,15 +128,14 @@ public:
         std::ifstream ifs(_log_dir+"/ben.log");
         string line;
         while (std::getline(ifs, line)) {
-            
             if (Module* m = get_module(line)) {
+                _lsda->run_on_module(m);
                 _lsda->replace_alloc(m);
                 _lsda->replace_free(m);
                 if (_use_indi) {
                     _lsda->replace_indi(m);
                 }
             }
-            
         }
     }
 };
