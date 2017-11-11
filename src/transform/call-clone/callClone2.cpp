@@ -515,7 +515,7 @@ public:
         }
 
         zpl("callclone2 output to %s", out.c_str())
-        SysDict::module()->print_to_file(out);
+        module->print_to_file(out);
 
         check_all_paths();
         check_unused(module);

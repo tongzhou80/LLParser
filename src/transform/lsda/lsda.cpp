@@ -289,6 +289,20 @@ public:
         insert_lsd(module);
         replace_alloc(module);
         replace_free(module);
+
+        string out = SysArgs::get_option("output");
+        if (out.empty()) {
+            out = SysDict::filename();
+            if (Strings::contains(out, ".ll")) {
+                Strings::ireplace(out, ".ll", ".ben.ll");
+            }
+            else {
+                out += ".ben.ll";
+            }
+        }
+
+        zpl("LSDA output to %s", out.c_str())
+        module->print_to_file(out);
         return true;
     }
 //
