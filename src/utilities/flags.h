@@ -56,6 +56,8 @@
          "")                                                                              \
   develop(bool, CheckDebugInfo, 0,                                                             \
          "")                                                                              \
+  develop(bool, PrintPassArguments, 0,                                                    \
+         "")                                                                              \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG)

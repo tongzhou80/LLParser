@@ -62,6 +62,7 @@ public:
     string get_argument(string key);
     void set_argument(string key, string value)            { _args[key] = value; }
     bool has_argument(string key);
+    void print_arguments();
 
     void set_unloader(pass_unloader v)                     { _unloader = v; }
     void unload();

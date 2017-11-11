@@ -13,11 +13,16 @@
 
 class GuidedClonePass: public Pass {
     std::ofstream _ofs;
+    LSDAPass* _lsda;
+
+    /* command line args */
     string _log_dir;
     string _src_dir;
     string _lang;
     bool _use_indi;
-    LSDAPass* _lsda;
+    bool _noclone;  // only does ben replacement
+    bool _noben;  // only does clone and no replacement
+
 
     /* flags */
     bool _load_verbose;
@@ -32,6 +37,10 @@ public:
         _src_dir = "./";
         _lang = "all";
         _use_indi = false;
+        _noclone = false;
+        _noben = false;
+        _load_verbose = false;
+        _replace_verbose = false;
         _clone_num = 0;
     }
 
@@ -48,6 +57,12 @@ public:
         }
         if (has_argument("indi")) {
             _use_indi = (bool)std::stoi(get_argument("indi"));
+        }
+        if (has_argument("noben")) {
+            _noben = (bool)std::stoi(get_argument("noben"));
+        }
+        if (has_argument("noclone")) {
+            _noclone = (bool)std::stoi(get_argument("noclone"));
         }
         _lsda = new LSDAPass(_lang);
         _lsda->do_initialization();
