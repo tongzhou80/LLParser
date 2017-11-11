@@ -89,8 +89,7 @@ public:
         return m;
     }
 
-    bool run_on_global() override {
-        init();
+    void do_clone() {
         std::ifstream ifs(_log_dir+"/clone.log");
         string line;
         while (std::getline(ifs, line)) {
@@ -129,8 +128,18 @@ public:
                 printf("replaced %s\n", callee_clone->name_as_c_str());
             }
         }
+    }
 
-        use_ben_malloc();
+    bool run_on_global() override {
+        init();
+
+        if (!_noclone) {
+            do_clone();
+        }
+
+        if (!_noben) {
+            use_ben_malloc();
+        }
 
         for (auto it: SysDict::module_table()) {
             Module* m = it.second;
