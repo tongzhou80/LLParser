@@ -458,7 +458,7 @@ public:
         lsda->do_initialization();
         zpd(_use_indi)
         lsda->set_use_indi(_use_indi);
-        lsda->run_on_module(module);
+        lsda->insert_lsd(module);
         _alloc_set = lsda->alloc_set();
         _free_set = lsda->free_set();
 

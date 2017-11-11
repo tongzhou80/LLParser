@@ -129,7 +129,7 @@ public:
         string line;
         while (std::getline(ifs, line)) {
             if (Module* m = get_module(line)) {
-                _lsda->run_on_module(m);
+                _lsda->insert_lsd(m);
                 _lsda->replace_alloc(m);
                 _lsda->replace_free(m);
                 if (_use_indi) {

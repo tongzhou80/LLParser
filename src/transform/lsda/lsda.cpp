@@ -287,6 +287,9 @@ public:
 
     bool run_on_module(Module* module) override {
         insert_lsd(module);
+        replace_alloc(module);
+        replace_free(module);
+        return true;
     }
 //
 //    void replace_free() {
