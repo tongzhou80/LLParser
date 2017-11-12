@@ -44,9 +44,9 @@ public:
     bool insert_instruction_before(Instruction* old, Instruction* neu);
     bool insert_instruction_after(Instruction* old, Instruction* neu);
     bool insert_instruction_after(Instruction* old, InstList& neus);
+    void resolve_callinsts();
 
     void replace(iterator iter, Instruction* neu);
-
     void replace(Instruction* old, Instruction* neu);
 
     int get_instruction_index(Instruction* inst);

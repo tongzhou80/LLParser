@@ -172,14 +172,15 @@ void Module::resolve_debug_info() {
 void Module::resolve_callinsts() {
     for (auto F: function_list()) {
         for (auto B: F->basic_block_list()) {
-            for (auto I: B->callinst_list()) {
-                if (I->is_indirect_call()) {
-                    I->try_resolve_indirect_call();
-                }
-                else {
-                    I->resolve_direct_call();
-                }
-            }
+            B->resolve_callinsts();
+//            for (auto I: B->callinst_list()) {
+//                if (I->is_indirect_call()) {
+//                    I->try_resolve_indirect_call();
+//                }
+//                else {
+//                    I->resolve_direct_call();
+//                }
+//            }
         }
     }
 }

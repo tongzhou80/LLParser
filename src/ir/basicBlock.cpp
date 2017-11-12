@@ -44,6 +44,17 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
     }
 }
 
+void BasicBlock::resolve_callinsts() {
+    for (auto I: callinst_list()) {
+        if (I->is_indirect_call()) {
+            I->try_resolve_indirect_call();
+        }
+        else {
+            I->resolve_direct_call();
+        }
+    }
+}
+
 void BasicBlock::check_insertion_side_effects_on_module(Instruction* ins) {
     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
         Function* callee = ci->called_function();
