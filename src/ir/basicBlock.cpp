@@ -196,6 +196,10 @@ BasicBlock* BasicBlock::clone() {
     BasicBlock* bb = new BasicBlock(*this);
     bb->callinst_list().clear();
     for (auto it = bb->begin(); it != bb->end(); ++it) {
+        Instruction* old = *it;
+        if (old->raw_text().find("%89 = call i64 (i8*, i8*, ...) %88(i8* %86, i8* %87), !dbg !1777") != string::npos) {
+            zpl("gocha");
+        }
         Instruction* neu = (*it)->clone();
         *it = neu;
         neu->set_parent(bb);
@@ -206,6 +210,7 @@ BasicBlock* BasicBlock::clone() {
             if (ci->is_indirect_call()) {
                 ci->try_resolve_indirect_call();
             }
+            zpl("ss")
         }
     }
 
