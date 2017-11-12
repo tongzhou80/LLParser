@@ -81,7 +81,7 @@ Instruction* Instruction::clone() {
             i = new BitCastInst(*dynamic_cast<BitCastInst*>(this));
             break;
         default:
-            guarantee(0, "sanity");
+            i = new Instruction(*this);
     }
     i->set_parent(NULL);
     return i;
