@@ -23,7 +23,7 @@ void CallInst::init_raw_field() {
 }
 
 Instruction* CallInst::clone() {
-    CallInst* ci = new CallInst(*this);
+    auto ci = new CallInst(*this);
     ci->set_parent(NULL);
     return ci;
 }
