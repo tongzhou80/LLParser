@@ -198,12 +198,15 @@ BasicBlock* BasicBlock::clone() {
     for (auto it = bb->begin(); it != bb->end(); ++it) {
         Instruction* neu = (*it)->clone();
         *it = neu;
+        neu->set_parent(bb);
 
         /* if instruction is CallInst, it changes the call graph upon insertion */
         if (auto ci = dynamic_cast<CallInstFamily*>(neu)) {
             bb->callinst_list().push_back(ci);
+            if (ci->is_indirect_call()) {
+                ci->try_resolve_indirect_call();
+            }
         }
-        neu->set_parent(bb);
     }
 
     return bb;
