@@ -209,14 +209,12 @@ public:
                         flang_alloc = true;
                     }
                     if (flang_alloc) {
-                        zpl("before: %s", I->raw_c_str())
                         BitCastInst* bci = dynamic_cast<BitCastInst*>(I->target_inst());
                         guarantee(bci, "");
                         bci->update_raw_field("value", "@" + t->new_name);
                         string ty2 = bci->get_raw_field("ty2");
                         insert_i32_to_type(ty2);
                         bci->update_raw_field("ty2", ty2);
-                        zpl("after: %s", I->raw_c_str())
                     }
                     else {
                         I->replace_callee(t->new_name);

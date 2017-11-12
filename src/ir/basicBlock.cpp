@@ -35,8 +35,10 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
         _callinst_list.push_back(ci);
     }
 
-    /* side effects, check current module first */
-    /* during parsing, this block's parent won't be inserted until the function body is parsed */
+    /* side effects, such as the callee has one more caller
+     * is the module is not yet fully resolved, the callee symbol
+     * may not be resolvable
+     */
     if (module()->is_fully_resolved()) {
         check_insertion_side_effects_on_module(ins);
     }
