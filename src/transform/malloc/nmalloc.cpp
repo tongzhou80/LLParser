@@ -200,7 +200,7 @@ public:
 
 
         if (ci->is_indirect_call()) {
-            Instruction* tarins = ci->target_inst();
+            Instruction* tarins = ci->chain_inst();
             BitCastInst* bci = dynamic_cast<BitCastInst*>(tarins);
             if (bci && modify_bitcast(bci, new_callee, add_id)) {
                 string new_args;

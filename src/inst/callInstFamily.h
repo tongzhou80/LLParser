@@ -16,7 +16,7 @@ protected:
     /* for indirect calls */
     string _called_label;
     Function* _called;
-    Instruction* _target_inst;  // the reference for indirect call's target
+    Instruction* _chain_inst;  // the reference for indirect call's target
 public:
     CallInstFamily();
 
@@ -56,12 +56,12 @@ public:
         CallInstFamily::_called_label = _called_label;
     }
 
-    Instruction *target_inst() const {
-        return _target_inst;
+    Instruction *chain_inst() const {
+        return _chain_inst;
     }
 
-    void set_target_inst(Instruction *_target_inst) {
-        CallInstFamily::_target_inst = _target_inst;
+    void set_chain_inst(Instruction *_chain_inst) {
+        CallInstFamily::_chain_inst = _chain_inst;
     }
 
     void replace_callee(string callee);

@@ -19,8 +19,10 @@ void BasicBlock::append_instruction(Instruction *ins) {
 }
 
 /**@brief This function will be called both during parsing and during executing passes.
- * The difference is that at parsing time, the current module's is_full_resolved is not
- * set while this flag will be set after parsing and resolving is done.
+ *
+ * This function will try to resolve indirect call chains, but won't resolve callees.
+ * A callee is only resolved after the parsing, or at the point when a new function
+ * after the module is fully parsed.
  *
  * @param pos
  * @param ins
@@ -33,14 +35,14 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
 
     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
         _callinst_list.push_back(ci);
-    }
-
-    /* side effects, such as the callee has one more caller
-     * is the module is not yet fully resolved, the callee symbol
-     * may not be resolvable
-     */
-    if (module()->is_fully_resolved()) {
-        check_insertion_side_effects_on_module(ins);
+        if (ci->is_indirect_call()) {
+            Instruction* prev_ins = _instruction_list[_instruction_list.size()-2];
+            //if (BitCastInst* bci = dynamic_cast<BitCastInst*>(prev_ins)) {
+            if (prev_ins->name() == '%' + ci->called_label()) {
+                ci->set_chain_inst(prev_ins);
+            }
+            //}
+        }
     }
 }
 
@@ -195,24 +197,24 @@ BasicBlock* BasicBlock::clone() {
     // callinst_list and inst_list need deep copy
     BasicBlock* bb = new BasicBlock(*this);
     bb->callinst_list().clear();
-    for (auto it = bb->begin(); it != bb->end(); ++it) {
-        Instruction* old = *it;
-        if (old->raw_text().find("%89 = call i64 (i8*, i8*, ...) %88(i8* %86, i8* %87), !dbg !1777") != string::npos) {
-            zpl("gocha");
-        }
-        Instruction* neu = (*it)->clone();
-        *it = neu;
-        neu->set_parent(bb);
-
-        /* if instruction is CallInst, it changes the call graph upon insertion */
-        if (auto ci = dynamic_cast<CallInstFamily*>(neu)) {
-            bb->callinst_list().push_back(ci);
-            if (ci->is_indirect_call()) {
-                ci->try_resolve_indirect_call();
-            }
-            zpl("ss")
-        }
+    bb->instruction_list().clear();
+    for (auto I: instruction_list()) {
+        bb->append_instruction(I->clone());
     }
+//    for (auto it = bb->begin(); it != bb->end(); ++it) {
+//        Instruction* old = *it;
+//        if (old->raw_text().find("%89 = call i64 (i8*, i8*, ...) %88(i8* %86, i8* %87), !dbg !1777") != string::npos) {
+//            zpl("gocha");
+//        }
+//        Instruction* neu = (*it)->clone();
+//        *it = neu;
+//        neu->set_parent(bb);
+//
+//        /* if instruction is CallInst, it changes the call graph upon insertion */
+//        if (auto ci = dynamic_cast<CallInstFamily*>(neu)) {
+//            bb->callinst_list().push_back(ci);
+//        }
+//    }
 
     return bb;
 }

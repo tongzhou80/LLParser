@@ -209,7 +209,7 @@ public:
                         flang_alloc = true;
                     }
                     if (flang_alloc) {
-                        BitCastInst* bci = dynamic_cast<BitCastInst*>(I->target_inst());
+                        BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
                         guarantee(bci, "");
                         bci->update_raw_field("value", "@" + t->new_name);
                         string ty2 = bci->get_raw_field("ty2");

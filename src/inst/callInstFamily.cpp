@@ -14,7 +14,7 @@ CallInstFamily::CallInstFamily() {
     _is_varargs = false;
     _has_bitcast = false;
     _called = NULL;
-    _target_inst = NULL;
+    _chain_inst = NULL;
 }
 
 void CallInstFamily::init_raw_field() {
@@ -101,23 +101,31 @@ void CallInstFamily::resolve_callee_symbol(string fn_name) {
  */
 void CallInstFamily::try_resolve_indirect_call() {
     guarantee(parent() != NULL, "Parent must not be NULL when resolving indirect calls");
+//
+//    for (auto rit = parent()->end(); rit != parent()->begin();) {
+//        --rit;
+//        Instruction* I = *rit;
+//        //zpl("name: |%s|   label: |%s|", I->name().c_str(), ('%'+called_label()).c_str());
+//        if (I->name() == '%' + called_label()) {
+//            set_chain_inst(I);
+//
+//            if (BitCastInst* bi = dynamic_cast<BitCastInst*>(I)) {
+//                string value = bi->get_raw_field("value");
+//                if (value[0] == '@') {
+//                    //zpl("resolved indirect call target to %s (%s)", value.c_str(), raw_c_str());
+//                    resolve_callee_symbol(&value[1]);
+//                }
+//            }
+//            //zpl("got call %s", raw_c_str());
+//            //zpl("got target %s", I->raw_c_str())
+//        }
+//    }
 
-    for (auto rit = parent()->end(); rit != parent()->begin();) {
-        --rit;
-        Instruction* I = *rit;
-        //zpl("name: |%s|   label: |%s|", I->name().c_str(), ('%'+called_label()).c_str());
-        if (I->name() == '%' + called_label()) {
-            set_target_inst(I);
-
-            if (BitCastInst* bi = dynamic_cast<BitCastInst*>(I)) {
-                string value = bi->get_raw_field("value");
-                if (value[0] == '@') {
-                    //zpl("resolved indirect call target to %s (%s)", value.c_str(), raw_c_str());
-                    resolve_callee_symbol(&value[1]);
-                }
-            }
-            //zpl("got call %s", raw_c_str());
-            //zpl("got target %s", I->raw_c_str())
+    if (BitCastInst* bi = dynamic_cast<BitCastInst*>(chain_inst())) {
+        string value = bi->get_raw_field("value");
+        if (value[0] == '@') {
+            //zpl("resolved indirect call target to %s (%s)", value.c_str(), raw_c_str());
+            resolve_callee_symbol(&value[1]);
         }
     }
 }
