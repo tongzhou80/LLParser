@@ -5,6 +5,7 @@
 #include <asmParser/sysDict.h>
 #include <asmParser/instParser.h>
 #include "irEssential.h"
+#include <inst/instEssential.h>
 #include <di/diEssential.h>
 
 Instruction::Instruction(): Value() {
@@ -56,7 +57,32 @@ DILocation* Instruction::debug_loc() {
 }
 
 Instruction* Instruction::clone() {
-    Instruction* i = new Instruction(*this);
+    Instruction* i;
+    switch (type()) {
+        case Instruction::AllocaInstType:
+            i = new AllocaInst(*dynamic_cast<AllocaInst*>(this));
+            break;
+        case Instruction::BranchInstType:
+            i = new BranchInst(*dynamic_cast<BranchInst*>(this));
+            break;
+        case Instruction::CallInstType:
+            i = new CallInst(*dynamic_cast<CallInst*>(this));
+            break;
+        case Instruction::InvokeInstType:
+            i = new InvokeInst(*dynamic_cast<InvokeInst*>(this));
+            break;
+        case Instruction::LoadInstType:
+            i = new LoadInst(*dynamic_cast<LoadInst*>(this));
+            break;
+        case Instruction::StoreInstType:
+            i = new StoreInst(*dynamic_cast<StoreInst*>(this));
+            break;
+        case Instruction::BitCastInstType:
+            i = new BitCastInst(*dynamic_cast<BitCastInst*>(this));
+            break;
+        default:
+            guarantee(0, "sanity");
+    }
     i->set_parent(NULL);
     return i;
 }

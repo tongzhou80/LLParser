@@ -21,10 +21,10 @@ void CallInst::init_raw_field() {
 //    set_raw_field("tail", "");
 //    set_raw_field("fast-math", "");
 }
-
-Instruction* CallInst::clone() {
-    auto ci = new CallInst(*this);
-    ci->set_parent(NULL);
-    return ci;
-}
+//
+//Instruction* CallInst::clone() {
+//    auto ci = new CallInst(*this);
+//    ci->set_parent(NULL);
+//    return ci;
+//}
 

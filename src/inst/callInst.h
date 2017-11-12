@@ -22,8 +22,6 @@ public:
      *
      * @return
      */
-    Instruction* clone();
-
     static void parse(Instruction* inst);
 };
 
