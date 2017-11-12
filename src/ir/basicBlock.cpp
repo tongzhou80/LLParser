@@ -35,7 +35,7 @@ void BasicBlock::insert_instruction(int pos, Instruction *ins) {
 
     if (CallInstFamily* ci = dynamic_cast<CallInstFamily*>(ins)) {
         _callinst_list.push_back(ci);
-        if (ci->is_indirect_call()) {
+        if (ci->is_indirect_call() && instruction_list().size() > 2) {
             Instruction* prev_ins = _instruction_list[_instruction_list.size()-2];
             //if (BitCastInst* bci = dynamic_cast<BitCastInst*>(prev_ins)) {
             if (prev_ins->name() == '%' + ci->called_label()) {
