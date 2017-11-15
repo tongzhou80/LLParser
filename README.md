@@ -172,6 +172,6 @@ module, synchronization will be minimized.
 While LLVM's `opt` only accepts one input file, `sopt` accepts multiple input files and will do the
 parsing/analyzing/transforming in parallel if `-XX:+ParallelModule` is on.
 Flag `-XX:+ParallelModule` is totally transparent, that is, just turning this on makes your pass run faster
-without any additional work.
+without any additional work, if you have multiple files as input.
 
 To add `-XX:+UseSplitModule` doc.
