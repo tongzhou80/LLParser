@@ -240,7 +240,7 @@ public:
     }
 
     void replace_free(Module* module) {
-        string suffixes[3] = {" ", ",", ")"};
+        string suffixes[4] = {" ", ",", ")", "("};
         for (auto F: module->function_list()) {
             for (auto B: F->basic_block_list()) {
                 for (auto I: B->instruction_list()) {
