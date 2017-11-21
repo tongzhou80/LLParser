@@ -366,7 +366,9 @@ void InstParser::do_load(Instruction *inst) {
     else if (_word == "bitcast") {
         BitCastInst* bci = new BitCastInst();
         do_bitcast(bci, true);
-        li->set_raw_field("pointer", bci->get_raw_field("value"));
+        //li->set_raw_field("pointer", bci->get_raw_field("value"));
+        li->set_raw_field("pointer", bci->raw_text());
+        li->set_raw_field("final-pointer", bci->get_raw_field("value"));
         syntax_check(bci->get_raw_field("ty2") == ty_p);
         match(',');
     }
@@ -410,7 +412,9 @@ void InstParser::do_store(Instruction *ins) {
         jump_ahead();
         auto bci = new BitCastInst();
         do_bitcast(bci, true);
-        di->set_raw_field("value", bci->get_raw_field("value"));
+        //di->set_raw_field("value", bci->get_raw_field("value"));
+        di->set_raw_field("value", bci->raw_text());
+        di->set_raw_field("final-value", bci->get_raw_field("value"));
         syntax_check(bci->get_raw_field("ty2") == ty);
         match(',');
     }
@@ -440,7 +444,9 @@ void InstParser::do_store(Instruction *ins) {
     else if (_word == "bitcast") {
         BitCastInst* bci = new BitCastInst();
         do_bitcast(bci, true);
-        di->set_raw_field("pointer", bci->get_raw_field("value"));
+        //di->set_raw_field("pointer", bci->get_raw_field("value"));
+        di->set_raw_field("pointer", bci->raw_text());
+        di->set_raw_field("final-pointer", bci->get_raw_field("value"));
         syntax_check(bci->get_raw_field("ty2") == ty_p);
         match(',');
     }
@@ -512,7 +518,9 @@ void InstParser::do_bitcast(Instruction *inst, bool is_embedded) {
     if (_word == "bitcast") {
         BitCastInst* embedded_bci = new BitCastInst();
         do_bitcast(embedded_bci, true);
-        I->set_raw_field("value", embedded_bci->get_raw_field("value"));
+        //I->set_raw_field("value", embedded_bci->get_raw_field("value"));
+        I->set_raw_field("value", embedded_bci->raw_text());
+        I->set_raw_field("final-value", embedded_bci->get_raw_field("value"));
         syntax_check(old_ty == embedded_bci->get_raw_field("ty2"));
     }
     else if (_word == "getelementptr") {
