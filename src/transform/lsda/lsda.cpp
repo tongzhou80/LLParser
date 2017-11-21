@@ -241,7 +241,7 @@ public:
                     /* print call site */
                     if (_print_callsites) {
                         DILocation* loc = I->debug_loc();
-                        _site_printer << id << " 0x0 " << t->new_name << std::endl;
+                        _site_printer << id << " 1 " << t->new_name << std::endl;
                         _site_printer << "(" << I->function()->name() << "+" << I->get_position_in_function() << ")"
                                       << " " << loc->filename() << ":" << loc->line() << "\n" << std::endl;
                     }
