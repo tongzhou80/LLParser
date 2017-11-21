@@ -35,8 +35,10 @@ class LSDAPass: public Pass {
     int _apid;
     bool _use_indi;
     bool _print_stats;
+    bool _print_callsites;
     int _new_allocs;
     int _new_frees;
+    std::ofstream _site_printer;
 public:
     LSDAPass() {
         set_is_module_pass();
@@ -56,8 +58,13 @@ public:
         _use_indi = false;
         _apid = 1;
         _print_stats = true;
+        _print_callsites = true;
         _new_allocs = 0;
         _new_frees = 0;
+
+        if (_print_callsites) {
+            _site_printer.open("call-sites.txt");
+        }
     }
 
     const std::vector<MFunc *> &alloc_set() const {
@@ -220,7 +227,8 @@ public:
                         I->replace_callee(t->new_name);
                     }
 
-                    string new_args = "i32 " + std::to_string(_apid++) + ", " + I->get_raw_field("args");
+                    int id = _apid++;
+                    string new_args = "i32 " + std::to_string(id) + ", " + I->get_raw_field("args");
                     I->replace_args(new_args);
 
                     if (flang_alloc) {
@@ -228,6 +236,14 @@ public:
                         insert_i32_to_type(fnty);
                         I->update_raw_field("fnty", fnty);
                         //I->dump();
+                    }
+
+                    /* print call site */
+                    if (_print_callsites) {
+                        DILocation* loc = I->debug_loc();
+                        _site_printer << id << " 0x0 " << t->new_name << std::endl;
+                        _site_printer << "(" << I->function()->name() << "+" << I->get_position_in_function() << ")"
+                                      << " " << loc->filename() << ":" << loc->line() << "\n" << std::endl;
                     }
                 }
             }

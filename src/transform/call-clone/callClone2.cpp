@@ -553,6 +553,7 @@ public:
     void generate_post_contexts() {
         std::ofstream ofs(SysDict::filedir() + "post-contexts.txt");
         std::set<string> alloc_files;
+        printf("call site num: %d\n", _all_paths.size());
         for (auto xpath: _all_paths) {
             CallInstFamily* alloc_caller = xpath->path[0];
             string args = alloc_caller->get_raw_field("args");
@@ -565,8 +566,10 @@ public:
                      << loc->filename() << ':' << loc->line() << std::endl;
                 if (is_first_line) {
                     //ofs1 << ci->function()->name() << " " << ci->get_position_in_function() << " " << loc->filename() << std::endl;
-                    if (ci->function()->name().find("__gnu_cxx") == string::npos)
+                    if (ci->function()->name().find("__gnu_cxx") == string::npos) {
                         alloc_files.insert(loc->filename());
+                    }
+
                     is_first_line = false;
                 }
             }
