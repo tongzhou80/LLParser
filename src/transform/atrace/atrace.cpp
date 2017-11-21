@@ -13,29 +13,27 @@
 #include <asmParser/irBuilder.h>
 #include <peripheral/sysArgs.h>
 
-class ATracePass: public Pass {
+class AtracePass: public Pass {
     bool PrintCloning;
     bool TracingVerbose;
     std::set<string> _black;
     int _cast_cnt = 0;
     std::ofstream _ofs;
 public:
-    ATracePass() {
+    AtracePass() {
         set_is_basic_block_pass();
     }
 
     // Declare but not implement the destructor causes a ATrace symbol not found error in dlopen
 
-    bool do_initialization(Module* M) {
-
+    bool do_initialization(Module* M) override {
+        string text = "declare void @xps_record_load(i8*)";
+        Function* newfunc = IRBuilder::create_function_declaration(text);
+        M->append_new_function(newfunc);
     }
 
     bool do_finalization(Module* M) {
-        string out = SysDict::filename();
-        if (out.empty()) {
-            out = "new";
-        }
-        out += ".atrace";
+        string out = Strings::replace(SysDict::filename(), ".ll", ".atrace.ll");
         if (SysArgs::has_property("output")) {
             out = SysArgs::get_property("output");
         }
@@ -44,7 +42,7 @@ public:
     }
 
     bool run_on_basic_block(BasicBlock* bb) {
-        if (bb->parent()->name() == "record_load") {
+        if (bb->parent()->name() == "xps_record_load") {
             return false;
         }
 
@@ -60,11 +58,11 @@ public:
                 zpl("got %s, %s", I->raw_c_str(), li->pointer_type_str().c_str());
                 string addr = li->get_raw_field("pointer");
 
-                string casted_addr = "%__tz_casted" + std::to_string(_cast_cnt++);
+                string casted_addr = "%tz_casted_addr" + std::to_string(_cast_cnt++);
                 string cast_inst_text = "  " +  casted_addr + " = bitcast " + li->pointer_type_str() + " " + addr + " to i8*";
                 Instruction* cast_inst = IRBuilder::create_instruction(cast_inst_text);
 
-                string call_inst_text = "  call void @record_load(i8* " + casted_addr + ")";
+                string call_inst_text = "  call void @xps_record_load(i8* " + casted_addr + ")";
                 Instruction* call_inst = IRBuilder::create_instruction(call_inst_text);
 
                 BasicBlock::InstList ls = {cast_inst, call_inst};
@@ -93,4 +91,4 @@ public:
     //bool do_finalization(Module* module);
 };
 
-REGISTER_PASS(ATracePass)
+REGISTER_PASS(AtracePass)

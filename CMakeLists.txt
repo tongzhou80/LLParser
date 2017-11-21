@@ -31,7 +31,7 @@ add_library(CallClone SHARED src/transform/call-clone/callClone2.cpp src/transfo
 add_library(LSDA SHARED src/transform/lsda/lsda.cpp)
 add_library(GuidedClone SHARED src/transform/guided-clone/guidedClone.cpp)
 add_library(Callgraph SHARED src/transform/call-graph/callGraph.cpp)
-add_library(ATrace SHARED src/transform/atrace/atrace.cpp)
+add_library(Atrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
 add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
@@ -48,7 +48,7 @@ install(TARGETS
         GuidedClone
         LSDA
         Callgraph
-        ATrace
+        Atrace
         HotCallClone
         NewClone
         RawReplaceCall
