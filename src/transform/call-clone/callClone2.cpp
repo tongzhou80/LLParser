@@ -14,7 +14,7 @@
 #include <inst/instEssential.h>
 #include <asmParser/irBuilder.h>
 #include <passes/passManager.h>
-#include <transform/lsda/lsda.cpp>
+#include <transform/ben-alloc/benAlloc.cpp>
 
 #include "contextGenerator.h"
 
@@ -454,7 +454,7 @@ public:
             _noben = true;
         }
 
-        auto lsda = new LSDAPass(_lang);
+        auto lsda = new BenAllocPass(_lang);
         lsda->do_initialization();
         zpd(_use_indi)
         lsda->set_use_indi(_use_indi);

@@ -9,11 +9,11 @@
 #include <asmParser/llParser.h>
 #include <di/diSubprogram.h>
 #include <utilities/strings.h>
-#include <transform/lsda/lsda.cpp>
+#include <transform/ben-alloc/benAlloc.cpp>
 
 class GuidedClonePass: public Pass {
     std::ofstream _ofs;
-    LSDAPass* _lsda;
+    BenAllocPass* _lsda;
 
     /* command line args */
     string _log_dir;
@@ -64,7 +64,7 @@ public:
         if (has_argument("noclone")) {
             _noclone = (bool)std::stoi(get_argument("noclone"));
         }
-        _lsda = new LSDAPass(_lang);
+        _lsda = new BenAllocPass(_lang);
         _lsda->do_initialization();
         _lsda->set_use_indi(_use_indi);
     }
