@@ -67,7 +67,9 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
                 }
             }
         }
+        
         _paths = new_paths;
+        
     }
 
     zpl("done with %s", alloc.c_str())
