@@ -28,7 +28,7 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
     if (!alloc_f) {
         return std::vector<XPath*>();
     }
-    
+
     for (auto ci: alloc_f->caller_list()) {
         XPath* path = new XPath;
         path->hotness = 0;
@@ -66,10 +66,12 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
                     new_paths.push_back(nxp);
                 }
             }
+            delete xpath;
         }
         
+        _paths.clear();
         _paths = new_paths;
-        
+        zpl("context generation one round done")
     }
 
     zpl("done with %s", alloc.c_str())
