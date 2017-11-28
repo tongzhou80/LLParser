@@ -121,7 +121,7 @@ public:
 
             /* need to insert declaration if inter-procedural */
             if (user_m != callee_m) {
-                _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name());
+                _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name(), false);
             }
             user_i->replace_callee(callee_clone->name());
             if (_replace_verbose) {
