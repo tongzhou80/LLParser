@@ -471,11 +471,15 @@ public:
             //load_hot_aps_file(SysDict::filedir() + "contexts.txt");
             generate(module, nlevel);
         }
+
+        zpd(_all_paths.size())
 //
         get_distinct_all_paths();
         check_all_paths();
 
 
+        zpd(_all_paths.size())
+            exit(0);
         int round = 0;
         while (!_done) {
             scan();
@@ -484,6 +488,7 @@ public:
             }
 
             round++;
+            zpl("round: %d", round);
         }
 
         if (!_noben) {
@@ -494,7 +499,9 @@ public:
             }
         }
 
+        zpl("to generate post")
         generate_post_contexts();
+        zpl("done generating post")
 
 //        replace_alloc();
 //        replace_free();
@@ -551,39 +558,37 @@ public:
     }
 
     void generate_post_contexts() {
-        std::ofstream ofs(SysDict::filedir() + "post-contexts.txt");
+        std::ofstream ctx_log(SysDict::filedir() + "post-contexts.txt");
+        std::ofstream ben_log(SysDict::filedir() + "ben.log");
         std::set<string> alloc_files;
         printf("call site num: %d\n", _all_paths.size());
         for (auto xpath: _all_paths) {
             CallInstFamily* alloc_caller = xpath->path[0];
             string args = alloc_caller->get_raw_field("args");
-            ofs << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << std::endl;
+            ctx_log << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << std::endl;
             //ofs1 << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << " ";
             bool is_first_line = true;
             for (auto ci: xpath->path) {
                 DILocation* loc = ci->debug_loc();
-                ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
+                ctx_log << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
                      << loc->filename() << ':' << loc->line() << std::endl;
+
+                /* Also record what files have allocations */
                 if (is_first_line) {
                     //ofs1 << ci->function()->name() << " " << ci->get_position_in_function() << " " << loc->filename() << std::endl;
                     if (ci->function()->name().find("__gnu_cxx") == string::npos) {
-                        alloc_files.insert(loc->filename());
+                        //alloc_files.insert(loc->filename());
+                        ben_log << loc->filename() << std::endl;
                     }
 
                     is_first_line = false;
                 }
             }
-            ofs << std::endl;
+            ctx_log << std::endl;
         }
-        ofs.close();
-
-        if (_logclone) {
-            ofs.open(SysDict::filedir() + "ben.log");
-            for (auto& f: alloc_files) {
-                ofs << f << std::endl;
-            }
-            ofs.close();
-        }
+        
+        ctx_log.close();
+        ben_log.close();
     }
 
     void replace_alloc() {

@@ -29,12 +29,25 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
         return std::vector<XPath*>();
     }
 
+    int skip_cnt = 0;
     for (auto ci: alloc_f->caller_list()) {
+        /* A special handler for wrf, with disabling this problematic function,
+         * 1. there're over 2M contexts which cause memory usage issue
+         * 2. the generated new IR is uncompilable for whatever reason
+         */
+        if (ci->function()->name() == "module_configure_in_use_for_config_") {
+            //printf("skipped module_configure_in_use_for_config_\n");
+            skip_cnt++;
+            continue;
+        }
+        
         XPath* path = new XPath;
         path->hotness = 0;
         path->path.push_back(ci);
         _paths.push_back(path);
     }
+
+    printf("skipped: %d\n", skip_cnt);
 
     zpl("to get all paths of %d layers of %s call chain", nlevel, alloc.c_str())
 
@@ -66,7 +79,7 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
                     new_paths.push_back(nxp);
                 }
             }
-            delete xpath;
+            //delete xpath;
         }
         
         _paths.clear();
@@ -86,12 +99,18 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
         }
         _ofs << _counter++ << " " + hotness + " " << alloc << std::endl;
         for (auto ci: xpath->path) {
+            guarantee(ci, "");
             DILocation* loc = ci->debug_loc();
+            if (!loc) {
+                std::cerr << "No DILocation found for:" << ci->raw_text() << std::endl;
+                exit(-1);
+            }
             _ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
                 << loc->filename() << ':' << loc->line() << std::endl;
         }
         _ofs << std::endl;
     }
+
     return _paths;
 }
 
