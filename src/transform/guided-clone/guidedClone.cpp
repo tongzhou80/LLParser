@@ -136,9 +136,11 @@ public:
         if (!_noclone) {
             do_clone();
         }
+        printf("clone done\n");
 
         if (!_noben) {
             use_ben_malloc();
+            printf("ben-alloc done\n");
         }
 
         for (auto it: SysDict::module_table()) {
@@ -151,14 +153,20 @@ public:
     void use_ben_malloc() {
         std::ifstream ifs(_log_dir+"/ben.log");
         string line;
+        Module* last = NULL;
         while (std::getline(ifs, line)) {
             if (Module* m = get_module(line)) {
+                if (m == last) {
+                    continue;
+                }
+                
                 _lsda->insert_lsd(m);
                 _lsda->replace_alloc(m);
                 _lsda->replace_free(m);
                 if (_use_indi) {
                     _lsda->replace_indi(m);
                 }
+                last = m;
             }
         }
     }

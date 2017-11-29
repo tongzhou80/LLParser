@@ -472,14 +472,11 @@ public:
             generate(module, nlevel);
         }
 
-        zpd(_all_paths.size())
-//
+
         get_distinct_all_paths();
         check_all_paths();
 
-
-        zpd(_all_paths.size())
-            exit(0);
+       
         int round = 0;
         while (!_done) {
             scan();
