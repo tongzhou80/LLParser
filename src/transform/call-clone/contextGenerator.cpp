@@ -35,11 +35,10 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
          * 1. there're over 2M contexts which cause memory usage issue
          * 2. the generated new IR is uncompilable for whatever reason
          */
-        if (ci->function()->name() == "module_configure_in_use_for_config_") {
-            //printf("skipped module_configure_in_use_for_config_\n");
-            skip_cnt++;
-            continue;
-        }
+        // if (ci->function()->name() == "module_configure_in_use_for_config_") {
+        //     skip_cnt++;
+        //     continue;
+        // }
         
         XPath* path = new XPath;
         path->hotness = 0;
@@ -66,7 +65,8 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
 //                }
 //            }
 
-            if (tos->function()->caller_list().empty()) {
+            if (tos->function()->caller_list().empty()
+                || tos->function()->name() == "module_configure_in_use_for_config_") {
                 new_paths.push_back(xpath);
                 zpl("reached top: %s", tos->function()->name_as_c_str());
             }
