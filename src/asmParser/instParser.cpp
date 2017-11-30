@@ -100,7 +100,11 @@ Instruction* InstParser::create_instruction(string &text) {
     }
     inst->set_raw_text(text);
 
-    if (inst->type() != Instruction::UnknownInstType) {
+    if (inst->type() != Instruction::UnknownInstType
+        && inst->type() != Instruction::BranchInstType
+        && inst->type() != Instruction::LoadInstType
+        && inst->type() != Instruction::StoreInstType
+        ) {
         parse(inst);
         //(this->*parse_routine)(inst);
         parse_metadata(inst);
@@ -117,7 +121,7 @@ void InstParser::parse(Instruction *inst) {
             break;
         }
         case Instruction::BranchInstType: {
-            do_branch(inst);
+            do_branch(inst);  // have an issue with omnetpp
             break;
         }
         case Instruction::CallInstType: {

@@ -189,6 +189,7 @@ void LLParser::parse_aliases() {
         get_word();
         if (IRFlags::is_linkage_flag(_word)) {
             alias->set_raw_field("linkage", _word);
+            get_word();
         }
 
         parser_assert(_word == "alias", " ");

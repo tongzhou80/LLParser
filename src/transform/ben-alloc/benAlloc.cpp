@@ -361,7 +361,9 @@ public:
         if (func == NULL) {
             return false;
         }
-        guarantee(func->is_external(), "malloc family should be external");
+
+        /* _Znwm is defined in omnetpp */
+        guarantee(func->is_external(), "malloc family should be external: %s", func->raw_c_str());
 
         if (m->get_function(newname)) {
             return false; // return if already inserted
