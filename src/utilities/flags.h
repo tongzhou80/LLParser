@@ -58,6 +58,8 @@
          "")                                                                              \
   develop(bool, PrintPassArguments, 0,                                                    \
          "")                                                                              \
+  develop(std::string, SkipInst, "",                                  \
+         "Skip parsing instructions of these types")                                      \
 
 // GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG, DECLARE_DEVELOP_FLAG, DECLARE_DIAGNOSTIC_FLAG)
 GENERATE_RUNTIME_FLAGS(DECLARE_DEVELOP_FLAG)

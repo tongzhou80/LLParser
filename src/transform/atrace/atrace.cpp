@@ -16,6 +16,8 @@
 class AtracePass: public Pass {
     size_t _load_cnt = 0;
     size_t _store_cnt = 0;
+    size_t _skipped = 0;
+    bool _skip_gint = true;
     std::ofstream _ofs;
 public:
     AtracePass() {
@@ -41,7 +43,8 @@ public:
         }
 
         SysDict::module()->print_to_file(out);
-        printf("load count: %zu, store count: %zu\n", _load_cnt, _store_cnt);
+        printf("load count: %zu, store count: %zu, skip count: %zu, all: %zu\n",
+               _load_cnt, _store_cnt, _skipped, _load_cnt+_store_cnt+_skipped);
     }
 
     void instrument_load(LoadInst* I, BasicBlock* bb) {
@@ -69,6 +72,14 @@ public:
                 if (!li->get_raw_field("pointer").empty()) {
                     //zpl("got %s, %s", I->raw_c_str(), li->pointer_type_str().c_str());
                     string addr = li->get_raw_field("pointer");
+                    string value_ty = li->get_raw_field("ty");
+                    // skip global ints and bools
+                    if (_skip_gint && (value_ty == "i64" || value_ty == "i32" || value_ty == "i8") && addr[0] == '@') {  
+                        i++;
+                        zpl("skip %s", li->raw_c_str());
+                        _skipped++;
+                        continue;
+                    }
 
                     string casted_addr = "%tz_load_addr" + std::to_string(_load_cnt++);
                     string cast_inst_text = "  " +  casted_addr + " = bitcast " + li->pointer_type_str() + " " + addr + " to i8*";
@@ -96,6 +107,14 @@ public:
                 if (!si->get_raw_field("pointer").empty()) {
                     //zpl("got %s, %s", I->raw_c_str(), si->pointer_type_str().c_str());
                     string addr = si->get_raw_field("pointer");
+                    string value_ty = si->get_raw_field("ty");
+                    if (_skip_gint && (value_ty == "i64" || value_ty == "i32" || value_ty == "i8") && addr[0] == '@') {
+                        i++;
+                        zpl("skip %s", si->raw_c_str());
+                        _skipped++;
+                        continue;
+                    }
+
 
                     string casted_addr = "%tz_store_addr" + std::to_string(_store_cnt++);
                     string cast_inst_text = "  " +  casted_addr + " = bitcast " + si->get_raw_field("ty") + "* " + addr + " to i8*";

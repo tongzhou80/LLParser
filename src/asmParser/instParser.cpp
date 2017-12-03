@@ -101,9 +101,10 @@ Instruction* InstParser::create_instruction(string &text) {
     inst->set_raw_text(text);
 
     if (inst->type() != Instruction::UnknownInstType
-        && inst->type() != Instruction::BranchInstType
-        && inst->type() != Instruction::LoadInstType
-        && inst->type() != Instruction::StoreInstType
+        && !Strings::contains(SkipInst, op+",")
+        // && inst->type() != Instruction::BranchInstType
+        // && inst->type() != Instruction::LoadInstType
+        // && inst->type() != Instruction::StoreInstType
         ) {
         parse(inst);
         //(this->*parse_routine)(inst);

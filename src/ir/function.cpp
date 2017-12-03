@@ -132,6 +132,11 @@ Function* Function::clone(string new_name) {
     /* create new debug info for the cloned function
      * except the name, other fields remain the same for now
      */
+    if (!this->di_subprogram()) {
+        this->dump();
+        guarantee(0, "");
+    }
+    
     auto dbg_copy = new DISubprogram(*(this->di_subprogram()));
     dbg_copy->set_name(copy->name());
     copy->set_di_subprogram(dbg_copy);
@@ -196,7 +201,15 @@ void Function::print_to_stream(std::ostream& os) {
     }
 }
 
+
 DISubprogram* Function::di_subprogram() {
+    /* Cloned functions cloned the _di_subprogram from their prototype,
+     * but the dbg_id is set to -1
+     */
+    if (is_clone()) {
+        return _di_subprogram;
+    }
+    
     if (dbg_id() < 0) {
         return NULL;
     }
