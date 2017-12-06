@@ -36,8 +36,9 @@ add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
 add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
 add_library(SplitModule SHARED src/transform/split-module/splitModule.cpp)
+add_library(IncludeTrace SHARED src/transform/include-trace/main.cpp)
 
-set_target_properties(NewClone PROPERTIES COMPILE_FLAGS "-g -rdynamic")
+#set_target_properties(NewClone PROPERTIES COMPILE_FLAGS "-g -rdynamic")
 
 install(TARGETS
         Hello
@@ -53,6 +54,7 @@ install(TARGETS
         NewClone
         RawReplaceCall
         PrintCaller
+        IncludeTrace
         DESTINATION /home/marena/llparser/passes/)
 
 set(SOURCE_FILES main.cpp src/ir/module.cpp src/ir/module.h

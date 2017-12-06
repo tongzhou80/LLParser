@@ -512,11 +512,12 @@ public:
             else {
                 out += ".clone.ll";
             }
-        }
 
-        if (_noben) {
-            Strings::ireplace(out, ".clone", ".expand");
+            if (_noben) {
+                Strings::ireplace(out, ".clone", ".expand");
+            }
         }
+        
 
         zpl("callclone2 output to %s", out.c_str())
         module->print_to_file(out);
