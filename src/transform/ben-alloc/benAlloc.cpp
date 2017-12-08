@@ -214,6 +214,9 @@ public:
                     }
                     if (flang_alloc) {
                         BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
+                        if (!bci) {
+                            printf("Chain instruction not found for: %s\n", I->raw_c_str());
+                        }
                         guarantee(bci, "");
                         bci->update_raw_field("value", "@" + t->new_name);
                         string ty2 = bci->get_raw_field("ty2");

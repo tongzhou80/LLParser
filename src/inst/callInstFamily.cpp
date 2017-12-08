@@ -72,7 +72,14 @@ void CallInstFamily::replace_args(string newargs) {
 void CallInstFamily::resolve_direct_call() {
     guarantee(!is_indirect_call(), "just check");
     string fn_name = get_raw_field("fnptrval");
-    resolve_callee_symbol(fn_name);
+    if (!fn_name.empty()) {
+        resolve_callee_symbol(fn_name);
+    }
+    else {
+        // Example:
+        // %0 = tail call i32 asm "pmovmskb $1, $0", "=r,x,~{dirflag},~{fpsr},~{flags}"(double %x) #1, !dbg !193374, !srcloc !193375
+        guarantee(Strings::contains(raw_text(), " asm "), "");
+    }
 }
 
 void CallInstFamily::resolve_callee_symbol(string fn_name) {
