@@ -161,18 +161,6 @@ public:
             _free_set.push_back(new MFunc("f90_auto_dealloc", "f90_ben_auto_dealloc", false));
             // todo
         }
-      
-//
-//        insert_declaration("malloc", "ben_malloc", true);
-//        insert_declaration("calloc", "ben_calloc", true);
-//        insert_declaration("realloc", "ben_realloc", true);
-//        insert_declaration("free", "ben_free", false);
-//
-//        insert_declaration("malloc", "indi_malloc", false);
-//        insert_declaration("calloc", "indi_calloc", false);
-//        insert_declaration("realloc", "indi_realloc", false);
-//        insert_declaration("free", "indi_free", false);
-
     }
 
     void insert_lsd(Module* module) {
@@ -212,7 +200,7 @@ public:
                     if (Strings::startswith(t->old_name, "f90_")) {
                         flang_alloc = true;
                     }
-                    if (flang_alloc) {
+                    if (flang_alloc && I->is_indirect_call()) {
                         BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
                         if (!bci) {
                             printf("Chain instruction not found for: %s\n", I->raw_c_str());
