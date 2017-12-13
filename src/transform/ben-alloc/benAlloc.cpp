@@ -2,6 +2,7 @@
 // Created by tzhou on 8/10/17.
 //
 
+#include <fstream>
 #include <set>
 #include <algorithm>
 #include <utilities/macros.h>
@@ -36,6 +37,8 @@ class BenAllocPass: public Pass {
     int _new_allocs;
     int _new_frees;
     std::ofstream _site_printer;
+    string _guide_file;
+    std::map<int, int> _ap_map;
 public:
     BenAllocPass() {
         set_is_module_pass();
@@ -104,8 +107,27 @@ public:
         if (has_argument("indi")) {
             _use_indi = true;
         }
+        if (has_argument("guide")) {
+            _guide_file = get_argument("lang");
+        }
 
+        init_guide();
         init_lang();
+    }
+
+    void init_guide() {
+        if (_guide_file.empty()) {
+            return;
+        }
+
+        std::ifstream ifs(_guide_file);
+        string line;
+        while (std::getline(ifs, line)) {
+            int pos = line.find(' ');
+            int n1 = std::to_string(line.substr(0, pos));
+            int n2 = std::to_string(line.substr(pos+1));
+            _ap_map[n1] = n2;
+        }
     }
 
     void init_lang() {
