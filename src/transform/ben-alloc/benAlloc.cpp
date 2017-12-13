@@ -108,7 +108,7 @@ public:
             _use_indi = true;
         }
         if (has_argument("guide")) {
-            _guide_file = get_argument("lang");
+            _guide_file = get_argument("guide");
         }
 
         init_guide();
@@ -124,9 +124,11 @@ public:
         string line;
         while (std::getline(ifs, line)) {
             int pos = line.find(' ');
-            int n1 = std::to_string(line.substr(0, pos));
-            int n2 = std::to_string(line.substr(pos+1));
+            int n1 = std::stoi(line.substr(0, pos));
+            int n2 = std::stoi(line.substr(pos+1));
             _ap_map[n1] = n2;
+            zpd(n1)
+                zpd(n2)
         }
     }
 
@@ -249,6 +251,10 @@ public:
                     }
 
                     int id = _apid++;
+                    if (_ap_map.find(id) != _ap_map.end()) {
+                        //zpl("map %d to %d", id, _ap_map[id]);
+                        id = _ap_map[id];
+                    }
                     string new_args = "i32 " + std::to_string(id) + ", " + I->get_raw_field("args");
                     I->replace_args(new_args);
 
@@ -321,6 +327,8 @@ public:
     }
 
     bool run_on_module(Module* module) override {
+        
+        
         insert_lsd(module);
         replace_alloc(module);
         replace_free(module);
