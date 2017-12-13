@@ -23,6 +23,9 @@ REGISTER_PASS(ExampleGlobalPass)
 /*********************************************************/
 
 
+#include <passes/pass.h>
+#include <ir/irEssential.h>
+
 // A module pass template
 
 class ExampleModulePass: public Pass {

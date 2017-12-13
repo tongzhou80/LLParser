@@ -153,3 +153,27 @@ Function* IRBuilder::create_function_declaration(string &text, LLParser* llparse
     f->set_is_external();
     return f;
 }
+
+/**@brief Add a global variable that represents string @param s
+ *
+ * A string constant looks like this:
+ * @.str = private unnamed_addr constant [5 x i8] c"sss\0A\00", align 1
+ * \0A: '\n'
+ * \00: '\0'
+ *
+ * @param m
+ * @param s
+ * @return
+ */
+void IRBuilder::add_global_string(Module *m, string varname, string s) {
+    int size = s.size()+1;
+    string str = Strings::replace(s, "\n", "\\0A");
+    str += "\\00";
+    string text = varname + " = private unnamed_addr constant [" + std::to_string(size) + " x i8] c\"" + str + "\", align 1";
+
+    auto gv = new GlobalVariable();
+    gv->set_name(varname);
+
+    gv->set_raw_text(text);
+    m->add_global_variable(gv);
+}

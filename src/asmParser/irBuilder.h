@@ -16,6 +16,9 @@ class IRBuilder {
 public:
     static Instruction* create_instruction(string& text, LLParser* llparser=NULL);
     static Function* create_function_declaration(string& text, LLParser* llparser=NULL);
+
+    /* Module */
+    static void add_global_string(Module* m, string varname, string s);
 };
 
 #endif //LLPARSER_INSTBUILDER_H
