@@ -572,14 +572,21 @@ void InstParser::do_branch(Instruction *inst) {
 
     // conditional
     if (_word == "i1") {
-        get_word(',');
+        get_word(", label ");
         inst->set_raw_field("cond", _word);
-        match(" label ");
-        get_word(',');
+        get_word(", label ");
         inst->set_raw_field("true-label", _word);
-        match(" label ");
-        get_word_of(" ,");
+        get_word_of(" ,");  // may have debug info after ','
         inst->set_raw_field("false-label", _word);
+        
+        // get_word(',');
+        // inst->set_raw_field("cond", _word);
+        // match(" label ");
+        // get_word(',');
+        // inst->set_raw_field("true-label", _word);
+        // match(" label ");
+        // get_word_of(" ,");
+        // inst->set_raw_field("false-label", _word);
     } // unconditional
     else if (_word == "label") {
         get_word_of(" ,");
