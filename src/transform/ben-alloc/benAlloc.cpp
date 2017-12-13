@@ -200,16 +200,27 @@ public:
                     if (Strings::startswith(t->old_name, "f90_")) {
                         flang_alloc = true;
                     }
-                    if (flang_alloc && I->is_indirect_call()) {
-                        BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
-                        if (!bci) {
-                            printf("Chain instruction not found for: %s\n", I->raw_c_str());
+                    if (flang_alloc) {
+                        if (I->is_indirect_call()) {
+                            BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
+                            if (!bci) {
+                                printf("Chain instruction not found for: %s\n", I->raw_c_str());
+                            }
+                            guarantee(bci, "");
+                            bci->update_raw_field("value", "@" + t->new_name);
+                            string ty2 = bci->get_raw_field("ty2");
+                            insert_i32_to_type(ty2);
+                            bci->update_raw_field("ty2", ty2);
                         }
-                        guarantee(bci, "");
-                        bci->update_raw_field("value", "@" + t->new_name);
-                        string ty2 = bci->get_raw_field("ty2");
-                        insert_i32_to_type(ty2);
-                        bci->update_raw_field("ty2", ty2);
+                        else {
+                            I->replace_callee(t->new_name);
+                            /* hacky code */
+                            auto pos = I->raw_text().find(" to ");
+                            guarantee(pos != string::npos, "");
+                            auto pos1 = I->raw_text().find("(i8*", pos);
+                            guarantee(pos1 != string::npos, "");
+                            I->raw_text().insert(pos1+1, "i32, ");
+                        }
                     }
                     else {
                         I->replace_callee(t->new_name);
