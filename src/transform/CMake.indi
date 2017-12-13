@@ -1,6 +1,6 @@
 
 SET(CMAKE_CXX_FLAGS "-std=c++11 -g -rdynamic")
-set(LLParserRoot "../../")
+set(LLParserRoot "../../../")
 include_directories(${LLParserRoot}/src)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build/")
 
