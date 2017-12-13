@@ -225,6 +225,35 @@ int StringParser::parse_integer(bool skip_whitespace) {
 //}
 //
 
+void StringParser::get_word(string delim, bool skip_delim, bool skip_whitespace) {
+    range_check();
+
+    _word.clear();
+
+    if (skip_whitespace) {
+        skip_ws();
+    }
+
+    if (!_eol) {
+        int startp = intext_pos();
+        int endp = text().find(delim, startp);
+
+        if (endp == string::npos) {
+            endp = text().size();
+        }
+
+        inc_intext_pos(endp - startp);
+        _word = _text.substr(startp, endp - startp);
+        //guarantee(endp != string::npos, "Char %c not found in subtext %s", delim, text().substr(intext_pos()).c_str());
+
+        if (skip_delim) {
+            if (!_eol) {
+                inc_intext_pos(delim.size());
+            }
+        }
+    }
+}
+
 StringParser* StringParser::get_word(char delim, bool append_delim, bool skip_delim, bool skip_whitespace) {
     range_check();
 

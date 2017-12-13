@@ -31,6 +31,7 @@ public:
     string jump_to_end_of_scope();
     void skip_ws();
 
+    void get_word(string delim, bool skip_delim=1, bool skip_ws=1);
     StringParser* get_word(char delim=' ', bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
     int parse_integer(bool skip_ws=1);
     void get_lookahead(char delim=' ', bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
