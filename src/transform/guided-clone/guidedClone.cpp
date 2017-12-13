@@ -14,6 +14,7 @@
 class GuidedClonePass: public Pass {
     std::ofstream _ofs;
     BenAllocPass* _lsda;
+    std::map<string, string> _name_map;
 
     /* command line args */
     string _log_dir;
@@ -67,14 +68,21 @@ public:
         _lsda = new BenAllocPass(_lang);
         _lsda->do_initialization();
         _lsda->set_use_indi(_use_indi);
+
+        load_filename_map();
     }
 
-    Module* get_module(string& src_filename) {
+    Module* get_module(string src_filename) {
+        if (_name_map.find(src_filename) != _name_map.end()) {
+            src_filename = _name_map[src_filename];
+        }
+        
         int pos = src_filename.rfind('.');
         guarantee(pos != string::npos, "");
         string ir_name = _src_dir+src_filename.substr(0, pos) + ".o.ll";
         Module* m = SysDict::get_module(ir_name);
         if (!m) {
+            //zpl("find %s", src_filename.c_str())
             m = SysDict::parser->parse(ir_name);
             if (_load_verbose) {
                 printf("parsed %s\n", m->name_as_c_str());
@@ -147,6 +155,18 @@ public:
             Module* m = it.second;
             //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
             m->print_to_file(m->input_file());
+        }
+    }
+
+    void load_filename_map() {
+        std::ifstream ifs(_log_dir+"/inclusion.txt");
+        string line;
+        guarantee(ifs.good(), "file inclusion.txt not found");
+        while (std::getline(ifs, line)) {
+            auto p1 = line.find(' ');
+            auto f1 = line.substr(0, p1);
+            auto f2 = line.substr(p1+1);
+            _name_map[f1] = f2;
         }
     }
 

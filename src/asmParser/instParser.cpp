@@ -171,6 +171,11 @@ void InstParser::parse_metadata(Instruction *ins) {
     /* todo: more metadata */
 }
 
+void InstParser::skip_to_metadata() {
+    auto pos = text().find(", !");
+    set_intext_pos(pos);
+}
+
 /*
  * <result> = [tail | musttail | notail ] call [fast-math flags] [cconv] [ret attrs] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]
              [ operand bundles ]
@@ -296,6 +301,11 @@ void InstParser::do_call_family(Instruction* inst) {
         ci->set_called_label(label);
         ci->set_raw_field("fnptrval", label);
         parser_assert(!ci->has_bitcast(), "just check");
+    }
+    else if (_char == 'a') {
+        match("asm");
+        skip_to_metadata();
+        return;
     }
     else {
         parser_assert(0, "Expect '%%' or '@', char: |%c|, pos: %d", _char, _intext_pos);

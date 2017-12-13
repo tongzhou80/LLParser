@@ -5,6 +5,7 @@
 #include <passes/pass.h>
 #include <ir/irEssential.h>
 #include <di/diEssential.h>
+#include <utilities/strings.h>
 
 class IncludeTracePass: public Pass {
     std::ofstream _ofs;
@@ -25,9 +26,18 @@ public:
         string parent = "";
         for (auto md: module->unnamed_metadata_list()) {
             if (DIFile* difile = dynamic_cast<DIFile*>(md)) {
-                zps(difile->filename())
+                if (parent.empty()) {
+                    parent = difile->filename();
+                    if (Strings::endswith(parent, ".c")) {
+                        return false;
+                    }
+                }
+                else {
+                    _ofs << difile->filename() << " " << parent << std::endl;
+                }
             }
         }
+        return false;
     }
 };
 

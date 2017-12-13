@@ -183,18 +183,6 @@ public:
             _free_set.push_back(new MFunc("f90_auto_dealloc", "f90_ben_auto_dealloc", false));
             // todo
         }
-      
-//
-//        insert_declaration("malloc", "ben_malloc", true);
-//        insert_declaration("calloc", "ben_calloc", true);
-//        insert_declaration("realloc", "ben_realloc", true);
-//        insert_declaration("free", "ben_free", false);
-//
-//        insert_declaration("malloc", "indi_malloc", false);
-//        insert_declaration("calloc", "indi_calloc", false);
-//        insert_declaration("realloc", "indi_realloc", false);
-//        insert_declaration("free", "indi_free", false);
-
     }
 
     void insert_lsd(Module* module) {
@@ -235,12 +223,26 @@ public:
                         flang_alloc = true;
                     }
                     if (flang_alloc) {
-                        BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
-                        guarantee(bci, "");
-                        bci->update_raw_field("value", "@" + t->new_name);
-                        string ty2 = bci->get_raw_field("ty2");
-                        insert_i32_to_type(ty2);
-                        bci->update_raw_field("ty2", ty2);
+                        if (I->is_indirect_call()) {
+                            BitCastInst* bci = dynamic_cast<BitCastInst*>(I->chain_inst());
+                            if (!bci) {
+                                printf("Chain instruction not found for: %s\n", I->raw_c_str());
+                            }
+                            guarantee(bci, "");
+                            bci->update_raw_field("value", "@" + t->new_name);
+                            string ty2 = bci->get_raw_field("ty2");
+                            insert_i32_to_type(ty2);
+                            bci->update_raw_field("ty2", ty2);
+                        }
+                        else {
+                            I->replace_callee(t->new_name);
+                            /* hacky code */
+                            auto pos = I->raw_text().find(" to ");
+                            guarantee(pos != string::npos, "");
+                            auto pos1 = I->raw_text().find("(i8*", pos);
+                            guarantee(pos1 != string::npos, "");
+                            I->raw_text().insert(pos1+1, "i32, ");
+                        }
                     }
                     else {
                         I->replace_callee(t->new_name);
