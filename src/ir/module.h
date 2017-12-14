@@ -43,6 +43,7 @@ private:
     std::map<string, Alias*> _alias_map;
     std::vector<Function*> _function_list;  // guaranteed in the original order
     std::map<string, Function*> _function_map;  // for symbol resolving
+    std::map<string, Value*> _value_map;
     std::vector<Attribute*> _attribute_list;
     //std::vector<MetaData*> _metadata_list;
     std::map<string, MetaData*> _named_metadata_map;
@@ -114,7 +115,7 @@ public:
     void add_module_level_asm(string& s)                   { _module_level_inline_asms.push_back(s); }
     void add_struct_type(StructType* st)                   { _struct_list.push_back(st); }
     void add_comdat(Comdat* cd)                            { _comdat_list.push_back(cd); }
-    void add_global_variable(GlobalVariable* gv)           { _global_list.push_back(gv); }
+    void add_global_variable(GlobalVariable* gv);
     GlobalVariable* get_global_variable(string name);
     void add_alias(string key, Alias* value)               { _alias_map[key] = value; }
     Alias* get_alias(string key)                           { if (_alias_map.find(key) == _alias_map.end()) { return NULL; } else { return _alias_map[key]; } }

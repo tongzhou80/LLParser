@@ -49,25 +49,39 @@ Function* Module::get_function_by_orig_name(string key) {
     throw FunctionNotFoundError(key);
 }
 
+void Module::add_global_variable(GlobalVariable* gv) {
+    _global_list.push_back(gv);
+    guarantee(!gv->name().empty(), "");
+    if (_value_map.find(gv->name()) != _value_map.end()) {
+        throw SymbolRedefinitionError(gv->name());
+    }
+    _value_map[gv->name()] = gv;
+}
+
 GlobalVariable* Module::get_global_variable(string name) {
-    
+    if (_value_map.find(name) != _value_map.end()) {
+        return dynamic_cast<GlobalVariable*>(_value_map[name]);
+    }
+    else {
+        return NULL;
+    }
 }
 
-Function* Module::create_child_function_symbol(string name) {
-    Function* f = new Function();
-    f->set_name(name);
-    f->set_parent(this);
-    _function_map[name] = f;
+// Function* Module::create_child_function_symbol(string name) {
+//     Function* f = new Function();
+//     f->set_name(name);
+//     f->set_parent(this);
+//     _function_map[name] = f;
 
-    return f;
-}
+//     return f;
+// }
 
-Function* Module::create_child_function(string name) {
-    Function* f = create_child_function_symbol(name);
-    set_as_resolved(f);
+// Function* Module::create_child_function(string name) {
+//     Function* f = create_child_function_symbol(name);
+//     set_as_resolved(f);
 
-    return f;
-}
+//     return f;
+// }
 
 void Module::set_as_resolved(Function *f) {
     guarantee(get_function(f->name()) != NULL, "function %s not in the symbol table", f->name().c_str());
@@ -107,6 +121,7 @@ void Module::insert_new_function(int pos, Function *inserted) {
     l.insert(l.begin()+pos, inserted);
     inserted->set_parent(this);
     _function_map[inserted->name()] = inserted;
+    _value_map[inserted->name()] = inserted;
 }
 
 void Module::insert_function_before(Function *old, Function *inserted) {

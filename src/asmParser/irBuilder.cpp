@@ -2,6 +2,8 @@
 // Created by tlaber on 6/17/17.
 //
 
+#include <time.h>
+#include <unordered_map>
 #include "irBuilder.h"
 #include "sysDict.h"
 #include <utilities/strings.h>
@@ -165,19 +167,20 @@ Function* IRBuilder::create_function_declaration(string &text, LLParser* llparse
  * @param s
  * @return
  */
-void IRBuilder::add_global_string(Module *m, string varname, string s) {
+GlobalVariable* IRBuilder::add_global_string(Module *m, const string& s) {
     int size = s.size()+1;
     string str = Strings::replace(s, "\n", "\\0A");
     str += "\\00";
     string type = "[" + std::to_string(size) + " x i8]";
-    string text = varname + " = private unnamed_addr constant " + type + " c\"" + str + "\", align 1";
+    string name = get_new_global_varname(); 
+    string text = name + " = private unnamed_addr constant " + type + " c\"" + str + "\", align 1";
 
     auto gv = new GlobalVariable();
-    gv->set_name(varname);
+    gv->set_name(name);
     gv->set_raw_field("type", type);
-
     gv->set_raw_text(text);
     m->add_global_variable(gv);
+    return gv;
 }
 
 /**@brief
@@ -186,7 +189,20 @@ void IRBuilder::add_global_string(Module *m, string varname, string s) {
  * Examples:
  * %4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.sopt.0, i32 0, i32 0))
  */
-CallInst* create_printf_callinst(string varname, string format, std::vector<string>& args) {
-    
-    string text = varname + " = call i32 (i8*, ...) @printf(i8* getelementptr inbounds (";
+CallInst* IRBuilder::create_printf_callinst(Module* m, GlobalVariable* gv, const std::vector<string>& args) {
+    string ty = gv->get_raw_field("type");
+    string text = get_new_local_varname() + " = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ("
+        + ty + ", " + ty + "* " + gv->name() + ", i32 0, i32 0))";
+    zps(text);
+    return dynamic_cast<CallInst*>(create_instruction(text));
+}
+
+string IRBuilder::get_new_local_varname() {
+    time_t now = time(NULL);
+    return "%sopt.local." + std::to_string(now);
+}
+
+string IRBuilder::get_new_global_varname() {
+    time_t now = time(NULL);
+    return "@sopt.global." + std::to_string(now);
 }

@@ -24,6 +24,11 @@ public:
     static void die();
 };
 
+class SymbolNotFoundError: public std::runtime_error {
+public:
+    SymbolNotFoundError(std::string msg): runtime_error("Symbol " + msg + " not found") {}
+    SymbolNotFoundError(): runtime_error("") {}
+};
 
 class FunctionNotFoundError: public std::runtime_error {
 public:

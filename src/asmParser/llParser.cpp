@@ -164,6 +164,7 @@ void LLParser::parse_globals(Module * module) {
         get_word('=');
         Strings::strip(_word);
         gv->set_name(_word);
+        parser_assert(!_word.empty(), "");
         get_word();
 
         // todo: 'alias' does not have to be right after '='

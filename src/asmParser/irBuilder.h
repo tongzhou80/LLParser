@@ -12,13 +12,19 @@ class LLParser;
 class Instruction;
 class Function;
 
+class GlobalVariable;
+
 class IRBuilder {
 public:
+    static string get_new_local_varname();
+    static string get_new_global_varname();
+        
     static Instruction* create_instruction(string& text, LLParser* llparser=NULL);
     static Function* create_function_declaration(string& text, LLParser* llparser=NULL);
 
     /* Module */
-    static void add_global_string(Module* m, string varname, string s);
+    static GlobalVariable* add_global_string(Module* m, const string& s);
+    static CallInst* create_printf_callinst(Module* m, GlobalVariable* gv, const std::vector<string>& args=std::vector<string>());
 };
 
 #endif //LLPARSER_INSTBUILDER_H
