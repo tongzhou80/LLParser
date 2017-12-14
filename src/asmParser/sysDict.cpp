@@ -147,13 +147,14 @@ void SysDict::merge_modules() {
         }
         else {
             auto& l = head->function_list();
-            auto& m = head->function_map();
-            //l.insert(l.end(), piece->function_list().begin(), piece->function_list().end());
+            auto& m = head->value_map();
+            //auto& m = head->function_map();
             for (auto F: piece->function_list()) {
                 l.push_back(F);
                 F->set_parent(head);
             }
-            m.insert(piece->function_map().begin(), piece->function_map().end());
+            //m.insert(piece->function_map().begin(), piece->function_map().end());
+            m.insert(piece->value_map().begin(), piece->value_map().end());
             delete piece;  // won't delete the actual instructions of the deleted module
         }
     }

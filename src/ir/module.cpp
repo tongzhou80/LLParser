@@ -24,11 +24,17 @@ Function* Module::get_function(string key) {
     if (Alias* alias = get_alias(key)) {
         return dynamic_cast<Function*>(alias->aliasee());
     }
+//
+//    if (_function_map.find(key) == _function_map.end()) {
+//        return NULL;
+//    } else {
+//        return _function_map[key];
+//    }
 
-    if (_function_map.find(key) == _function_map.end()) {
+    if (_value_map.find(key) == _value_map.end()) {
         return NULL;
     } else {
-        return _function_map[key];
+        return dynamic_cast<Function*>(_value_map[key]);
     }
 }
 
@@ -67,22 +73,6 @@ GlobalVariable* Module::get_global_variable(string name) {
     }
 }
 
-// Function* Module::create_child_function_symbol(string name) {
-//     Function* f = new Function();
-//     f->set_name(name);
-//     f->set_parent(this);
-//     _function_map[name] = f;
-
-//     return f;
-// }
-
-// Function* Module::create_child_function(string name) {
-//     Function* f = create_child_function_symbol(name);
-//     set_as_resolved(f);
-
-//     return f;
-// }
-
 void Module::set_as_resolved(Function *f) {
     guarantee(get_function(f->name()) != NULL, "function %s not in the symbol table", f->name().c_str());
     _function_list.push_back(f);
@@ -120,7 +110,7 @@ void Module::insert_new_function(int pos, Function *inserted) {
     auto& l = _function_list;
     l.insert(l.begin()+pos, inserted);
     inserted->set_parent(this);
-    _function_map[inserted->name()] = inserted;
+    //_function_map[inserted->name()] = inserted;
     _value_map[inserted->name()] = inserted;
 }
 
@@ -318,8 +308,8 @@ void Module::print_to_stream(FILE *fp) {
 }
 
 void Module::check_after_parse() {
-    guarantee(_function_map.size() == _function_list.size(),
-              "map size: %d, list size: %d\n", _function_map.size(), _function_list.size());
+//    guarantee(_function_map.size() == _function_list.size(),
+//              "map size: %d, list size: %d\n", _function_map.size(), _function_list.size());
 
     for (auto F: _function_list) {
 //        if (!F->is_defined() && !F->is_external()) {

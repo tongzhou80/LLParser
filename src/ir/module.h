@@ -101,7 +101,8 @@ public:
     std::vector<GlobalVariable*>& global_list()            { return _global_list; }
     std::map<string, Alias*>& alias_map()                  { return _alias_map; }
     std::vector<Function*>& function_list()                { return _function_list; }
-    std::map<string, Function*>& function_map()            { return _function_map; };
+    std::map<string, Function*>& function_map()            { return _function_map; }
+    std::map<string, Value*>& value_map()                  { return _value_map; }
     std::vector<Attribute*>& attribute_list()              { return _attribute_list; }
     std::map<string, MetaData*>& named_metadata_map()      { return _named_metadata_map; };
     std::vector<MetaData*>& unnamed_metadata_list()        { return _unnamed_metadata_list; }
