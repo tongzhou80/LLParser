@@ -115,6 +115,7 @@ public:
     void add_struct_type(StructType* st)                   { _struct_list.push_back(st); }
     void add_comdat(Comdat* cd)                            { _comdat_list.push_back(cd); }
     void add_global_variable(GlobalVariable* gv)           { _global_list.push_back(gv); }
+    GlobalVariable* get_global_variable(string name);
     void add_alias(string key, Alias* value)               { _alias_map[key] = value; }
     Alias* get_alias(string key)                           { if (_alias_map.find(key) == _alias_map.end()) { return NULL; } else { return _alias_map[key]; } }
     void append_new_function(Function* f)                  { insert_new_function(_function_list.size(), f); }

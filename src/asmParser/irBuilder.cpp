@@ -169,11 +169,24 @@ void IRBuilder::add_global_string(Module *m, string varname, string s) {
     int size = s.size()+1;
     string str = Strings::replace(s, "\n", "\\0A");
     str += "\\00";
-    string text = varname + " = private unnamed_addr constant [" + std::to_string(size) + " x i8] c\"" + str + "\", align 1";
+    string type = "[" + std::to_string(size) + " x i8]";
+    string text = varname + " = private unnamed_addr constant " + type + " c\"" + str + "\", align 1";
 
     auto gv = new GlobalVariable();
     gv->set_name(varname);
+    gv->set_raw_field("type", type);
 
     gv->set_raw_text(text);
     m->add_global_variable(gv);
+}
+
+/**@brief
+ *
+ * The args should contain types as well.
+ * Examples:
+ * %4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.sopt.0, i32 0, i32 0))
+ */
+CallInst* create_printf_callinst(string varname, string format, std::vector<string>& args) {
+    
+    string text = varname + " = call i32 (i8*, ...) @printf(i8* getelementptr inbounds (";
 }

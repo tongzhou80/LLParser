@@ -49,6 +49,10 @@ Function* Module::get_function_by_orig_name(string key) {
     throw FunctionNotFoundError(key);
 }
 
+GlobalVariable* Module::get_global_variable(string name) {
+    
+}
+
 Function* Module::create_child_function_symbol(string name) {
     Function* f = new Function();
     f->set_name(name);
