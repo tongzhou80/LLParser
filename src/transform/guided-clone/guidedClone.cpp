@@ -173,20 +173,19 @@ public:
     void use_ben_malloc() {
         std::ifstream ifs(_log_dir+"/ben.log");
         string line;
-        Module* last = NULL;
+        std::set<Module*> scanned;
         while (std::getline(ifs, line)) {
             if (Module* m = get_module(line)) {
-                if (m == last) {
+                if (scanned.find(m) != scanned.end()) {
                     continue;
                 }
-                
                 _lsda->insert_lsd(m);
                 _lsda->replace_alloc(m);
                 _lsda->replace_free(m);
                 if (_use_indi) {
                     _lsda->replace_indi(m);
                 }
-                last = m;
+                scanned.insert(m);
             }
         }
     }
