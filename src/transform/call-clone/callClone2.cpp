@@ -575,8 +575,11 @@ public:
                 if (is_first_line) {
                     //ofs1 << ci->function()->name() << " " << ci->get_position_in_function() << " " << loc->filename() << std::endl;
                     if (ci->function()->name().find("__gnu_cxx") == string::npos) {
-                        //alloc_files.insert(loc->filename());
-                        ben_log << loc->filename() << std::endl;
+
+                        if (alloc_files.find(loc->filename()) == alloc_files.end()) {
+                            ben_log << loc->filename() << std::endl;
+                            alloc_files.insert(loc->filename());
+                        }
                     }
 
                     is_first_line = false;
