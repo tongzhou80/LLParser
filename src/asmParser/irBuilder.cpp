@@ -189,10 +189,14 @@ GlobalVariable* IRBuilder::add_global_string(Module *m, const string& s) {
  * Examples:
  * %4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.sopt.0, i32 0, i32 0))
  */
-CallInst* IRBuilder::create_printf_callinst(Module* m, GlobalVariable* gv, const std::vector<string>& args) {
+CallInst* IRBuilder::create_printf_callinst(Module* m, GlobalVariable* gv, string args) {
     string ty = gv->get_raw_field("type");
     string text = get_new_local_varname() + " = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ("
-        + ty + ", " + ty + "* " + gv->name() + ", i32 0, i32 0))";
+        + ty + ", " + ty + "* " + gv->name() + ", i32 0, i32 0)";
+    if (!args.empty()) {
+        text += ", " + args;
+    }
+    text += ")";
     zps(text);
     return dynamic_cast<CallInst*>(create_instruction(text));
 }

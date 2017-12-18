@@ -24,7 +24,8 @@ public:
 
     /* Module */
     static GlobalVariable* add_global_string(Module* m, const string& s);
-    static CallInst* create_printf_callinst(Module* m, GlobalVariable* gv, const std::vector<string>& args=std::vector<string>());
+    //static CallInst* create_printf_callinst(Module* m, GlobalVariable* gv, const std::vector<string>& args=std::vector<string>());
+    static CallInst* create_printf_callinst(Module* m, GlobalVariable* gv, string args="");
 };
 
 #endif //LLPARSER_INSTBUILDER_H
