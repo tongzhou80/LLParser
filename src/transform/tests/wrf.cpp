@@ -13,7 +13,11 @@ public:
 
     void print_nelem(Module* module) {
         Function* f = module->get_function("f90_ben_ptr_alloc04");
-        zps(f->get_raw_field("args"))
+        for (auto ci: f->caller_list()) {
+            string nelem = ci->get_nth_arg_by_split(1);
+            zps(nelem)
+        }
+            
 //        GlobalVariable* str = IRBuilder::add_global_string(module, "test");
 //        CallInst* ci = IRBuilder::create_printf_callinst(module, str);
 //        Function* f = module->get_function("main");

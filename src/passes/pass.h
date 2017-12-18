@@ -119,27 +119,27 @@ public:
      * processing before it runs on any module.
      */
     virtual bool do_initialization() {
-        printf("ModulePass: do_initialization called, do nothing\n");
+        printf("<warning>: Pass::do_initialization() called, do nothing\n");
     }
 
     virtual bool do_finalization() {
-        printf("ModulePass: do_finalization called, do nothing\n");
+        printf("<warning>: Pass::do_finalization() called, do nothing\n");
     }
 
     virtual bool do_initialization(Module* M) {
-        printf("Pass.do_initialization on module called: do nothing\n");
+        printf("<warning>: Pass::do_initialization(Module*) called: do nothing\n");
     }
 
     virtual bool do_finalization(Module* M) {
-        printf("Pass.do_finalization on module called: do nothing\n");
+        printf("<warning>: Pass::do_finalization(Module*) called: do nothing\n");
     }
 
     virtual bool do_initialization(Function* F) {
-        printf("Pass.do_initialization on module called: do nothing\n");
+        printf("<warning>: Pass::do_initialization(Function*) called: do nothing\n");
     }
 
     virtual bool do_finalization(Function* F) {
-        printf("Pass.do_finalization on module called: do nothing\n");
+        printf("<warning>: Pass::do_finalization(Function*) called: do nothing\n");
     }
 
 };
