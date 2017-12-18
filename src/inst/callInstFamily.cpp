@@ -69,6 +69,12 @@ void CallInstFamily::replace_args(string newargs) {
     set_raw_field("args", newargs);
 }
 
+string CallInstFamily::get_nth_arg_by_split(int pos) {
+    string args = get_raw_field("args");
+    auto items = Strings::split(args, ',');
+    return items.at(pos);
+}
+
 void CallInstFamily::resolve_direct_call() {
     guarantee(!is_indirect_call(), "just check");
     string fn_name = get_raw_field("fnptrval");

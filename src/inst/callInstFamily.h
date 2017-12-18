@@ -66,6 +66,7 @@ public:
 
     void replace_callee(string callee);
     void replace_args(string newargs);
+    string get_nth_arg_by_split(int pos);
 
     void try_resolve_indirect_call();
     void resolve_direct_call();
