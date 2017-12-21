@@ -48,13 +48,23 @@ public:
         }
     }
 
+    void instrument_calls(Module* module, std::vector<Function*>& funcs) {
+        for (auto F: funcs) {
+            for (auto ci: F->caller_list()) {
+                
+                int ci_pos = get_index_in_block();
+                ci->parent()->insert_instruction(ci_pos, )
+            }
+        }
+    }
+
     void test_append_global(Module* module) {
         module->append_new_global("@sopt.br.1 = thread_local global i32 0, align 4");
         module->print_to_file(SysDict::get_pass_out_name("lbr"));
     }
 
     bool run_on_module(Module* module) override {
-        test_append_global(module);
+        
         return true;
     }
 };
