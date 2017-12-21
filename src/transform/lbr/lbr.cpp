@@ -51,9 +51,6 @@ public:
     void test_append_global(Module* module) {
         module->append_new_global("@sopt.br.1 = thread_local global i32 0, align 4");
         module->print_to_file(SysDict::get_pass_out_name("lbr"));
-        //SysDict::pass_print_to_file("lbr", module);
-        //module->append_new_global("@sopt.br.2 = thread_local global i32 0, align 4");
-        //module->append_new_global("@sopt.br.3 = thread_local global i32 0, align 4");
     }
 
     bool run_on_module(Module* module) override {
