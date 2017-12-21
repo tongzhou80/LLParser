@@ -384,6 +384,7 @@ void StringParser::jump_ahead() {
     else {
         _eol = true;
     }
+    _word = _lookahead;
 }
 
 /**@brief When current char is '(', '{', '[' or '<', jump to the end of the scope and return the skipped part

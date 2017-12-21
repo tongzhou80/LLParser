@@ -139,7 +139,17 @@ string IRParser::match_constant_expr() {
     else if (IRFlags::is_const_expr_opcode(_lookahead)) {
         /* need some special code for gep, icmp and fcmp */
         jump_ahead();
-        
+        if (_word == "getelementptr") {
+            get_lookahead_of(", ");
+            if (_lookahead == "inbounds") {
+                jump_ahead();
+            }
+        }
+
+        if (_word == "icmp" || _word == "fcmp") {
+            get_word(); // should be COND
+        }
+
         return jump_to_end_of_scope();
     }
     else {
@@ -201,9 +211,7 @@ string IRParser::match_constant() {
     }
 
     ret = match_constant_expr();
-    if (!ret.empty()) {
-        return ret;
-    }
+    return ret;
 }
 
 /**@brief Match an integer or a float number
@@ -239,6 +247,7 @@ string IRParser::match_decnum() {
     if (_char == '-' || _char == '+') {
         sign += _char;
         inc_intext_pos();
+        startp++;
     }
 
     while (!_eol) {

@@ -423,6 +423,10 @@ void InstParser::do_store(Instruction *ins) {
 
     string ty = parse_compound_type();
     string value = match_value();
+
+        zps(text())
+
+    zps(value)
     di->set_raw_field("value", value);
 
 //    get_lookahead();

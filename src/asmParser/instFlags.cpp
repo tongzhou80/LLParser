@@ -16,6 +16,7 @@ std::set<string> IRFlags::_param_attrs;
 std::set<string> IRFlags::_tails;
 std::set<string> IRFlags::_terminator_insts;
 
+std::set<string> IRFlags::_binary_opcodes;
 std::set<string> IRFlags::_const_expr_opcodes;
 
 void IRFlags::init() {
