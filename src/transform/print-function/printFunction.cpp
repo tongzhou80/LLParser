@@ -5,21 +5,18 @@
 #include <ir/irEssential.h>
 
 class PrintFunctionPass: public Pass {
-    size_t func_cnt;
 public:
     PrintFunctionPass() {
         set_is_function_pass();
-
-        func_cnt = 0;
     }
 
     bool run_on_function(Function* function) override {
-        for (auto B: function->basic_block_list()) {
-            std::cout << B->name() << std::endl;
-        }
+        std::cout << function->name() << ": " << function->instruction_count() << " instructions" << std::endl;
     }
 
-    bool
+    bool do_finalization(Module* M) override {
+        std::cout << "in total: " << M->function_list().size() << " functions" << std::endl;
+    }
 };
 
 REGISTER_PASS(PrintFunctionPass);

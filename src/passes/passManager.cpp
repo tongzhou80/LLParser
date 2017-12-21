@@ -113,6 +113,7 @@ void PassManager::add_pass(Pass *p) {
         insert_with_priority(_global_passes, p);
     }
     if (p->is_module_pass()) {
+        // other passes's initializations are applied in apply_passes()
         p->do_initialization();
         insert_with_priority(_module_passes, p);
     }
