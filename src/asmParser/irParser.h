@@ -17,6 +17,7 @@ class IRParser: public virtual StringParser {
 public:
     string match_identifier();
     string match_constant();
+    string match_constant_expr();
     string match_value();
     string match_hexnum();
     string match_decnum();

@@ -408,6 +408,14 @@ void InstParser::do_load(Instruction *inst) {
     /* TODO: more field */
 }
 
+/**
+ *
+ * Syntax:
+ * store [volatile] <ty> <value>, <ty>* <pointer>[, align <alignment>][, !nontemporal !<index>][, !invariant.group !<index>]        ; yields void
+ * store atomic [volatile] <ty> <value>, <ty>* <pointer> [syncscope("<target-scope>")] <ordering>, align <alignment> [, !invariant.group !<index>] ; yields void
+
+ * @param ins
+ */
 void InstParser::do_store(Instruction *ins) {
     StoreInst* di = dynamic_cast<StoreInst*>(ins);
     set_optional_field(ins, "atomic");

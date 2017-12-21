@@ -76,6 +76,10 @@ string IRParser::match_identifier() {
     }
 }
 
+string IRParser::match_constant_expr() {
+
+}
+
 string IRParser::match_value() {
     if (_char == '%' || _char == '@') {  // named variables and unnamed variables(%num)
         get_word_of(" ,");
@@ -88,25 +92,40 @@ string IRParser::match_value() {
 }
 
 string IRParser::match_simple_constant() {
-    if (_char == 't') {
-        match("true");
-        return "true";
-    }
-    else if (_char == 'f') {
-        match("false");
-        return "false";
-    }
-    else if (_char == 'n') {
-        get_word_of(" ,");
-        syntax_check(_word == "none" || _word == "null");
-        return _word;
+    get_lookahead_of(" ,");
+    if (_lookahead == "true"
+        || _lookahead == "false"
+        || _lookahead == "null"
+        || _lookahead == "none") {
+        jump_ahead();
+        return _lookahead;
     }
     else {
         string number = match_number();
-        parser_assert(!number.empty(), "_char: %c", _char);
         return number;
     }
 }
+
+//string IRParser::match_simple_constant() {
+//    if (_char == 't') {
+//        match("true");
+//        return "true";
+//    }
+//    else if (_char == 'f') {
+//        match("false");
+//        return "false";
+//    }
+//    else if (_char == 'n') {
+//        get_word_of(" ,");
+//        syntax_check(_word == "none" || _word == "null");
+//        return _word;
+//    }
+//    else {
+//        string number = match_number();
+//        parser_assert(!number.empty(), "_char: %c", _char);
+//        return number;
+//    }
+//}
 
 string IRParser::match_complex_constant() {
     return jump_to_end_of_scope();

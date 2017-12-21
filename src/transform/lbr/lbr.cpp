@@ -52,8 +52,8 @@ public:
         for (auto F: funcs) {
             for (auto ci: F->caller_list()) {
                 
-                int ci_pos = get_index_in_block();
-                ci->parent()->insert_instruction(ci_pos, )
+                //int ci_pos = get_index_in_block();
+                //ci->parent()->insert_instruction(ci_pos, )
             }
         }
     }

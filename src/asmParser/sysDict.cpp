@@ -98,7 +98,7 @@ const string SysDict::get_pass_out_name(string passname) {
     return out;
 }
 
-const string SysDict::pass_print_to_file(string passname, Module* module) {
+void SysDict::pass_print_to_file(string passname, Module* module) {
     string out = get_pass_out_name(passname);
     std::cout << "Pass " + passname + " printing to file " + out << std::endl;
     module->print_to_file(out);

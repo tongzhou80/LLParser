@@ -170,7 +170,6 @@ GlobalVariable* LLParser::parse_global(Module * module) {
     inc_intext_pos();
     get_word('=');
 
-    zps(_word)
     Strings::strip(_word);
     gv->set_name(_word);
     parser_assert(!_word.empty(), "");
