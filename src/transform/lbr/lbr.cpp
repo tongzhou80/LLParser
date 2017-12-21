@@ -6,10 +6,10 @@
 
 // A module pass template
 
-class CtxVarPass: public Pass {
-    const int nlevel = 3;
+class LBRPass: public Pass {
+    int nlevel = 3;
 public:
-    CtxVarPass() {
+    LBRPass() {
         set_is_module_pass();
     }
 
@@ -48,25 +48,16 @@ public:
         }
     }
 
-    void instrument_entry(Function* func) {
-        Function* f = module->get_function("f90_ben_ptr_alloc04");
-        for (auto ci: f->caller_list()) {
-            string nelem = ci->get_nth_arg_by_split(1);
-            zps(nelem)
-        }
-            
-//        GlobalVariable* str = IRBuilder::add_global_string(module, "test");
-//        CallInst* ci = IRBuilder::create_printf_callinst(module, str);
-//        Function* f = module->get_function("main");
-//        auto bb = f->basic_block_list()[0];
-//        bb->insert_instruction(5, (Instruction*)ci);
-//        module->print_to_file("out.ll");
+    void test_append_global(Module* module) {
+        module->append_new_global("@sopt.br.1 = thread_local global i32 0, align 4");
+        //module->append_new_global("@sopt.br.2 = thread_local global i32 0, align 4");
+        //module->append_new_global("@sopt.br.3 = thread_local global i32 0, align 4");
     }
 
     bool run_on_module(Module* module) override {
-        print_nelem(module);
+        test_append_global(module);
         return true;
     }
 };
 
-REGISTER_PASS(CtxVarPass);
+REGISTER_PASS(LBRPass);

@@ -157,23 +157,42 @@ void LLParser::parse_comdats() {
     }
 }
 
+/**@brief Try to parse a global variable from the current line
+ *
+ * Return the new GV* on success
+ * Return NULL if the line is not a gv line
+ *
+ * @param module
+ * @return
+ */
+GlobalVariable* LLParser::parse_global(Module * module) {
+    GlobalVariable* gv = new GlobalVariable();
+    inc_intext_pos();
+    get_word('=');
+
+    zps(_word)
+    Strings::strip(_word);
+    gv->set_name(_word);
+    parser_assert(!_word.empty(), "");
+    get_word();
+
+    // todo: 'alias' does not have to be right after '='
+    if (_word == "alias") {
+        return NULL;
+    }
+    gv->set_raw_text(line());
+    module->add_global_variable(gv);
+    return gv;
+}
+
+
 void LLParser::parse_globals(Module * module) {
     while (line()[0] == '@') {
-        GlobalVariable* gv = new GlobalVariable();
-        inc_intext_pos();
-        get_word('=');
-        Strings::strip(_word);
-        gv->set_name(_word);
-        parser_assert(!_word.empty(), "");
-        get_word();
-
-        // todo: 'alias' does not have to be right after '='
-        if (_word == "alias") {
+        GlobalVariable* gv = parse_global(module);
+        if (!gv) {
             set_text(_text);
             break;
         }
-        gv->set_raw_text(line());
-        module->add_global_variable(gv);
         get_real_line();
     }
 }

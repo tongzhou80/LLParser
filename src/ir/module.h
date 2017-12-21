@@ -108,7 +108,7 @@ public:
     std::vector<MetaData*>& unnamed_metadata_list()        { return _unnamed_metadata_list; }
 
     // Globals
-    void append_new_global(string& text);
+    void append_new_global(string text);
 
     string module_id()                                     { return _module_id; }
     void set_module_id(string id)                          { _module_id = id; }

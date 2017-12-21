@@ -18,6 +18,7 @@ class Module;
 class StructType;
 class Function;
 class BasicBlock;
+class GlobalVariable;
 
 class DIFile;
 class DISubprogram;
@@ -78,6 +79,7 @@ public:
     void parse_structs(Module* );
     void parse_comdats();
     void parse_globals(Module* );
+    GlobalVariable* parse_global(Module* );
     void parse_aliases();
     void parse_functions();
     void parse_function_declaration();

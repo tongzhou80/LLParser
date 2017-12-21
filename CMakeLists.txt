@@ -38,6 +38,7 @@ add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
 add_library(PrintFunction SHARED src/transform/print-function/printFunction.cpp)
 add_library(SplitModule SHARED src/transform/split-module/splitModule.cpp)
 add_library(IncludeTrace SHARED src/transform/include-trace/main.cpp)
+add_library(LBR SHARED src/transform/lbr/lbr.cpp)
 
 #set_target_properties(NewClone PROPERTIES COMPILE_FLAGS "-g -rdynamic")
 
