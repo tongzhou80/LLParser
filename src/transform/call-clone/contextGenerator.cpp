@@ -20,6 +20,16 @@ ContextGenerator::~ContextGenerator() {
     _ofs.close();
 }
 
+/**
+ *
+ * nlevel is in the sense of the height of the tree. If the call graph is
+ * A -> malloc, B -> malloc, C -> A
+ * nlevel = 1 will consider A and B, but not C
+ * @param module
+ * @param alloc
+ * @param nlevel
+ * @return
+ */
 std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int nlevel) {
     _paths.clear();
     _stack.clear();

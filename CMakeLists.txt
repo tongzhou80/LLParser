@@ -35,6 +35,7 @@ add_library(Atrace SHARED src/transform/atrace/atrace.cpp)
 add_library(HotCallClone SHARED src/transform/hot-call-clone/hotCallClone3.cpp)
 add_library(NewClone SHARED src/transform/new-clone/newClone.cpp)
 add_library(PrintCaller SHARED src/transform/print-caller/printCaller.cpp)
+add_library(PrintFunction SHARED src/transform/print-function/printFunction.cpp)
 add_library(SplitModule SHARED src/transform/split-module/splitModule.cpp)
 add_library(IncludeTrace SHARED src/transform/include-trace/main.cpp)
 

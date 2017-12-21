@@ -8,6 +8,7 @@
 #include <di/diEssential.h>
 #include <utilities/flags.h>
 #include <asmParser/sysDict.h>
+#include <asmParser/llParser.h>
 
 string Module::get_header(string key) {
      if (_headers.find(key) == _headers.end()) {
@@ -16,6 +17,13 @@ string Module::get_header(string key) {
      else {
          return _headers[key];
      }
+}
+
+// Globals
+void Module::append_new_global(string &text) {
+    LLParser* parser = SysDict::parser;
+    parser->set_line(text);
+    parser->parse_globals(this);
 }
 
 Function* Module::get_function(string key) {
