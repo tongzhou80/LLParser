@@ -50,7 +50,7 @@ void StringParser::match(const string& s, bool skip_whitspace) {
             continue;
         }
         else {
-            parser_assert(0, "match |%s| but get |%s|", s.c_str(), text().substr(startp, len).c_str());
+            parser_assert(0, "tries to match |%s| but differs at pos %d: |%c|", s.c_str(), len, text()[startp+len]);
         }
     }
 }
@@ -184,6 +184,7 @@ int StringParser::parse_integer(bool skip_whitespace) {
     }
     else {
         guarantee(0, "end of line");
+        return 0;
     }
 }
 //

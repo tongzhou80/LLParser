@@ -424,32 +424,7 @@ void InstParser::do_store(Instruction *ins) {
     string ty = parse_compound_type();
     string value = match_value();
     parser_assert(!value.empty(), "expect a value after %s", ty.c_str());
-
     di->set_raw_field("value", value);
-
-//    get_lookahead();
-//    if (_lookahead == "getelementptr") {
-//        jump_ahead();
-//        auto gepi = new GetElementPtrInst();
-//        do_getelementptr(gepi, true);
-//        di->set_raw_field("value", gepi->raw_text());
-//        match(',');
-//    }
-//    else if (_lookahead == "bitcast") {
-//        jump_ahead();
-//        auto bci = new BitCastInst();
-//        do_bitcast(bci, true);
-//        //di->set_raw_field("value", bci->get_raw_field("value"));
-//        di->set_raw_field("value", bci->raw_text());
-//        di->set_raw_field("final-value", bci->get_raw_field("value"));
-//        syntax_check(bci->get_raw_field("ty2") == ty);
-//        match(',');
-//    }
-//    else {
-//        string value = match_value();
-//        //zps(value)
-//        di->set_raw_field("value", value);
-//    }
 
     /* the match_value() may or may not skip the ',' */
     if (_char == ',') {
@@ -463,26 +438,35 @@ void InstParser::do_store(Instruction *ins) {
 
     di->set_raw_field("ty", ty);
 
-    get_word_of(" ,");
+    //get_word_of(" ,");
 
-    if (_word == "getelementptr") {
-        GetElementPtrInst* gepi = new GetElementPtrInst();
-        do_getelementptr(gepi, true);
-        di->set_raw_field("pointer", gepi->raw_text());
-        match(',');
+    value = match_value();
+    parser_assert(!value.empty(), "expect a pointer after %s*", ty.c_str());
+    di->set_raw_field("pointer", value);
+    /* the match_value() may or may not skip the ',' */
+    if (_char == ',') {
+        inc_intext_pos();
     }
-    else if (_word == "bitcast") {
-        BitCastInst* bci = new BitCastInst();
-        do_bitcast(bci, true);
-        //di->set_raw_field("pointer", bci->get_raw_field("value"));
-        di->set_raw_field("pointer", bci->raw_text());
-        di->set_raw_field("final-pointer", bci->get_raw_field("value"));
-        syntax_check(bci->get_raw_field("ty2") == ty_p);
-        match(',');
-    }
-    else {
-        di->set_raw_field("pointer", _word);  // might do some syntax check on pointer
-    }
+
+
+//    if (_word == "getelementptr") {
+//        GetElementPtrInst* gepi = new GetElementPtrInst();
+//        do_getelementptr(gepi, true);
+//        di->set_raw_field("pointer", gepi->raw_text());
+//        match(',');
+//    }
+//    else if (_word == "bitcast") {
+//        BitCastInst* bci = new BitCastInst();
+//        do_bitcast(bci, true);
+//        //di->set_raw_field("pointer", bci->get_raw_field("value"));
+//        di->set_raw_field("pointer", bci->raw_text());
+//        di->set_raw_field("final-pointer", bci->get_raw_field("value"));
+//        syntax_check(bci->get_raw_field("ty2") == ty_p);
+//        match(',');
+//    }
+//    else {
+//        di->set_raw_field("pointer", _word);  // might do some syntax check on pointer
+//    }
 
     //zps(li->raw_text())
     //zpl("load from %s", li->get_raw_field("pointer").c_str())
