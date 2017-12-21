@@ -79,7 +79,7 @@ public:
     void print_to_stream(std::ostream& ofs);
 
     bool is_clone()                                         { return _is_clone; }
-    bool set_is_clone(bool v=1)                             { _is_clone = 1; }
+    void set_is_clone(bool v=1)                             { _is_clone = 1; }
 };
 
 

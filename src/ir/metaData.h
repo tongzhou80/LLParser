@@ -29,7 +29,7 @@ public:
     virtual void resolve_non_refs() {}
     virtual void resolve_refs() {}
     bool is_resolved()                                       { return _is_resolved; }
-    bool set_is_resolved(bool v=1)                           { _is_resolved = v; }
+    void set_is_resolved(bool v=1)                           { _is_resolved = v; }
 };
 
 

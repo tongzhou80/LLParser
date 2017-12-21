@@ -22,10 +22,8 @@ string Module::get_header(string key) {
 // Globals
 void Module::append_new_global(string text) {
     LLParser* parser = SysDict::parser;
-    zpl("to add")
     parser->set_line(text);
-    parser->parse_globals(this);
-
+    parser->parse_global(this);
 }
 
 Function* Module::get_function(string key) {

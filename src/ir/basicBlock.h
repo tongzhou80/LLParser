@@ -57,10 +57,10 @@ public:
     Module* module() const;
 
     bool is_entry()                                       { return _is_entry; }
-    bool set_is_entry(bool v=1)                           { _is_entry = v; }
+    void set_is_entry(bool v=1)                           { _is_entry = v; }
 
     bool is_exit()                                        { return _is_exit; }
-    bool set_is_exit(bool v=1)                            { _is_exit = v; }
+    void set_is_exit(bool v=1)                            { _is_exit = v; }
 
     void append_pred(string label)                        { _pred_labels.push_back(label); }
 

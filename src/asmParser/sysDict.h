@@ -34,7 +34,8 @@ public:
     static Module* module();
     static const string& filename();
     static const string filedir();
-
+    static const string get_pass_out_name(string passname);
+    static const string pass_print_to_file(string passname, Module*);
 
     /* for UseSplitModule */
     static void merge_modules();

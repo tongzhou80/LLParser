@@ -8,6 +8,7 @@
 #include <utilities/flags.h>
 #include <asmParser/llParserTLS.h>
 #include <asmParser/instFlags.h>
+#include <peripheral/sysArgs.h>
 #include "sysDict.h"
 #include "instParser.h"
 #include "llParser.h"
@@ -82,6 +83,26 @@ const string SysDict::filedir() {
     }
 }
 
+const string SysDict::get_pass_out_name(string passname) {
+    string suffix = "."+passname+".ll";
+    string out = SysArgs::get_option("output");
+    if (out.empty()) {
+        out = SysDict::filename();
+        if (Strings::contains(out, ".ll")) {
+            Strings::ireplace(out, ".ll", suffix);
+        }
+        else {
+            out += suffix;
+        }
+    }
+    return out;
+}
+
+const string SysDict::pass_print_to_file(string passname, Module* module) {
+    string out = get_pass_out_name(passname);
+    std::cout << "Pass " + passname + " printing to file " + out << std::endl;
+    module->print_to_file(out);
+}
 
 /**@brief Register a module.
  *

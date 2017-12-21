@@ -4,7 +4,7 @@ project(LLParser)
 include_directories(src/)
 SET(CMAKE_CXX_FLAGS "-std=c++11 -g -rdynamic")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DLLDEBUG -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wreturn-type -DLLDEBUG -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DPRODUCTION -O3")
 
 find_package(OpenMP)
