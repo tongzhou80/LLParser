@@ -76,12 +76,11 @@ string IRParser::match_identifier() {
     }
 }
 
-string IRParser::match_constant_expr() {
-
-}
-
 string IRParser::match_value() {
-    if (_char == '%' || _char == '@') {  // named variables and unnamed variables(%num)
+    /* named variables and unnamed variables(%num)
+     * global variables are actually also constants although (known at link-time)
+     */
+    if (_char == '%' || _char == '@') {
         get_word_of(" ,");
         return _word;
     }
@@ -131,36 +130,79 @@ string IRParser::match_complex_constant() {
     return jump_to_end_of_scope();
 }
 
-string IRParser::match_constant() {
+string IRParser::match_constant_expr() {
     get_lookahead_of(" ,");
-    if (_lookahead == "zeroinitializer") {
+    if (_lookahead == "zeroinitializer") { // actually a complex constant
         jump_ahead();
         return _lookahead;
     }
-    else if (_lookahead == "inttoptr"
-             || _lookahead == "trunc"
-             || _lookahead == "zext"
-             || _lookahead == "sext"
-             || _lookahead == "fptrunc"
-             || _lookahead == "fpext"
-             || _lookahead == "fptoui"
-             || _lookahead == "fptosi"
-             || _lookahead == "uitofp"
-             || _lookahead == "sitofp"
-             || _lookahead == "ptrtoint"
-             || _lookahead == "inttoptr"
-             || _lookahead == "bitcast"
-             || _lookahead == "addrspacecast"
-            ) {
+    else if (IRFlags::is_const_expr_opcode(_lookahead)) {
+        /* need some special code for gep, icmp and fcmp */
         jump_ahead();
+        
         return jump_to_end_of_scope();
     }
-
-    if (_char == '{' || _char == '[' || _char == '<') {
-        return match_complex_constant();
-    }
     else {
-        return match_simple_constant();
+        return "";
+    }
+}
+
+/**@brief Match a constant. Return an empty string on failure
+ * Parse order:
+ * complex constant
+ * simple constant
+ * constant expression
+ * @return
+ */
+string IRParser::match_constant() {
+//    string ret = match_constant_expr();
+//    if (!ret.empty()) {
+//        return ret;
+//    }
+//
+//    /* not a constant expression: continue trying */
+//    get_lookahead_of(" ,");
+//    if (_lookahead == "zeroinitializer") {
+//        jump_ahead();
+//        return _lookahead;
+//    }
+//    else if (_lookahead == "inttoptr"
+//             || _lookahead == "trunc"
+//             || _lookahead == "zext"
+//             || _lookahead == "sext"
+//             || _lookahead == "fptrunc"
+//             || _lookahead == "fpext"
+//             || _lookahead == "fptoui"
+//             || _lookahead == "fptosi"
+//             || _lookahead == "uitofp"
+//             || _lookahead == "sitofp"
+//             || _lookahead == "ptrtoint"
+//             || _lookahead == "inttoptr"
+//             || _lookahead == "bitcast"
+//             || _lookahead == "addrspacecast"
+//            ) {
+//        jump_ahead();
+//        return jump_to_end_of_scope();
+//    }
+    string ret;
+    if (_char == '{' || _char == '[' || _char == '<') {
+        ret = match_complex_constant();  // not include zeroinitializer
+        if (!ret.empty()) {
+            return ret;
+        }
+        else {
+            parser_assert(!ret.empty(), "expect complex constant, but got empty");
+        }
+    }
+
+    ret = match_simple_constant();
+    if (!ret.empty()) {
+        return ret;
+    }
+
+    ret = match_constant_expr();
+    if (!ret.empty()) {
+        return ret;
     }
 }
 

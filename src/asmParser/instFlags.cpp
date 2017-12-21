@@ -16,6 +16,8 @@ std::set<string> IRFlags::_param_attrs;
 std::set<string> IRFlags::_tails;
 std::set<string> IRFlags::_terminator_insts;
 
+std::set<string> IRFlags::_const_expr_opcodes;
+
 void IRFlags::init() {
     _fastmaths = { "nnan", "ninf", "nsz", "arcp", "contract", "fast"};
     _linkages = { "private", "internal", "available_externally", "weak", "linkonce", "common",
@@ -26,8 +28,12 @@ void IRFlags::init() {
     _param_attrs = { "zeroext", "signext", "inreg", "byval", "inalloca", "sret", "align", "noalias",
                      "nocapture", "nest", "returned", "nonnull", "dereferenceable", "dereferenceable_or_null" }; // more to go
     _tails = { "tail", "musttail", "notail" };
-
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
+    _const_expr_opcodes = { "trunc", "zext", "sext", "fptrunc", "fpext",
+                            "fptoui", "fptosi", "uitofp", "sitofp", "ptrtoint",
+                            "inttoptr", "bitcast", "addrspacecast", "getelementptr", "select",
+                            "icmp", "fcmp", "extractelement", "insertelement", "shufflevector",
+                            "extractvalue", "insertvalue" };
 }
 
 bool IRFlags::is_cconv_flag(const string& key) {
@@ -63,4 +69,16 @@ bool IRFlags::is_param_attr_flag(const string& key) {
     }
 
     return _param_attrs.find(key) != _param_attrs.end();
+}
+
+bool IRFlags::is_const_expr_opcode(const string &key) {
+    if (_const_expr_opcodes.find(key) != _const_expr_opcodes.end()) {
+        return true;
+    }
+
+    if (is_binary_opcode(key)) {
+        return true;
+    }
+
+    return false;
 }

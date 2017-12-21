@@ -36,7 +36,7 @@ public:
     int parse_integer(bool skip_ws=1);
     void get_lookahead(char delim=' ', bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
     void jump_ahead();
-    StringParser* get_word_of(string delims,  bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
+    StringParser* get_word_of(string delims, bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
     void get_lookahead_of(string delims, bool append_delim=0, bool skip_delim=1, bool skip_ws=1);
 
     bool try_match(const string& s, bool skip_ws=false);

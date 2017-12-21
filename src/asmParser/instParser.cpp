@@ -422,30 +422,32 @@ void InstParser::do_store(Instruction *ins) {
     set_optional_field(ins, "volatile");
 
     string ty = parse_compound_type();
-    //zps(ty)
-    get_lookahead();
-    if (_lookahead == "getelementptr") {
-        jump_ahead();
-        auto gepi = new GetElementPtrInst();
-        do_getelementptr(gepi, true);
-        di->set_raw_field("value", gepi->raw_text());
-        match(',');
-    }
-    else if (_lookahead == "bitcast") {
-        jump_ahead();
-        auto bci = new BitCastInst();
-        do_bitcast(bci, true);
-        //di->set_raw_field("value", bci->get_raw_field("value"));
-        di->set_raw_field("value", bci->raw_text());
-        di->set_raw_field("final-value", bci->get_raw_field("value"));
-        syntax_check(bci->get_raw_field("ty2") == ty);
-        match(',');
-    }
-    else {
-        string value = match_value();
-        //zps(value)
-        di->set_raw_field("value", value);
-    }
+    string value = match_value();
+    di->set_raw_field("value", value);
+
+//    get_lookahead();
+//    if (_lookahead == "getelementptr") {
+//        jump_ahead();
+//        auto gepi = new GetElementPtrInst();
+//        do_getelementptr(gepi, true);
+//        di->set_raw_field("value", gepi->raw_text());
+//        match(',');
+//    }
+//    else if (_lookahead == "bitcast") {
+//        jump_ahead();
+//        auto bci = new BitCastInst();
+//        do_bitcast(bci, true);
+//        //di->set_raw_field("value", bci->get_raw_field("value"));
+//        di->set_raw_field("value", bci->raw_text());
+//        di->set_raw_field("final-value", bci->get_raw_field("value"));
+//        syntax_check(bci->get_raw_field("ty2") == ty);
+//        match(',');
+//    }
+//    else {
+//        string value = match_value();
+//        //zps(value)
+//        di->set_raw_field("value", value);
+//    }
 
     inc_intext_pos();
     string ty_p = parse_compound_type();
