@@ -139,18 +139,21 @@ string IRParser::match_constant_expr() {
     else if (IRFlags::is_const_expr_opcode(_lookahead)) {
         /* need some special code for gep, icmp and fcmp */
         jump_ahead();
+        string op = _word;
         if (_word == "getelementptr") {
             get_lookahead_of(", ");
             if (_lookahead == "inbounds") {
                 jump_ahead();
+                op += " inbounds";
             }
         }
 
         if (_word == "icmp" || _word == "fcmp") {
             get_word(); // should be COND
+            op += " " + _word;
         }
 
-        return jump_to_end_of_scope();
+        return op + " " + jump_to_end_of_scope();
     }
     else {
         return "";

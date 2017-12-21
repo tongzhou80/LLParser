@@ -21,7 +21,9 @@ class IRFlags {
     static std::set<string> _terminator_insts;
 
     static std::set<string> _binary_opcodes;
+    static std::set<string> _bitwise_binary_opcodes;
     static std::set<string> _const_expr_opcodes;
+
 public:
     static void init();
     static std::set<string> fastmaths()                                   { return _fastmaths; }
@@ -46,6 +48,7 @@ public:
     static bool is_terminator_inst(const string& key)                     { return _terminator_insts.find(key) != _terminator_insts.end(); }
 
     static bool is_binary_opcode(const string& key)                       { return _binary_opcodes.find(key) != _binary_opcodes.end(); }
+    static bool is_bitwise_binary_opcode(const string& key)               { return _bitwise_binary_opcodes.find(key) != _bitwise_binary_opcodes.end(); }
     static bool is_const_expr_opcode(const string& key);//                   { return _const_expr_opcodes.find(key) != _const_expr_opcodes.end(); }
 };
 

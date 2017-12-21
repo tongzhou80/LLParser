@@ -423,10 +423,8 @@ void InstParser::do_store(Instruction *ins) {
 
     string ty = parse_compound_type();
     string value = match_value();
+    parser_assert(!value.empty(), "expect a value after %s", ty.c_str());
 
-        zps(text())
-
-    zps(value)
     di->set_raw_field("value", value);
 
 //    get_lookahead();
@@ -453,14 +451,17 @@ void InstParser::do_store(Instruction *ins) {
 //        di->set_raw_field("value", value);
 //    }
 
-    inc_intext_pos();
+    /* the match_value() may or may not skip the ',' */
+    if (_char == ',') {
+        inc_intext_pos();
+    }
+
     string ty_p = parse_compound_type();
     if (ty_p != ty + '*') {
         syntax_check(ty_p == ty + '*');
     }
 
     di->set_raw_field("ty", ty);
-
 
     get_word_of(" ,");
 

@@ -17,6 +17,7 @@ std::set<string> IRFlags::_tails;
 std::set<string> IRFlags::_terminator_insts;
 
 std::set<string> IRFlags::_binary_opcodes;
+std::set<string> IRFlags::_bitwise_binary_opcodes;  // todo: to add
 std::set<string> IRFlags::_const_expr_opcodes;
 
 void IRFlags::init() {
@@ -30,6 +31,9 @@ void IRFlags::init() {
                      "nocapture", "nest", "returned", "nonnull", "dereferenceable", "dereferenceable_or_null" }; // more to go
     _tails = { "tail", "musttail", "notail" };
     _terminator_insts = { "ret", "br", "switch", "indirectbr", "invoke", "resume", "catchswitch", "catchret", "cleanupret", "unreachable" };
+    _binary_opcodes = { "add", "fadd", "sub", "fsub", "mul",
+                        "fmul", "udiv", "sdiv", "fdiv", "urem",
+                        "srem", "frem"};
     _const_expr_opcodes = { "trunc", "zext", "sext", "fptrunc", "fpext",
                             "fptoui", "fptosi", "uitofp", "sitofp", "ptrtoint",
                             "inttoptr", "bitcast", "addrspacecast", "getelementptr", "select",
@@ -45,6 +49,8 @@ bool IRFlags::is_cconv_flag(const string& key) {
     if (Strings::startswith(key, "cc")) {
         return Strings::is_number(key.substr(2));
     }
+
+    return false;
 }
 
 
@@ -77,7 +83,7 @@ bool IRFlags::is_const_expr_opcode(const string &key) {
         return true;
     }
 
-    if (is_binary_opcode(key)) {
+    if (is_binary_opcode(key) || is_bitwise_binary_opcode(key)) {
         return true;
     }
 
