@@ -96,7 +96,7 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        module->append_new_global("@sopt.ctx = thread_local global i32 0, align 4");
+        module->append_new_global("@sopt.ctx = external thread_local global i32, align 4");
         std::set<Function*> funcs;
         get_target_functions(module, funcs);
         zpd(funcs.size())
