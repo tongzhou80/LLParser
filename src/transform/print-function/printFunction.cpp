@@ -18,7 +18,7 @@ public:
         _inst_cnt += function->instruction_count();
     }
 
-    bool do_finalization(Module* M) override {
+    void do_finalization(Module* M) override {
         std::cout << "in total: " << M->function_list().size() << " functions, "
                   << _inst_cnt << " instructions" << std::endl;
     }

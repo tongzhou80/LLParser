@@ -705,8 +705,8 @@ public:
             printf("\n");
     }
 
-    bool do_initialization() override {}
-    bool do_finalization() override {}
+    void do_initialization() override {}
+    void do_finalization() override {}
 };
 
 

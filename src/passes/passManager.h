@@ -37,7 +37,7 @@ public:
     void add_pass(string name);
     Pass* load_pass(string name);
 
-    int insert_with_priority(std::vector<Pass*>& list, Pass* p);
+    void insert_with_priority(std::vector<Pass*>& list, Pass* p);
 
     void apply_global_passes();
     void apply_module_passes(Module* module);

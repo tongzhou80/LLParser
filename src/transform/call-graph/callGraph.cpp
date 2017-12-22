@@ -36,7 +36,7 @@ public:
 
     void print_dot_line(string caller, string callee);
 
-    //bool do_finalization(Module* module);
+    //void do_finalization(Module* module);
 };
 
 bool CallgraphPass::run_on_module(Module *module) {

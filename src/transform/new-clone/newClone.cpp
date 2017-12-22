@@ -61,7 +61,7 @@ public:
 
     }
 
-    int match_header(string& line) {
+    void match_header(string& line) {
         char hotness[11];  // max hold 0xffffffff + '\0'
         int apid;
 
@@ -363,18 +363,18 @@ public:
         zpl("recog: %d, path: %d, cxt: %d", recognized, _path_counter, _cxt_counter);
     }
 
-    bool insert_declaration(string oldname, string newname, bool add_id=true) {
+    void insert_declaration(string oldname, string newname, bool add_id=true) {
         Function* func = SysDict::module()->get_function(oldname);
 
         if (func == NULL) {
-            return 0;
+            return;
         }
         guarantee(func->is_external(), "malloc family should be external");
         //Function* newfunc = SysDict::module()->create_child_function(_new_malloc);
 
         Function* existed = SysDict::module()->get_function(newname);
         if (existed) {
-            return 0; // return if already inserted
+            return; // return if already inserted
         }
 
         /* manipulate the text */
@@ -517,7 +517,7 @@ public:
         SysDict::module()->print_to_file(out);
     }
 
-    //bool do_finalization(Module* module);
+    //void do_finalization(Module* module);
 };
 
 REGISTER_PASS(NewClonePass);

@@ -100,7 +100,7 @@ public:
         return _lang;
     }
 
-    bool do_initialization() override {
+    void do_initialization() override {
         if (has_argument("lang")) {
             _lang = get_argument("lang");
         }
@@ -387,18 +387,18 @@ public:
 //        }
 //    }
 
-    bool insert_declaration(Module* m, string oldname, string newname, bool add_id=true) {
+    void insert_declaration(Module* m, string oldname, string newname, bool add_id=true) {
         Function* func = m->get_function(oldname);
 
         if (func == NULL) {
-            return false;
+            return;
         }
 
         /* _Znwm is defined in omnetpp */
         guarantee(func->is_external(), "malloc family should be external: %s", func->raw_c_str());
 
         if (m->get_function(newname)) {
-            return false; // return if already inserted
+            return; // return if already inserted
         }
 
         /* manipulate the text */

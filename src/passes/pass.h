@@ -108,37 +108,33 @@ public:
         return false; // not mutate
     }
 
-    virtual bool parse_epilogue() {
-        printf("Pass.epilogue called: used for parse time passes, execute after all the parsing is done\n");
-    }
-
     /**@brief Do initialization work for a module pass
      *
      * This happens AFTER pass's arguments are parsed,
      * so this method is often used to do some further
      * processing before it runs on any module.
      */
-    virtual bool do_initialization() {
+    virtual void do_initialization() {
         printf("<warning>: Pass::do_initialization() called, do nothing\n");
     }
 
-    virtual bool do_finalization() {
+    virtual void do_finalization() {
         printf("<warning>: Pass::do_finalization() called, do nothing\n");
     }
 
-    virtual bool do_initialization(Module* M) {
+    virtual void do_initialization(Module* M) {
         printf("<warning>: Pass::do_initialization(Module*) called: do nothing\n");
     }
 
-    virtual bool do_finalization(Module* M) {
+    virtual void do_finalization(Module* M) {
         printf("<warning>: Pass::do_finalization(Module*) called: do nothing\n");
     }
 
-    virtual bool do_initialization(Function* F) {
+    virtual void do_initialization(Function* F) {
         printf("<warning>: Pass::do_initialization(Function*) called: do nothing\n");
     }
 
-    virtual bool do_finalization(Function* F) {
+    virtual void do_finalization(Function* F) {
         printf("<warning>: Pass::do_finalization(Function*) called: do nothing\n");
     }
 
@@ -153,7 +149,7 @@ public:
         p->set_name(#classname); \
         return p; \
     } \
-    extern "C" Pass* __unload_pass_##classname(classname* p) { \
+    extern "C" void __unload_pass_##classname(classname* p) { \
         /* printf("dynamically unload pass " #classname "!\n"); */ \
         delete p; \
     } \

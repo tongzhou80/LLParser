@@ -16,7 +16,7 @@
 
 
 class CallClonePass: public Pass {
-    //bool do_finalization(Module* module);
+    //void do_finalization(Module* module);
 };
 
 

@@ -98,7 +98,7 @@ void PassManager::initialize_passes() {
     }
 }
 
-int PassManager::insert_with_priority(std::vector<Pass *>& list, Pass *p) {
+void PassManager::insert_with_priority(std::vector<Pass *>& list, Pass *p) {
     int i;
     for (i = 0; i < list.size(); ++i) {
         if (list[i]->priority() < p->priority()) {
@@ -267,23 +267,23 @@ void PassManager::apply_basic_block_passes(BasicBlock *bb) {
 void PassManager::apply_initializations(Module *module) {
     std::vector<Pass*>& passes = _function_passes;
     for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->do_initialization(module);
+        passes[i]->do_initialization(module);
     }
 
     std::vector<Pass*>& passes1 = _basic_block_passes;
     for (int i = 0; i < passes1.size(); ++i) {
-        int mutated = passes1[i]->do_initialization(module);
+        passes1[i]->do_initialization(module);
     }
 }
 
 void PassManager::apply_finalization(Module *module) {
     std::vector<Pass*>& passes = _function_passes;
     for (int i = 0; i < passes.size(); ++i) {
-        int mutated = passes[i]->do_finalization(module);
+        passes[i]->do_finalization(module);
     }
 
     std::vector<Pass*>& passes2 = _basic_block_passes;
     for (int i = 0; i < passes2.size(); ++i) {
-        int mutated = passes2[i]->do_finalization(module);
+        passes2[i]->do_finalization(module);
     }
 }

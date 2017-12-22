@@ -15,13 +15,13 @@ public:
         set_is_function_pass();
     }
 
-    bool do_initialization(Module*)  {}
+    void do_initialization(Module*)  {}
 
     bool run_on_function(Function* func) {
         printf("hello function: %s\n", func->name().c_str());
     }
 
-    bool do_finalization(Module* m)  {
+    void do_finalization(Module* m)  {
         printf("function count: %d\n", m->function_list().size());
     }
 };

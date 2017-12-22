@@ -14,11 +14,11 @@ public:
         set_is_module_pass();
     }
 
-    bool do_initialization() override {
+    void do_initialization() override {
         _ofs.open("inclusion.txt");
     }
 
-    bool do_finalization() override {
+    void do_finalization() override {
         _ofs.close();
     }
 

@@ -26,7 +26,7 @@ public:
 
     // Declare but not implement the destructor causes a ATrace symbol not found error in dlopen
 
-    bool do_initialization(Module* M) override {
+    void do_initialization(Module* M) override {
         string text = "declare void @xps_record_load(i8*)";
         Function* newfunc = IRBuilder::create_function_declaration(text);
         M->append_new_function(newfunc);
@@ -36,7 +36,7 @@ public:
         M->append_new_function(newfunc);
     }
 
-    bool do_finalization(Module* M) override {
+    void do_finalization(Module* M) override {
         string out = Strings::replace(SysDict::filename(), ".ll", ".atrace.ll");
         if (SysArgs::has_property("output")) {
             out = SysArgs::get_property("output");
@@ -143,7 +143,7 @@ public:
         return true;
     }
 
-    //bool do_finalization(Module* module);
+    //void do_finalization(Module* module);
 };
 
 REGISTER_PASS(AtracePass)

@@ -759,7 +759,7 @@ public:
         }
     }
 
-    //bool do_finalization(Module* module);
+    //void do_finalization(Module* module);
 };
 
 
