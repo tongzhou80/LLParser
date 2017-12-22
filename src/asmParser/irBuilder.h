@@ -16,6 +16,8 @@ class GlobalVariable;
 
 class IRBuilder {
 public:
+    static int new_var;
+
     static string get_new_local_varname();
     static string get_new_global_varname();
         

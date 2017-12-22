@@ -51,20 +51,35 @@ public:
     void instrument_calls(Module* module, std::vector<Function*>& funcs, int mode) {
         for (auto F: funcs) {
             for (auto ci: F->caller_list()) {
+                /* instrument exit */
                 string v1 = IRBuilder::get_new_local_varname();
                 Instruction* i1 = IRBuilder::create_instruction(v1+" = load i32, i32* @sopt.ctx, align 4");
                 string v2 = IRBuilder::get_new_local_varname();
-                string i2_text = v2 + " = add i32 " + v1 + ", " + std::to_string(ci->dbg_id());
+                string i2_text = v2 + " = sub i32 " + v1 + ", " + std::to_string(ci->dbg_id());
                 Instruction* i2 = IRBuilder::create_instruction(i2_text);
-                Instruction* i3 = IRBuilder::create_instruction("store i32 %3, i32* @ti, align 4");
+                Instruction* i3 = IRBuilder::create_instruction("store i32 "+v2+", i32* @sopt.ctx, align 4");
 
                 int ci_pos = ci->get_index_in_block();
+                ci->parent()->insert_instruction(ci_pos+1, i3);
+                ci->parent()->insert_instruction(ci_pos+1, i2);
+                ci->parent()->insert_instruction(ci_pos+1, i1);
+
+                /* instrument entry */
+                v1 = IRBuilder::get_new_local_varname();
+                i1 = IRBuilder::create_instruction(v1+" = load i32, i32* @sopt.ctx, align 4");
+                v2 = IRBuilder::get_new_local_varname();
+                i2_text = v2 + " = add i32 " + v1 + ", " + std::to_string(ci->dbg_id());
+                i2 = IRBuilder::create_instruction(i2_text);
+                i3 = IRBuilder::create_instruction("store i32 "+v2+", i32* @sopt.ctx, align 4");
+
+                ci_pos = ci->get_index_in_block();
                 ci->parent()->insert_instruction(ci_pos, i3);
                 ci->parent()->insert_instruction(ci_pos, i2);
                 ci->parent()->insert_instruction(ci_pos, i1);
             }
         }
     }
+
 
     void test_append_global(Module* module) {
         module->append_new_global("@sopt.bp.1 = thread_local global i32 0, align 4");
