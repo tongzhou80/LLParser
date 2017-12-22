@@ -24,7 +24,7 @@
  * @param llparser: specify which llparser to use, defaults to SysDict::parser
  * @return
  */
-Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
+Instruction* IRBuilder::create_instruction(string text, LLParser* llparser) {
     if (llparser == NULL) {
         llparser = SysDict::parser;
     }

@@ -88,6 +88,9 @@ public:
     virtual Instruction* clone();
 //    Function* function()                      { return _func; }
 //    void set_function(Function* f)            { _func = f; }
+
+    void print_to_stream(std::ostream &os) override ;
+    void print_to_stream(FILE* fp) override ;
 };
 
 

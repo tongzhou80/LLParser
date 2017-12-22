@@ -85,3 +85,15 @@ Instruction* Instruction::clone() {
     i->set_parent(NULL);
     return i;
 }
+
+void Instruction::print_to_stream(std::ostream &os) {
+    string& text = raw_text();
+    if (!(text[0] == ' ' && text[1] == ' ')) {
+        text = "  " + text;
+    }
+    os << raw_text() << std::endl;
+}
+
+void Instruction::print_to_stream(FILE *fp) {
+    Value::print_to_stream(fp);
+}

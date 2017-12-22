@@ -48,23 +48,35 @@ public:
         }
     }
 
-    void instrument_calls(Module* module, std::vector<Function*>& funcs) {
+    void instrument_calls(Module* module, std::vector<Function*>& funcs, int mode) {
         for (auto F: funcs) {
             for (auto ci: F->caller_list()) {
-                
-                //int ci_pos = get_index_in_block();
-                //ci->parent()->insert_instruction(ci_pos, )
+                string v1 = IRBuilder::get_new_local_varname();
+                Instruction* i1 = IRBuilder::create_instruction(v1+" = load i32, i32* @sopt.ctx, align 4");
+                string v2 = IRBuilder::get_new_local_varname();
+                string i2_text = v2 + " = add i32 " + v1 + ", " + std::to_string(ci->dbg_id());
+                Instruction* i2 = IRBuilder::create_instruction(i2_text);
+                Instruction* i3 = IRBuilder::create_instruction("store i32 %3, i32* @ti, align 4");
+
+                int ci_pos = ci->get_index_in_block();
+                ci->parent()->insert_instruction(ci_pos, i3);
+                ci->parent()->insert_instruction(ci_pos, i2);
+                ci->parent()->insert_instruction(ci_pos, i1);
             }
         }
     }
 
     void test_append_global(Module* module) {
-        module->append_new_global("@sopt.br.1 = thread_local global i32 0, align 4");
+        module->append_new_global("@sopt.bp.1 = thread_local global i32 0, align 4");
         module->print_to_file(SysDict::get_pass_out_name("lbr"));
     }
 
     bool run_on_module(Module* module) override {
-        
+        module->append_new_global("@sopt.ctx = thread_local global i32 0, align 4");
+        std::vector<Function*> roots;
+        roots.push_back(module->get_function("malloc"));
+        instrument_calls(module, roots, 0);
+        module->print_to_file(SysDict::get_pass_out_name("lbr"));
         return true;
     }
 };
