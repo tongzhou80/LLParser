@@ -9,7 +9,6 @@
 #include <di/diEssential.h>
 
 Instruction::Instruction(): Value() {
-    _is_fully_parsed = false;
     //_parser = SysDict::instParser;  // for synchronous inst parsing
     _type = UnknownInstType;
     _has_assignment = false;
