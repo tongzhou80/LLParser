@@ -111,7 +111,7 @@ public:
         // start with that key.
         // If each path has a distinct first call site (no
         // call sites share the same first call site), the
-        // cloning algorithm terminates
+        // cloning algorithm terminates.
         std::map<CallInstFamily*, std::vector<XPath*>> head_map;
         for (auto xpath: _all_paths) {
             auto dr = xpath->path[0];
@@ -121,51 +121,62 @@ public:
             head_map[dr].push_back(xpath);
         }
 
-        for (auto dr: head_map) {
-            auto& paths = dr.second;
-            if (paths.size() > 1) {
-                replaced = true;
-                int i = 0;
-                for (; check_common_edge(paths, i) ; ++i) {}
-                if (i == 0) {
-                    for (auto p: paths) {
-                        check_path(p->path, true);
-                    }
-                }
-                guarantee(i > 0, "");
-
-                /* paths is a set of XPS_Paths that share i common items, for example
-                 * p1: I1 < I2 < I3
-                 * p2: I1 < I2 < I4
-                 *
-                 * paths: {p1, p2}
-                 * i is the position where divergence starts, which would be 2 in this example.
-                 * i-1 (1) points to the last shared item
-                 */
-                auto root = paths[0]->path[i-1];  // the last shared instruction
-                auto callee = root->function();
-
-                /* always let the first path remain the same and rewrite other paths
-                 */
-                Instruction* last_updated_caller = NULL;
-                for (int j = 1; j < paths.size(); ++j) {
-                    auto& this_path = paths[j]->path;
-
-                    if (this_path[i] != last_updated_caller) {
-                        auto cloned_callee = callee->clone();
-
-                        if (_logclone) {
-                            //_clone_log << "clone: " << callee->name() << " -> " << cloned_callee->name() << '\n';
-                            record_clone(callee, cloned_callee);
-                        }
-                        SysDict::module()->append_new_function(cloned_callee);
-                        _cloned++;
-                        update_callee_in_all_paths(this_path[i], cloned_callee);
-                        last_updated_caller = this_path[i];
-                    }
-                }
-                break;
+        for (auto it: head_map) {
+            auto& paths = it.second;
+            if (paths.size() == 1) {
+                continue;
             }
+
+            // If N paths share a first call site, clone
+            // the callee N-1 times
+            replaced = true;
+            int i = 0;
+            for (; check_common_edge(paths, i) ; ++i) {}
+            if (i == 0) {
+                for (auto p: paths) {
+                    check_path(p->path, true);
+                }
+            }
+            guarantee(i > 0, "");
+
+            /* paths is a set of XPS_Paths that share i
+             * common items, for example
+             * p1: I1 < I2 < I3
+             * p2: I1 < I2 < I4
+             *
+             * paths: {p1, p2}
+             * i is the position where divergence starts,
+             * which would be 2 in this example.
+             * i-1 (1) points to the last shared item
+             */
+
+            /* the last shared instruction */
+            auto root = paths[0]->path[i-1];
+            auto callee = root->function();
+
+            /* Always let the first path remain the same
+             * and rewrite other paths
+             */
+            Instruction* last_updated_caller = NULL;
+            for (int j = 1; j < paths.size(); ++j) {
+                auto& this_path = paths[j]->path;
+
+                if (this_path[i] != last_updated_caller) {
+                    auto cloned_callee = callee->clone();
+
+                    if (_logclone) {
+                        record_clone(callee, cloned_callee);
+                    }
+                    SysDict::module()->append_new_function(
+                        cloned_callee);
+                    _cloned++;
+                    update_callee_in_all_paths(this_path[i],
+                                               cloned_callee);
+                    last_updated_caller = this_path[i];
+                }
+            }
+            break;
+
         }
 
         if (!replaced) {
@@ -175,24 +186,29 @@ public:
 
     void record_clone(Function* host, Function* cloned) {
         auto sp = host->di_subprogram();
-        guarantee(sp, "Function %s has no debug info", host->name_as_c_str());
+        guarantee(sp, "Function %s has no debug info",
+                  host->name_as_c_str());
         string host_log_name = sp->to_string();
         string cloned_log_name = cloned->name();
-        _clone_log << host_log_name << " " << cloned_log_name << " ";
+        _clone_log << host_log_name << " "
+                   << cloned_log_name << " ";
     }
 
-    void record_callee_update(Instruction* caller, Function* new_callee) {
+    void record_callee_update(Instruction* caller,
+                              Function* new_callee) {
         auto sp = caller->function()->di_subprogram();
-        guarantee(sp, "Function %s has no debug info", caller->function()->name_as_c_str());
+        guarantee(sp, "Function %s has no debug info",
+                  caller->function()->name_as_c_str());
         string caller_log_name = sp->to_string();
-        _clone_log << caller_log_name << " " << caller->get_position_in_function()
+        _clone_log << caller_log_name << " "
+                   << caller->get_position_in_function()
                    << " " + new_callee->name() << "\n";
     }
 
-    void update_callee_in_all_paths(CallInstFamily* caller, Function* new_callee) {
+    void update_callee_in_all_paths(CallInstFamily* caller,
+                                    Function* new_callee) {
         bool is_replaced = false;
         for (auto& xps_path: _all_paths) {
-
             auto& stack = xps_path->path;
             guarantee(caller != NULL, " ");
             for (int i = 1; i < stack.size(); ++i) {
@@ -201,7 +217,9 @@ public:
                     /* replace I's callee to new_callee */
                     if (!is_replaced) {
                         if (_verbose_clone) {
-                            zpl("in callinst repalce %s to %s in %p", I->called_function()->name_as_c_str(), new_callee->name_as_c_str(), I)
+                            zpl("in callinst repalce %s to %s in %p",
+                                I->called_function()->name_as_c_str(),
+                                new_callee->name_as_c_str(), I)
                         }
 
                         if (_logclone) {
@@ -213,10 +231,12 @@ public:
 
                     }
 
-                    /* replace the i-1th element with new_callee's inst in the stack */
+                    /* Replace the i-1th element with new_callee's inst
+                     * in the stack */
                     auto ci_to_replace = stack[i-1];
                     auto call_pos = ci_to_replace->get_position_in_function();
-                    auto ci_in_new_callee = static_cast<CallInstFamily*>(new_callee->get_instruction(call_pos));
+                    auto ci_in_new_callee = static_cast<CallInstFamily*>(
+                        new_callee->get_instruction(call_pos));
                     stack[i-1] = ci_in_new_callee;
                     if (_verbose_clone) {
                         zpl("path pos %d to %s", i - 1, ci_in_new_callee->function()->name_as_c_str())
