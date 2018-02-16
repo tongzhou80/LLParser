@@ -31,13 +31,14 @@ void test(apple* a) {
 }
 
 int main ( int argc , char ** argv ) {
-    apple *a = malloc ( sizeof ( apple )) ;
-    a ->p = & foo ;
-    a->p();
-    orange o;
-//    apple a;
-//    a.p = & foo ;
-//
-//    a.p () ;
-    return 0;
+    /* apple *a = malloc ( sizeof ( apple )) ; */
+    /* a ->p = foo ; */
+    /* a->p(); */
+    /* orange o; */
+   apple a;
+   a.p = & foo ;
+
+   //apple b = a;
+   a.p () ;
+   return 0;
 }

@@ -62,18 +62,18 @@ public:
             for (auto ci: F->caller_list()) {
                 /* create instrument instructions */
                 string v1 = IRBuilder::get_new_local_varname();
-                Instruction* i1 = IRBuilder::create_instruction(v1+" = load i32, i32* @sopt.ctx, align 4");
+                Instruction* i1 = IRBuilder::create_instruction(v1+" = load i32, i32* @sopt_ctx, align 4");
                 string v2 = IRBuilder::get_new_local_varname();
                 string i2_text = v2 + " = add i32 " + v1 + ", " + std::to_string(ci->dbg_id());
                 Instruction* i2 = IRBuilder::create_instruction(i2_text);
-                Instruction* i3 = IRBuilder::create_instruction("store i32 "+v2+", i32* @sopt.ctx, align 4");
+                Instruction* i3 = IRBuilder::create_instruction("store i32 "+v2+", i32* @sopt_ctx, align 4");
 
                 string v4 = IRBuilder::get_new_local_varname();
-                Instruction*i4 = IRBuilder::create_instruction(v4+" = load i32, i32* @sopt.ctx, align 4");
+                Instruction*i4 = IRBuilder::create_instruction(v4+" = load i32, i32* @sopt_ctx, align 4");
                 string v5 = IRBuilder::get_new_local_varname();
                 string i5_text = v5 + " = sub i32 " + v4 + ", " + std::to_string(ci->dbg_id());
                 Instruction* i5 = IRBuilder::create_instruction(i5_text);
-                Instruction* i6 = IRBuilder::create_instruction("store i32 "+v5+", i32* @sopt.ctx, align 4");
+                Instruction* i6 = IRBuilder::create_instruction("store i32 "+v5+", i32* @sopt_ctx, align 4");
 
                 /* insert at exit */
                 int ci_pos = ci->get_index_in_block();
@@ -96,7 +96,7 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        module->append_new_global("@sopt.ctx = external thread_local global i32, align 4");
+        module->append_new_global("@sopt_ctx = external thread_local global i32, align 4");
         std::set<Function*> funcs;
         get_target_functions(module, funcs);
         zpd(funcs.size())

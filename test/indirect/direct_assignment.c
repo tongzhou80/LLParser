@@ -4,7 +4,8 @@
 
 #include <stdio.h>
 
-typedef void (*function_ptr) (int);
+typedef void (*func_ptr) (int);
+func_ptr gfp;
 
 void foo(int i) {
     printf("foo %d", i);
@@ -14,7 +15,7 @@ void bar(int i) {
     printf("bar %d", i);
 }
 
-void test(function_ptr p, int i) {
+void test(func_ptr p, int i) {
     if (i == 1) {
         p = foo;
     }
@@ -22,16 +23,12 @@ void test(function_ptr p, int i) {
 }
 
 int main(int argc, char** argv) {
-    void (*p)(int );
-    if (argc == 2) {
-        p = foo;
-    }
-    else {
-        p = bar;
-    }
+  func_ptr p, q;
+  p = bar;
+  gfp = foo;
+  gfp(1);
+  p(2);
 
-    p(2);
-
-    void* q = p;
-
+  q = p;
+  q(2);  
 }

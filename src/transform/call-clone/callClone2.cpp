@@ -431,115 +431,6 @@ public:
         }
     }
 
-    bool run_on_module(Module* module) override {
-        int nlevel = 2;
-        if (has_argument("nlevel")) {
-            nlevel = std::stoi(get_argument("nlevel"));
-        }
-        if (has_argument("logclone")) {
-            _logclone = (bool)std::stoi(get_argument("logclone"));
-            _clone_log.open(SysDict::filedir()+"clone.log");
-        }
-        if (has_argument("min-cxt")) {
-            _min_cxt = std::stoi(get_argument("min-cxt"));
-            zpd(_min_cxt)
-        }
-        if (has_argument("lang")) {
-            _lang = get_argument("lang");
-        }
-        if (has_argument("indi")) {
-            _use_indi = (bool)std::stoi(get_argument("indi"));
-        }
-        if(has_argument("noben")) {
-            _noben = true;
-        }
-
-        auto lsda = new BenAllocPass(_lang);
-        lsda->do_initialization();
-        zpd(_use_indi)
-        lsda->set_use_indi(_use_indi);
-        lsda->insert_lsd(module);
-        _alloc_set = lsda->alloc_set();
-        _free_set = lsda->free_set();
-
-        string arg_name = "hot_aps_file";
-        if (has_argument(arg_name)) {
-            string hot_aps_file = get_argument(arg_name);
-            load_hot_aps_file(hot_aps_file);
-        }
-        else {
-            //load_hot_aps_file(SysDict::filedir() + "contexts.txt");
-            generate(module, nlevel);
-        }
-
-
-        get_distinct_all_paths();
-        check_all_paths();
-
-       
-        int round = 0;
-        while (!_done) {
-            scan();
-            if (_verbose_clone) {
-                zpl("one clone done.")
-            }
-
-            round++;
-            zpl("round: %d", round);
-        }
-
-        if (!_noben) {
-            lsda->replace_alloc(module);
-            lsda->replace_free(module);
-            if (_use_indi) {
-                lsda->replace_indi(module);
-            }
-        }
-
-        zpl("to generate post")
-        generate_post_contexts();
-        zpl("done generating post")
-
-//        replace_alloc();
-//        replace_free();
-
-        string out = SysArgs::get_option("output");
-        if (out.empty()) {
-            out = SysDict::filename();
-            if (Strings::contains(out, ".ll")) {
-                Strings::ireplace(out, ".ll", ".clone.ll");
-            }
-            else {
-                out += ".clone.ll";
-            }
-
-            if (_noben) {
-                Strings::ireplace(out, ".clone", ".expand");
-            }
-        }
-        
-
-        zpl("callclone2 output to %s", out.c_str())
-        module->print_to_file(out);
-
-        check_all_paths();
-        check_unused(module);
-
-//
-//        _timer.stop();
-//        std::ofstream stat_ofs;
-//        stat_ofs.open(out + ".timing");
-//        stat_ofs << _timer.seconds() << " " << _hot_cxt_counter << " " << _used_hot_cxt << " " << _cloned << " " << _ben_num;
-//        stat_ofs.close();
-
-        zpl("======== Summary ======");
-        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d",
-            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round);
-
-//        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
-//            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
-    }
-
     void check_unused(Module* module) {
         printf("unused clone check...\n");
         for (auto F:module->function_list()) {
@@ -707,6 +598,109 @@ public:
 
     void do_initialization() override {}
     void do_finalization() override {}
+
+    bool run_on_module(Module* module) override {
+        int nlevel = 2;
+        if (has_argument("nlevel")) {
+            nlevel = std::stoi(get_argument("nlevel"));
+        }
+        if (has_argument("logclone")) {
+            _logclone = (bool)std::stoi(get_argument("logclone"));
+            _clone_log.open(SysDict::filedir()+"clone.log");
+        }
+        if (has_argument("min-cxt")) {
+            _min_cxt = std::stoi(get_argument("min-cxt"));
+            zpd(_min_cxt)
+        }
+        if (has_argument("lang")) {
+            _lang = get_argument("lang");
+        }
+        if (has_argument("indi")) {
+            _use_indi = (bool)std::stoi(get_argument("indi"));
+        }
+        if(has_argument("noben")) {
+            _noben = true;
+        }
+
+        auto lsda = new BenAllocPass(_lang);
+        lsda->do_initialization();
+        zpd(_use_indi)
+        lsda->set_use_indi(_use_indi);
+        lsda->insert_lsd(module);
+        _alloc_set = lsda->alloc_set();
+        _free_set = lsda->free_set();
+
+        string arg_name = "hot_aps_file";
+        if (has_argument(arg_name)) {
+            string hot_aps_file = get_argument(arg_name);
+            load_hot_aps_file(hot_aps_file);
+        }
+        else {
+            //load_hot_aps_file(SysDict::filedir() + "contexts.txt");
+            generate(module, nlevel);
+        }
+
+
+        get_distinct_all_paths();
+        check_all_paths();
+
+
+        int round = 0;
+        while (!_done) {
+            scan();
+            if (_verbose_clone) {
+                zpl("one clone done.")
+            }
+
+            round++;
+            zpl("round: %d", round);
+        }
+
+        if (!_noben) {
+            lsda->replace_alloc(module);
+            lsda->replace_free(module);
+            if (_use_indi) {
+                lsda->replace_indi(module);
+            }
+        }
+
+        zpl("to generate post")
+        generate_post_contexts();
+        zpl("done generating post")
+
+        //        replace_alloc();
+        //        replace_free();
+
+        string out = SysArgs::get_option("output");
+        if (out.empty()) {
+            out = SysDict::filename();
+            if (Strings::contains(out, ".ll")) {
+                Strings::ireplace(out, ".ll", ".clone.ll");
+            }
+            else {
+                out += ".clone.ll";
+            }
+
+            if (_noben) {
+                Strings::ireplace(out, ".clone", ".expand");
+            }
+        }
+
+
+        zpl("callclone2 output to %s", out.c_str())
+        module->print_to_file(out);
+
+        check_all_paths();
+        check_unused(module);
+
+        zpl("======== Summary ======");
+        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d",
+            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round);
+
+        //        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
+        //            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
+  }
+
 };
 
 
