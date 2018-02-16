@@ -213,36 +213,40 @@ public:
             guarantee(caller != NULL, " ");
             for (int i = 1; i < stack.size(); ++i) {
                 CallInstFamily* I = stack[i];
-                if (I == caller) {
-                    /* replace I's callee to new_callee */
-                    if (!is_replaced) {
-                        if (_verbose_clone) {
-                            zpl("in callinst repalce %s to %s in %p",
-                                I->called_function()->name_as_c_str(),
-                                new_callee->name_as_c_str(), I)
-                        }
-
-                        if (_logclone) {
-                            record_callee_update(I, new_callee);
-                        }
-
-                        I->replace_callee(new_callee->name());
-                        is_replaced = true;
-
-                    }
-
-                    /* Replace the i-1th element with new_callee's inst
-                     * in the stack */
-                    auto ci_to_replace = stack[i-1];
-                    auto call_pos = ci_to_replace->get_position_in_function();
-                    auto ci_in_new_callee = static_cast<CallInstFamily*>(
-                        new_callee->get_instruction(call_pos));
-                    stack[i-1] = ci_in_new_callee;
-                    if (_verbose_clone) {
-                        zpl("path pos %d to %s", i - 1, ci_in_new_callee->function()->name_as_c_str())
-                    }
-                    //check_path(stack);
+                if (I != caller) {
+                    continue;
                 }
+
+                /* Replace I's callee to new_callee */
+                if (!is_replaced) {
+                    if (_verbose_clone) {
+                        zpl("in callinst repalce %s to %s in %p",
+                            I->called_function()->name_as_c_str(),
+                            new_callee->name_as_c_str(), I)
+                    }
+
+                    if (_logclone) {
+                        record_callee_update(I, new_callee);
+                    }
+
+                    I->replace_callee(new_callee->name());
+                    is_replaced = true;
+
+                }
+
+                /* Replace the i-1th element with new_callee's inst
+                 * in the stack */
+                auto ci_to_replace = stack[i-1];
+                auto call_pos = ci_to_replace->get_position_in_function();
+                auto ci_in_new_callee = static_cast<CallInstFamily*>(
+                    new_callee->get_instruction(call_pos));
+                stack[i-1] = ci_in_new_callee;
+                if (_verbose_clone) {
+                    zpl("path pos %d to %s", i - 1,
+                        ci_in_new_callee->function()->name_as_c_str())
+                }
+                //check_path(stack);
+
             }
 
         }
@@ -253,7 +257,8 @@ public:
         std::ifstream ifs;
         ifs.open(filename);
         if (!ifs.is_open()) {
-            fprintf(stderr, "open file %s failed.\n", filename.c_str());
+            fprintf(stderr, "open file %s failed.\n",
+                    filename.c_str());
         }
         string line;
         bool is_header = true;
@@ -721,8 +726,10 @@ public:
         check_unused(module);
 
         zpl("======== Summary ======");
-        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d",
-            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round);
+        zpl("recog: %d, cxt: %d, recursive: %d, "
+                "distinct: %d, cloned: %d, round: %d",
+            _recognized, _cxt_counter, _recursive,
+            _all_paths.size(), _cloned, round);
   }
 
 };
