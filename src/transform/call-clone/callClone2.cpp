@@ -30,24 +30,24 @@ class CallClonePass: public Pass {
     /* flags */
     bool _done;
     bool _skip;
+    bool _noben;
+    bool _use_indi;
     bool _logclone;
-    bool _print_cloning;
     bool _path_check;
+    bool _print_cloning;
     bool _verbose_match;
     bool _verbose_clone;
-    bool _use_indi;
-    bool _noben;
 
     /* statistics */
+    int _ben_num;
+    int _cloned;
     int _hot_counter;
     int _path_counter;
     int _cxt_counter;
     int _recursive;
     int _recognized;
-    int _ben_num;
     int _hot_cxt_counter;
     int _used_hot_cxt;
-    int _cloned;
 
     Timer _timer;
     std::ofstream _clone_log;
@@ -93,7 +93,8 @@ public:
     }
 
     bool check_common_edge(std::vector<XPath*>& paths, int pos) {
-        guarantee(pos < paths[0]->path.size(), "pos: %d, size: %lu", pos, paths.size());
+        guarantee(pos < paths[0]->path.size(),
+                  "pos: %d, size: %lu", pos, paths.size());
         auto sentinel = paths[0]->path[pos];
         for (int i = 1; i < paths.size(); ++i) {
             if (paths[i]->path[pos] != sentinel) {
@@ -105,16 +106,22 @@ public:
 
     void scan() {
         bool replaced = false;
-        std::map<CallInstFamily*, std::vector<XPath*>> dr_map;
+        // This map uses the first call site from each path
+        // as the key, and each value is a set of paths that
+        // start with that key.
+        // If each path has a distinct first call site (no
+        // call sites share the same first call site), the
+        // cloning algorithm terminates
+        std::map<CallInstFamily*, std::vector<XPath*>> head_map;
         for (auto xpath: _all_paths) {
             auto dr = xpath->path[0];
-            if (dr_map.find(dr) == dr_map.end()) {
-                dr_map[dr] = std::vector<XPath*>();
+            if (head_map.find(dr) == head_map.end()) {
+                head_map[dr] = std::vector<XPath*>();
             }
-            dr_map[dr].push_back(xpath);
+            head_map[dr].push_back(xpath);
         }
 
-        for (auto dr: dr_map) {
+        for (auto dr: head_map) {
             auto& paths = dr.second;
             if (paths.size() > 1) {
                 replaced = true;
@@ -696,9 +703,6 @@ public:
         zpl("======== Summary ======");
         zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d",
             _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round);
-
-        //        zpl("recog: %d, cxt: %d, recursive: %d, distinct: %d, cloned: %d, round: %d, ben malloc: %d",
-        //            _recognized, _cxt_counter, _recursive, _all_paths.size(), _cloned, round, _ben_num);
   }
 
 };
