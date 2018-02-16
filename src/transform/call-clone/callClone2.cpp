@@ -252,89 +252,6 @@ public:
         }
     }
 
-    // todo: the hot_aps_file must have an appending new line to be correctly parsed for now
-    void load_hot_aps_file(string filename) {
-        std::ifstream ifs;
-        ifs.open(filename);
-        if (!ifs.is_open()) {
-            fprintf(stderr, "open file %s failed.\n",
-                    filename.c_str());
-        }
-        string line;
-        bool is_header = true;
-        string header;
-        int is_hot = 0;
-
-        while (std::getline(ifs, line)) {
-            // got a whole call stack
-            if (line.empty()) {
-                is_header = true;
-
-                bool has_all = true;
-                if (!_stack.empty()) {
-                    std::vector<CallInstFamily*> usable_stack;
-                    for (auto I:_stack) {
-                        if (I) {
-                            usable_stack.push_back(I);
-                        }
-                        else {
-                            break;
-                        }
-                    }
-                    _stack = usable_stack;
-                    if (_stack.size() < _min_cxt) {
-                        has_all = false;
-                    }
-                    for (int i = 0; i < _stack.size(); ++i) {
-                        if (!_stack[i]) {
-                            has_all = false;
-                        }
-                    }
-
-                    if (has_all) {
-                        _recognized++;
-                        //if (!has_direct_recursion()) {
-                        if (!has_continuous_recursion()) {
-                            XPath* path = new XPath();
-                            path->path = _stack;
-                            path->hotness = is_hot;
-                            _all_paths.push_back(path);
-                        }
-                        _path_counter++;
-                    }
-                    else {
-                        if (_verbose_match)
-                        zpl("not match: %s", header.c_str())
-                    }
-                }
-                _cxt_counter++;
-                _stack.clear();
-                _caller.clear();
-                _callee.clear();
-                _skip = false;
-                is_hot = false;
-            }
-            else {
-                if (is_header) {
-                    header = line;
-                    is_hot = match_header(line);
-                    is_header = false;
-                }
-                else {
-                    if (Strings::contains(line, "__libc_start_main")) {
-                        _skip = true;
-                    }
-
-                    if (!_skip) {
-                        CallInstFamily* ret = match_callsite(line);
-                        _stack.push_back(ret);
-                    }
-                }
-            }
-        }
-
-    }
-
     void get_distinct_all_paths() {
         std::vector<XPath*> distinct_set;
         std::set<string> contexts;
@@ -365,59 +282,6 @@ public:
         _all_paths = distinct_set;
     }
 
-    int match_header(string& line) {
-        char hotness[11];  // max hold 0xffffffff + '\0'
-        int apid;
-        char alloc[64];
-
-        int matched = sscanf(line.c_str(), "%d %s %s", &apid, hotness, alloc);
-        guarantee(matched == 3, "Matched: %d, Bad hotset file format: %s", matched, line.c_str());
-
-        _callee = string(alloc);
-        if (string(hotness) == "0xffffffff") {
-            _hot_cxt_counter++;
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    CallInstFamily* match_callsite(string & line) {
-        guarantee(Strings::contains(line, "("), " ");
-        line = line.substr(line.find('('));  // strip the exe name before '('
-
-        int pos1 = line.find(' ');
-        string bt_symbol = line.substr(0, pos1);
-        string fileline = line.substr(pos1+1);
-
-
-        int pos2 = bt_symbol.find('+');
-        _caller = bt_symbol.substr(1, pos2-1);
-        if (Alias* alias = SysDict::module()->get_alias(_caller)) {
-            _caller = dynamic_cast<Function*>(alias->aliasee())->name();
-        }
-        string offset = bt_symbol.substr(pos2+1);
-        int bi, ii;
-        sscanf(offset.c_str(), "%d_%d", &bi, &ii);
-
-
-        int pos3 = fileline.find(':');
-        string file = fileline.substr(0, pos3);
-        string lino_str = fileline.substr(pos3+1);
-        int line_num = -1;
-        if (Strings::is_number(lino_str)) {
-            line_num = std::stoi(lino_str);
-        }
-
-        CallInstFamily* ret = dynamic_cast<CallInstFamily*>(SysDict::module()->get_function(_caller)->get_instruction(bi, ii));
-        DILocation* loc = ret->debug_loc();
-        guarantee(ret && loc->filename() == file && loc->line() == line_num, "");
-        _callee = _caller;
-
-        return ret;
-    }
-
     bool has_direct_recursion() {
         std::map<CallInstFamily*, int> counters;
         for (auto I: _stack) {
@@ -431,10 +295,11 @@ public:
                 string callee = v[0]->called_function()->name();
                 printf("skip: %s", callee.c_str());
                 for (auto I: v) {
-                    guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+                    guarantee(I->called_function()->name() == callee,
+                              "%s, %s", I->called_function()->name_as_c_str(),
+                              callee.c_str());
                     printf(" <- %s(%p)", I->function()->name_as_c_str(), I);
                     callee = I->function()->name();
-                    // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
                 }
                 return true;
             }
@@ -458,8 +323,10 @@ public:
         ContextGenerator cg;
 
         for (auto target: _alloc_set) {
-            auto paths = cg.generate(module, target->old_name, nlevel);
-            _all_paths.insert(_all_paths.end(), paths.begin(), paths.end());
+            auto paths = cg.generate(module,
+                                     target->old_name, nlevel);
+            _all_paths.insert(_all_paths.end(),
+                              paths.begin(), paths.end());
         }
     }
 
@@ -486,27 +353,31 @@ public:
         for (auto xpath: _all_paths) {
             CallInstFamily* alloc_caller = xpath->path[0];
             string args = alloc_caller->get_raw_field("args");
-            ctx_log << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << std::endl;
-            //ofs1 << get_apid_from_args(args) << " " << alloc_caller->called_function()->name() << " ";
+            ctx_log << get_apid_from_args(args) << " "
+                    << alloc_caller->called_function()->name()
+                    << std::endl;
             bool is_first_line = true;
             for (auto ci: xpath->path) {
                 DILocation* loc = ci->debug_loc();
-                ctx_log << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
-                     << loc->filename() << ':' << loc->line() << std::endl;
+                ctx_log << '(' << ci->function()->name()
+                        << '+' << ci->get_position_in_function()
+                        << ") " << loc->filename()
+                        << ':' << loc->line() << std::endl;
 
                 /* Also record what files have allocations */
-                if (is_first_line) {
-                    //ofs1 << ci->function()->name() << " " << ci->get_position_in_function() << " " << loc->filename() << std::endl;
-                    if (ci->function()->name().find("__gnu_cxx") == string::npos) {
-
-                        if (alloc_files.find(loc->filename()) == alloc_files.end()) {
-                            ben_log << loc->filename() << std::endl;
-                            alloc_files.insert(loc->filename());
-                        }
-                    }
-
-                    is_first_line = false;
+                if (!is_first_line) {
+                    continue;
                 }
+
+                if (ci->function()->name().find("__gnu_cxx") == string::npos) {
+                    if (alloc_files.find(loc->filename()) == alloc_files.end()) {
+                        ben_log << loc->filename() << std::endl;
+                        alloc_files.insert(loc->filename());
+                    }
+                }
+
+                is_first_line = false;
+
             }
             ctx_log << std::endl;
         }
@@ -515,84 +386,19 @@ public:
         ben_log.close();
     }
 
-    void replace_alloc() {
-        int id = 1;
-        for (auto p: _all_paths) {
-            auto path = p->path;
-            CallInstFamily* ci = path[0];
-            string old_callee = ci->called_function()->name();
-
-            //guarantee(old_callee == "malloc" || old_callee == "calloc" || old_callee == "realloc", "old callee: %s", old_callee.c_str());
-            string new_name = "";
-            for (auto t: _alloc_set) {
-                if (old_callee == t->old_name) {
-                    new_name = t->new_name;
-                }
-            }
-            guarantee(new_name != "", "bad old callee to replace: %s", old_callee.c_str());
-
-            ci->replace_callee(new_name);
-            _ben_num++;
-            string new_args = "i32 " + std::to_string(id++) + ", " + ci->get_raw_field("args");
-            ci->replace_args(new_args);
-        }
-    }
-
-    void replace_free() {
-        for (auto t: _free_set) {
-            if (Function* free_fp = SysDict::module()->get_function(t->old_name)) {
-                for (auto ci: free_fp->caller_list()) {
-                    ci->replace_callee(t->new_name);
-                }
-            }
-        }
-
-        //todo: non-dirty way
-        if (!_use_indi) {
-            return;
-        }
-
-        int indi_alloc = 0;
-        int indi_free = 0;
-        string suffixes[3] = {" ", ",", ")"};
-        for (auto F: SysDict::module()->function_list()) {
-            for (auto B: F->basic_block_list()) {
-                for (auto I: B->instruction_list()) {
-                    for (auto& suf: suffixes) {
-                        //string targets[4] = {"malloc", "calloc", "realloc", "free"};
-                        for (auto& t: _alloc_set) {
-                            string old = "@"+t->old_name+suf;
-                            if (I->raw_text().find(old) != string::npos) {
-                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
-                                indi_alloc++;
-                            }
-                        }
-                        for (auto& t: _free_set) {
-                            string old = "@"+t->old_name+suf;
-                            if (I->raw_text().find(old) != string::npos) {
-                                Strings::ireplace(I->raw_text(), old, "@indi_"+t->old_name+suf);
-                                indi_free++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        zpd(indi_alloc)
-        zpd(indi_free)
-    }
-
     void check_all_paths(bool do_print=false) {
         for (auto v: _all_paths) {
             string callee = v->path[0]->called_function()->name();
             if (do_print)
                 printf("%d: %s", v->hotness, callee.c_str());
             for (auto I: v->path) {
-                guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
+                guarantee(I->called_function()->name() == callee, "%s, %s",
+                          I->called_function()->name_as_c_str(), callee.c_str());
                 if (do_print)
-                    printf(" <- %p %s(%d, %d)", I, I->function()->name_as_c_str(), I->parent()->get_index_in_function(), I->get_index_in_block());
+                    printf(" <- %p %s(%d, %d)", I, I->function()->name_as_c_str(),
+                           I->parent()->get_index_in_function(),
+                           I->get_index_in_block());
                 callee = I->function()->name();
-                // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
             }
             if (do_print)
                 printf("\n");
@@ -606,19 +412,20 @@ public:
         for (auto I: path) {
             if (I->called_function()->name() != callee) {
                 terminate = true;
-                msg = "I called: " + I->called_function()->name() + " but should call " + callee + " at " + I->function()->name_as_c_str() + ":" + I->get_position_in_function().c_str();
+                msg = "I called: " + I->called_function()->name()
+                    + " but should call " + callee + " at "
+                    + I->function()->name_as_c_str() + ":"
+                    + I->get_position_in_function().c_str();
                 if (do_print) {
-                    zpl("wrong %p called %p: %s", I, I->called_function(), msg.c_str())
+                    zpl("wrong %p called %p: %s", I,
+                        I->called_function(), msg.c_str())
                 }
             }
             if (do_print)
-                printf("%s <- %s(%p, %s)\n", callee.c_str(), I->function()->name_as_c_str(), I, I->get_position_in_function().c_str());
+                printf("%s <- %s(%p, %s)\n", callee.c_str(),
+                       I->function()->name_as_c_str(), I,
+                       I->get_position_in_function().c_str());
             callee = I->function()->name();
-
-            //zpl("set callee to %s", callee.c_str())
-
-            //guarantee(I->called_function()->name() == callee, "%s, %s", I->called_function()->name_as_c_str(), callee.c_str());
-            // printf("%s > %s, ", I->called_function()->name_as_c_str(), I->function()->name_as_c_str());
         }
         if (terminate) {
             guarantee(0, " ");
@@ -665,7 +472,7 @@ public:
         string arg_name = "hot_aps_file";
         if (has_argument(arg_name)) {
             string hot_aps_file = get_argument(arg_name);
-            load_hot_aps_file(hot_aps_file);
+            //load_hot_aps_file(hot_aps_file);
         }
         else {
             //load_hot_aps_file(SysDict::filedir() + "contexts.txt");
