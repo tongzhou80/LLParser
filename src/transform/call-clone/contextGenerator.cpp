@@ -8,6 +8,14 @@
 #include <set>
 #include "contextGenerator.h"
 
+//#define DEBUG_MODE
+
+#ifdef DEBUG_MODE
+#define DEBUG(s) s
+#else
+#define DEBUG(s) //s
+#endif
+
 ContextGenerator::ContextGenerator() {
     string out = SysDict::filedir() + "contexts.txt";
     _ofs.open(out);
@@ -21,7 +29,6 @@ ContextGenerator::~ContextGenerator() {
 }
 
 /**
- *
  * nlevel is in the sense of the height of the tree. If the call graph is
  * A -> malloc, B -> malloc, C -> A
  * nlevel = 1 will consider A and B, but not C
@@ -30,7 +37,8 @@ ContextGenerator::~ContextGenerator() {
  * @param nlevel
  * @return
  */
-std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int nlevel) {
+std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc,
+                                               int nlevel) {
     _paths.clear();
     _stack.clear();
     Function* alloc_f = module->get_function(alloc);
@@ -56,9 +64,8 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
         _paths.push_back(path);
     }
 
-    printf("skipped: %d\n", skip_cnt);
-
-    zpl("to get all paths of %d layers of %s call chain", nlevel, alloc.c_str())
+    DEBUG(zpl("to get all paths of %d layers of %s call chain",
+        nlevel, alloc.c_str()))
 
     /* keep all contexts whose depth is less than nlevel */
     while (--nlevel) {
@@ -67,18 +74,13 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
             auto& context = xpath->path;
             auto tos = context[context.size()-1];
 
-            //            if (tos->function()->name() == "main") {
-//                new_paths.push_back(xpath);
-//                zpl("reached main:")
-//                for (auto i: context) {
-//                    zpl("%s ", i->function()->name_as_c_str())
-//                }
-//            }
-
-            if (tos->function()->caller_list().empty()
-                || tos->function()->name() == "module_configure_in_use_for_config_") {
+            // Stop traversing callers for functions that have no callers
+            // or module_configure_in_use_for_config_ for wrf
+            Function* F = tos->function();
+            if (F->caller_list().empty()
+                || F->name() == "module_configure_in_use_for_config_") {
                 new_paths.push_back(xpath);
-                zpl("reached top: %s", tos->function()->name_as_c_str());
+                DEBUG(zpl("reached top: %s", tos->function()->name_as_c_str());)
             }
             else {
                 for (auto ci: tos->function()->caller_list()) {
@@ -94,10 +96,10 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
         
         _paths.clear();
         _paths = new_paths;
-        zpl("context generation one round done")
+        DEBUG(zpl("context generation one round done"))
     }
 
-    zpl("done with %s", alloc.c_str())
+    DEBUG(zpl("done with %s", alloc.c_str()))
 
     srand(time(NULL));
     double p = (double)rand() / (double)RAND_MAX;
@@ -112,11 +114,15 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc, int
             guarantee(ci, "");
             DILocation* loc = ci->debug_loc();
             if (!loc) {
-                std::cerr << "No DILocation found for:" << ci->raw_text() << std::endl;
+                std::cerr << "No DILocation found for:" << ci->raw_text()
+                          << "\nMaybe try enabling -g for compilation"
+                          << std::endl;
                 exit(-1);
             }
-            _ofs << '(' << ci->function()->name() << '+' << ci->get_position_in_function() << ") "
-                << loc->filename() << ':' << loc->line() << std::endl;
+            _ofs << '(' << ci->function()->name() << '+'
+                 << ci->get_position_in_function() << ") "
+                 << loc->filename() << ':' << loc->line()
+                 << std::endl;
         }
         _ofs << std::endl;
     }
