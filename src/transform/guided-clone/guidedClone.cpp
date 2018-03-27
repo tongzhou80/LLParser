@@ -79,10 +79,10 @@ public:
         
         int pos = src_filename.rfind('.');
         guarantee(pos != string::npos, "");
-        string ir_name = _src_dir+src_filename.substr(0, pos) + ".o.ll";
+        string ir_name = _src_dir +
+            src_filename.substr(0, pos) + ".o.ll";
         Module* m = SysDict::get_module(ir_name);
         if (!m) {
-            //zpl("find %s", src_filename.c_str())
             m = SysDict::parser->parse(ir_name);
             if (_load_verbose) {
                 printf("parsed %s\n", m->name_as_c_str());
@@ -103,7 +103,9 @@ public:
         while (std::getline(ifs, line)) {
             auto fields = Strings::split(line, ' ');
             string callee_file = fields.at(0);
-            string callee = fields.at(1);  // name of the function that's to be cloned
+            // name of the function that's to be cloned
+            string callee = fields.at(1);
+            string new_callee = fields.at(2);
             string user_file = fields.at(3);
             string user = fields.at(4);
             string use_loc = fields.at(5);
@@ -114,22 +116,29 @@ public:
                 continue;
             }
             Function* callee_f = callee_m->get_function_by_orig_name(callee);
-            Function* callee_clone = callee_f->clone();
+            Function* callee_clone = callee_f->clone(new_callee);
             _clone_num++;
+            //zpl("callee: %s, user: %s", callee.c_str(), user.c_str());
+            //zpl("append cloned f %s", callee_clone->name().c_str());
             callee_m->append_new_function(callee_clone);
             Module* user_m = get_module(user_file);
             if (!user_m) {
                 continue;
             }
             //Function* user_f = user_m->get_function(user);
+
+            
             Function* user_f = user_m->get_function_by_orig_name(user);
             guarantee(user_f, "Function %s not found", user.c_str());
-            auto user_i = dynamic_cast<CallInstFamily*>(user_f->get_instruction(point));
+            auto user_i = dynamic_cast<CallInstFamily*>
+                (user_f->get_instruction(point));
             guarantee(user_i, "");
 
             /* need to insert declaration if inter-procedural */
             if (user_m != callee_m) {
-                _lsda->insert_declaration(user_m, user_i->called_function()->name(), callee_clone->name(), false);
+                _lsda->insert_declaration(user_m,
+                                          user_i->called_function()->name(),
+                                          callee_clone->name(), false);
             }
             user_i->replace_callee(callee_clone->name());
             if (_replace_verbose) {
@@ -174,6 +183,7 @@ public:
         std::ifstream ifs(_log_dir+"/ben.log");
         string line;
         std::set<Module*> scanned;
+        
         while (std::getline(ifs, line)) {
             if (Module* m = get_module(line)) {
                 if (scanned.find(m) != scanned.end()) {

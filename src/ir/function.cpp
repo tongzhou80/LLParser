@@ -73,7 +73,8 @@ std::size_t Function::instruction_count() {
  * 1. it has no parent (not in the module yet)
  * 2. it has no users
  * 3. the name of the copy would be the old name + "." + a number, indicated by _copy_cnt
- * 4. the subprogram debug info is stripped, if any (llvm 4 does not allow two functions have the same DISubproggram)
+ * 4. the subprogram debug info is stripped, if any (llvm 4 does not allow two functions
+ * have the same DISubproggram)
  * 5. some other info are also stripped to avoid collision
  *
  * A pseudo debug info will be created for the new function, that is,
@@ -112,7 +113,7 @@ Function* Function::clone(string new_name) {
     }
 
     if (new_name.empty()) {
-        new_name = name()+'.'+std::to_string(++_copy_cnt);
+        new_name = name() + '.' + std::to_string(++_copy_cnt);
         //new_name = name()+".c."+std::to_string(++_copy_cnt);  // ".c" is inserted
     }
     copy->rename(new_name);
