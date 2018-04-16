@@ -6,7 +6,8 @@
 #include <ir/instruction.h>
 #include "irParser.h"
 
-/**@brief Match extended alphabetic ([-a-zA-Z$._]) strings until the current char is not a match
+/**@brief Match extended alphabetic ([-a-zA-Z$._]) strings until
+ * the current char is not a match
  * The state of the parser changes as the matching goes
  * @return The matched string
  */
@@ -17,7 +18,8 @@ string IRParser::match_xalpha() {
         if (std::isalpha(_char)) {
             inc_intext_pos();
         }
-        else if (_char == '-' || _char == '$' || _char == '.' || _char == '_') {
+        else if (_char == '-' || _char == '$' ||
+                 _char == '.' || _char == '_') {
             inc_intext_pos();
         }
         else {
@@ -29,7 +31,8 @@ string IRParser::match_xalpha() {
     return _text.substr(startp, len);
 }
 
-/**@brief Match extended alphanumeric ([-a-zA-Z$._0-9]) strings until the current char is not a match
+/**@brief Match extended alphanumeric ([-a-zA-Z$._0-9]) strings
+ * until the current char is not a match
  * The state of the parser changes as the matching goes
  * @return The matched string
  */
@@ -40,7 +43,8 @@ string IRParser::match_xalphanumeric() {
         if (std::isalnum(_char)) {
             inc_intext_pos();
         }
-        else if (_char == '-' || _char == '$' || _char == '.' || _char == '_') {
+        else if (_char == '-' || _char == '$' ||
+                 _char == '.' || _char == '_') {
             inc_intext_pos();
         }
         else {
@@ -52,9 +56,11 @@ string IRParser::match_xalphanumeric() {
     return _text.substr(startp, len);
 }
 
-/**@brief Match an identifier, which could be the name of variables, functions, structs, etc.
- * The actual regular expression used is '[%@][-a-zA-Z$._][-a-zA-Z$._0-9]*'.
- * Identifiers that require other characters in their names can be surrounded with quotes.
+/**@brief Match an identifier, which could be the name of variables,
+ * functions, structs, etc.
+ * Matched by '[%@][-a-zA-Z$._][-a-zA-Z$._0-9]*'.
+ * Identifiers that require other characters in their names can be
+ * surrounded with double quotes.
  *
  * @return The matched string
  */
@@ -69,7 +75,8 @@ string IRParser::match_identifier() {
     }
     else {
         string p1 = match_xalpha();
-        parser_assert(!p1.empty(), "The identifier does not start with [-a-zA-Z$._]: %c", _char);
+        parser_assert(!p1.empty(),
+              "The identifier does not start with [-a-zA-Z$._]: %c", _char);
         string p2 = match_xalphanumeric();
 
         return p1 + p2;
@@ -204,7 +211,8 @@ string IRParser::match_constant() {
             return ret;
         }
         else {
-            parser_assert(!ret.empty(), "expect complex constant, but got empty");
+            parser_assert(!ret.empty(),
+                          "expect complex constant, but got empty");
         }
     }
 
@@ -305,6 +313,11 @@ string IRParser::parse_basic_type() {
         }
         case 'h': {  // half
             fulltype = "half";
+            match(fulltype);
+            break;
+        }
+        case 'x': {  
+            fulltype = "x86_fp80";
             match(fulltype);
             break;
         }
