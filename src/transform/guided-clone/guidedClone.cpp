@@ -97,6 +97,13 @@ public:
     return m;
   }
 
+  /** @brief Get function by function name and file name
+   *
+   */
+  Function* get_function(string& func, string& file) {
+
+  }
+
   void do_clone() {
     std::ifstream ifs(_log_dir+"/clone.log");
     string line;
