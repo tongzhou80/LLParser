@@ -13,49 +13,49 @@
 // file will be compiled to an ir file.
 
 class IncludeTracePass: public Pass {
-    std::ofstream _ofs;
+  std::ofstream _ofs;
 public:
-    IncludeTracePass() {
-        set_is_module_pass();
-    }
+  IncludeTracePass() {
+    set_is_module_pass();
+  }
 
-    void do_initialization() override {
-        _ofs.open("inclusion.txt");
-    }
+  void do_initialization() override {
+    _ofs.open("inclusion.txt");
+  }
 
-    void do_finalization() override {
-        _ofs.close();
-    }
+  void do_finalization() override {
+    _ofs.close();
+  }
 
-    // FIXME: This assumes the first DIfile is the
-    // current file, which I am not sure if is correct.
-    bool run_on_module(Module* module) override {
-        string name = module->name();
-        if (Strings::endswith(name, ".c")
-            || Strings::endswith(name, ".cc")
-            || Strings::endswith(name, ".cpp")
-            ) {
+  // FIXME: This assumes the first DIfile is the
+  // current file, which I am not sure if is correct.
+  bool run_on_module(Module* module) override {
+    string name = module->name();
+//    if (Strings::endswith(name, ".c")
+//      || Strings::endswith(name, ".cc")
+//      || Strings::endswith(name, ".cpp")
+//      ) {
+//      return false;
+//    }
+    string parent = "";
+    for (auto md: module->unnamed_metadata_list()) {
+      if (DIFile* difile = dynamic_cast<DIFile*>(md)) {
+        if (parent.empty()) {
+          parent = difile->filename();
+          if (Strings::endswith(parent, ".c")) {
+            std::cout << "P: " << parent << "\n";
             return false;
+          }
         }
-        string parent = "";
-        for (auto md: module->unnamed_metadata_list()) {
-            if (DIFile* difile = dynamic_cast<DIFile*>(md)) {
-                if (parent.empty()) {
-                    parent = difile->filename();
-                    if (Strings::endswith(parent, ".c")) {
-                        std::cout << "P: " << parent << "\n";
-                        return false;
-                    }
-                }
-                else {
-                    _ofs << difile->filename()
-                         << " " << parent
-                         << std::endl;
-                }
-            }
+        else {
+          _ofs << difile->filename()
+               << " " << parent
+               << std::endl;
         }
-        return false;
+      }
     }
+    return false;
+  }
 };
 
 REGISTER_PASS(IncludeTracePass);
