@@ -175,7 +175,7 @@ public:
     if (!_noclone) {
       process_clone_log();
     }
-    printf("clone done\n");
+    printf("guided clone done\n");
 
     if (!_noben) {
       use_ben_malloc();
