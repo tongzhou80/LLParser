@@ -6,6 +6,7 @@
 #include <asmParser/sysDict.h>
 #include <di/diEssential.h>
 #include <set>
+#include <utilities/strings.h>
 #include "contextGenerator.h"
 
 //#define DEBUG_MODE
@@ -53,10 +54,12 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc,
      * 1. there're over 2M contexts which cause memory usage issue
      * 2. the generated new IR is uncompilable for whatever reason
      */
-    // if (ci->function()->name() == "module_configure_in_use_for_config_") {
-    //     skip_cnt++;
-    //     continue;
-    // }
+//    if (Strings::contains(ci->function()->name(), "__gnu_cxx")
+//      //|| ci->function()->name() == "module_configure_in_use_for_config_"
+//      ) {
+//      skip_cnt++;
+//      continue;
+//    }
 
     XPath* path = new XPath;
     path->hotness = 0;
@@ -78,7 +81,7 @@ std::vector<XPath*> ContextGenerator::generate(Module* module, string alloc,
       // or module_configure_in_use_for_config_ for wrf
       Function* F = tos->function();
       if (F->caller_list().empty()
-          || F->name() == "module_configure_in_use_for_config_") {
+        || F->name() == "module_configure_in_use_for_config_") {
         new_paths.push_back(xpath);
         DEBUG(zpl("reached top: %s", tos->function()->name_as_c_str());)
       }

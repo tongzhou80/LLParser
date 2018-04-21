@@ -11,6 +11,7 @@
 #include <di/diSubprogram.h>
 #include <utilities/strings.h>
 #include <transform/ben-alloc/benAlloc.cpp>
+#include <utilities/systems.h>
 
 class GuidedClonePass: public Pass {
   std::ofstream _ofs;
@@ -70,7 +71,7 @@ public:
     _lsda->do_initialization();
     _lsda->set_use_indi(_use_indi);
 
-    load_filename_map();
+    //load_filename_map();
   }
 
   string get_ir_name_from_source_name(string source) {
@@ -97,28 +98,29 @@ public:
    *
    */
   Function* get_function(string& func, string& file) {
-    if (Strings::endswith(file, "c")
-      || Strings::endswith(file, "cc")
-      || Strings::endswith(file, "cpp")
-      ) {
-      string ir_name = get_ir_name_from_source_name(file);
-      Module* m = get_module(ir_name);
-      guarantee(m, "Module not found for %s", file.c_str());
-      return m->get_function_by_orig_name(func);
-    } else {
+    string ir_name = get_ir_name_from_source_name(file);
+    Module* m = get_module(ir_name);
+    if (!m) {
       // There is no corresponding IR for <file>
       // Typically <func> is defined in a header
-      // Inclusion relations should be present
-      guarantee(_name_map.find(file) != _name_map.end(), "");
-      for (auto src: _name_map[file]) {
-        if (auto f = get_function(func, src)) {
-          return f;
-        }
-      }
-      guarantee(0, "Failed to find function %s (%s)",
-                func.c_str(), file.c_str());
+      m = find_function_module(func);
+      guarantee(m, "No module found for %s (%s)",
+                  func.c_str(), file.c_str());
     }
+    Function* f = m->get_function_by_orig_name(func);
+    return f;
+  }
 
+  Module* find_function_module(string& func) {
+    Module* m;
+    string count_defs = "grep 'define .*@" + func + "' *.o.ll | wc -l";
+    string output = Systems::exec(count_defs);
+    guarantee(output == "1", output.c_str());
+    string grep = "grep 'define .*@" + func + "' *.o.ll";
+    output = Systems::exec(grep);
+    int p = output.find(':');
+    string ir_name = _src_dir + output.substr(0, p);
+    return get_module(ir_name);
   }
 
   void process_clone_log() {
