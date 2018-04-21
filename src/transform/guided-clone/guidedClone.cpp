@@ -14,7 +14,7 @@
 class GuidedClonePass: public Pass {
   std::ofstream _ofs;
   BenAllocPass* _lsda;
-  std::map<string, string> _name_map;
+  std::map<string, std::vector<string>> _name_map;
 
   /* command line args */
   string _log_dir;
@@ -165,6 +165,7 @@ public:
       //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
       m->print_to_file(m->input_file());
     }
+    return true;
   }
 
   void load_filename_map() {
@@ -175,7 +176,10 @@ public:
       auto p1 = line.find(' ');
       auto f1 = line.substr(0, p1);
       auto f2 = line.substr(p1+1);
-      _name_map[f1] = f2;
+      if (_name_map.find(f1) == _name_map.end()) {
+        _name_map[f1] = std::vector<string>();
+      }
+      _name_map[f1].push_back(f2);
     }
   }
 
