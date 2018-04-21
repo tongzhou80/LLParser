@@ -2,6 +2,7 @@
 // Created by tzhou on 10/28/17.
 //
 
+#include <cassert>
 #include <cstdio>
 #include <ir/irEssential.h>
 #include <passes/pass.h>
@@ -72,15 +73,14 @@ public:
     load_filename_map();
   }
 
-  Module* get_module(string src_filename) {
-    if (_name_map.find(src_filename) != _name_map.end()) {
-      src_filename = _name_map[src_filename];
-    }
-
-    int pos = src_filename.rfind('.');
+  string get_ir_name_from_source_name(string source) {
+    int pos = source.rfind('.');
     guarantee(pos != string::npos, "");
-    string ir_name = _src_dir +
-      src_filename.substr(0, pos) + ".o.ll";
+    string ir_name = _src_dir + source.substr(0, pos) + ".o.ll";
+    return ir_name;
+  }
+
+  Module* get_module(string ir_name) {
     Module* m = SysDict::get_module(ir_name);
     if (!m) {
       m = SysDict::parser->parse(ir_name);
@@ -88,10 +88,6 @@ public:
         printf("parsed %s\n", m->name_as_c_str());
       }
       //guarantee(m, "");
-
-//            if (m) {
-//                _lsda->run_on_module(m);
-//            }
     }
 
     return m;
@@ -101,10 +97,31 @@ public:
    *
    */
   Function* get_function(string& func, string& file) {
+    if (Strings::endswith(file, "c")
+      || Strings::endswith(file, "cc")
+      || Strings::endswith(file, "cpp")
+      ) {
+      string ir_name = get_ir_name_from_source_name(file);
+      Module* m = get_module(ir_name);
+      guarantee(m, "Module not found for %s", file.c_str());
+      return m->get_function_by_orig_name(func);
+    } else {
+      // There is no corresponding IR for <file>
+      // Typically <func> is defined in a header
+      // Inclusion relations should be present
+      guarantee(_name_map.find(file) != _name_map.end(), "");
+      for (auto src: _name_map[file]) {
+        if (auto f = get_function(func, src)) {
+          return f;
+        }
+      }
+      guarantee(0, "Failed to find function %s (%s)",
+                func.c_str(), file.c_str());
+    }
 
   }
 
-  void do_clone() {
+  void process_clone_log() {
     std::ifstream ifs(_log_dir+"/clone.log");
     string line;
     while (std::getline(ifs, line)) {
@@ -113,44 +130,42 @@ public:
       // name of the function that's to be cloned
       string callee = fields.at(1);
       string new_callee = fields.at(2);
-      string user_file = fields.at(3);
-      string user = fields.at(4);
+      string caller_file = fields.at(3);
+      string caller = fields.at(4);
       string use_loc = fields.at(5);
       Point2D<int> point(use_loc);
 
-      Module* callee_m = get_module(callee_file);
-      if (!callee_m) {
-        continue;
-      }
-      Function* callee_f = callee_m->get_function_by_orig_name(callee);
-      Function* callee_clone = callee_f->clone(new_callee);
-      _clone_num++;
-      //zpl("callee: %s, user: %s", callee.c_str(), user.c_str());
-      //zpl("append cloned f %s", callee_clone->name().c_str());
-      callee_m->append_new_function(callee_clone);
-      Module* user_m = get_module(user_file);
-      if (!user_m) {
-        continue;
-      }
-      //Function* user_f = user_m->get_function(user);
+      Function* calleeF = get_function(callee, callee_file);
+      Function* callerF = get_function(caller, caller_file);
+      guarantee(calleeF, "Function %s not found", callee.c_str());
+      guarantee(callerF, "Function %s not found", caller.c_str());
+      do_clone(calleeF, callerF, new_callee, point);
+    }
+  }
 
+  void do_clone(Function* callee, Function* caller, string newname,
+                Point2D<int> callsite) {
+    Module* calleeM = callee->parent();
+    Module* callerM = caller->parent();
+    Function* callee_clone = callee->clone(newname);
+    _clone_num++;
+    //zpl("callee: %s, user: %s", callee.c_str(), user.c_str());
+    //zpl("append cloned f %s", callee_clone->name().c_str());
+    calleeM->append_new_function(callee_clone);
 
-      Function* user_f = user_m->get_function_by_orig_name(user);
-      guarantee(user_f, "Function %s not found", user.c_str());
-      auto user_i = dynamic_cast<CallInstFamily*>
-      (user_f->get_instruction(point));
-      guarantee(user_i, "");
+    auto user_i = dynamic_cast<CallInstFamily*>(
+      caller->get_instruction(callsite));
+    guarantee(user_i, "");
 
-      /* need to insert declaration if inter-procedural */
-      if (user_m != callee_m) {
-        _lsda->insert_declaration(user_m,
-                                  user_i->called_function()->name(),
-                                  callee_clone->name(), false);
-      }
-      user_i->replace_callee(callee_clone->name());
-      if (_replace_verbose) {
-        printf("replaced %s\n", callee_clone->name_as_c_str());
-      }
+    /* need to insert declaration if inter-procedural */
+    if (callerM != calleeM) {
+      _lsda->insert_declaration(callerM,
+                                user_i->called_function()->name(),
+                                callee_clone->name(), false);
+    }
+    user_i->replace_callee(callee_clone->name());
+    if (_replace_verbose) {
+      printf("replaced %s\n", callee_clone->name_as_c_str());
     }
   }
 
@@ -158,7 +173,7 @@ public:
     init();
 
     if (!_noclone) {
-      do_clone();
+      process_clone_log();
     }
     printf("clone done\n");
 
@@ -169,7 +184,8 @@ public:
 
     for (auto it: SysDict::module_table()) {
       Module* m = it.second;
-      //m->print_to_file(Strings::replace(m->input_file(), ".ll", ".clone.ll"));
+      //m->print_to_file(Strings::replace(
+      // m->input_file(), ".ll", ".clone.ll"));
       m->print_to_file(m->input_file());
     }
     return true;
