@@ -61,10 +61,6 @@ public:
         _print_callsites = true;
         _new_allocs = 0;
         _new_frees = 0;
-
-        if (_print_callsites) {
-            _site_printer.open("call-sites.txt");
-        }
     }
 
     const std::vector<MFunc *> &alloc_set() const {
@@ -327,7 +323,10 @@ public:
     }
 
     bool run_on_module(Module* module) override {
-        
+        if (_print_callsites) {
+            _site_printer.open(module->name() + ".callsites.txt");
+        }
+
         
         insert_lsd(module);
         replace_alloc(module);
@@ -346,6 +345,11 @@ public:
 
         zpl("BenAlloc output to %s", out.c_str())
         module->print_to_file(out);
+
+        if (_print_callsites) {
+            _site_printer.close();
+        }
+
         return true;
     }
 //
