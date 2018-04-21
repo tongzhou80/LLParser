@@ -738,8 +738,11 @@ Module* LLParser::parse() {
  */
     _ifs.open(_file_name.c_str());
     if (!_ifs.is_open()) {
+      if (!Strings::contains(_file_name, "/include/c++/")) {
         fprintf(stderr, "open file %s failed.\n", _file_name.c_str());
-        return NULL;
+      }
+      
+      return NULL;
     }
 
     _module = new Module();

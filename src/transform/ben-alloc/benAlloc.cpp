@@ -392,8 +392,6 @@ public:
 //    }
 
   void insert_declaration(Module* m, string oldname, string newname, bool add_id=true) {
-    zps(m->name())
-    zps(oldname)
     Function* func = m->get_function(oldname);
 
     if (func == NULL) {
@@ -401,7 +399,7 @@ public:
     }
 
     /* _Znwm is defined in omnetpp */
-    guarantee(func->is_external(), "malloc family should be external: %s", func->raw_c_str());
+    //guarantee(func->is_external(), "malloc family should be external: %s", func->raw_c_str());
 
     if (m->get_function(newname)) {
       return; // return if already inserted

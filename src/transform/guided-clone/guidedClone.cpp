@@ -115,7 +115,7 @@ public:
     Module* m;
     string count_defs = "grep 'define .*@" + func + "' *.o.ll | wc -l";
     string output = Systems::exec(count_defs);
-    guarantee(output == "1", output.c_str());
+    //guarantee(output == "1", output.c_str());
     string grep = "grep 'define .*@" + func + "' *.o.ll";
     output = Systems::exec(grep);
     int p = output.find(':');
@@ -136,6 +136,14 @@ public:
       string caller = fields.at(4);
       string use_loc = fields.at(5);
       Point2D<int> point(use_loc);
+
+//      if (Strings::contains(caller_file, "/include/c++/")) {
+//        continue;
+//      }
+//
+//      if (Strings::contains(callee_file, "/include/c++/")) {
+//        continue;
+//      }
 
       Function* calleeF = get_function(callee, callee_file);
       Function* callerF = get_function(caller, caller_file);
@@ -171,8 +179,15 @@ public:
     }
   }
 
+  void print_stats() {
+    printf("[stats]\n");
+    printf("  cloned: %d\n", _clone_num);
+  }
+
   bool run_on_global() override {
     init();
+    //use_ben_malloc();
+    //return false;
 
     if (!_noclone) {
       process_clone_log();
@@ -190,6 +205,8 @@ public:
       // m->input_file(), ".ll", ".clone.ll"));
       m->print_to_file(m->input_file());
     }
+
+    print_stats();
     return true;
   }
 
@@ -209,24 +226,42 @@ public:
   }
 
   void use_ben_malloc() {
-    std::ifstream ifs(_log_dir+"/ben.log");
-    string line;
-    std::set<Module*> scanned;
-
-    while (std::getline(ifs, line)) {
-      if (Module* m = get_module(line)) {
-        if (scanned.find(m) != scanned.end()) {
-          continue;
-        }
+    string cmd = "grep -l '@malloc(' *.o.ll";
+    string output = Systems::exec(cmd);
+    for (auto file: Strings::split(output, '\n')) {
+      
+      if (Module* m = get_module(file)) {
+        
         _lsda->insert_lsd(m);
         _lsda->replace_alloc(m);
         _lsda->replace_free(m);
         if (_use_indi) {
           _lsda->replace_indi(m);
         }
-        scanned.insert(m);
+        
       }
+      
     }
+    
+    // std::ifstream ifs(_log_dir+"/ben.log");
+    // string line;
+    // std::set<Module*> scanned;
+
+    // while (std::getline(ifs, line)) {
+    //   string irname = get_ir_name_from_source_name(line);
+    //   if (Module* m = get_module(irname)) {
+    //     if (scanned.find(m) != scanned.end()) {
+    //       continue;
+    //     }
+    //     _lsda->insert_lsd(m);
+    //     _lsda->replace_alloc(m);
+    //     _lsda->replace_free(m);
+    //     if (_use_indi) {
+    //       _lsda->replace_indi(m);
+    //     }
+    //     scanned.insert(m);
+    //   }
+    // }
   }
 };
 
