@@ -143,18 +143,18 @@ public:
         module->print_to_file(out);
     }
 
-    bool insert_declaration(string oldname, string newname, bool add_id=true) {
+    void insert_declaration(string oldname, string newname, bool add_id=true) {
         Function* func = SysDict::module()->get_function(oldname);
 
         if (func == NULL) {
-            return 0;
+            return;
         }
         guarantee(func->is_external(), "malloc family should be external");
         //Function* newfunc = SysDict::module()->create_child_function(_new_malloc);
 
         Function* existed = SysDict::module()->get_function(newname);
         if (existed) {
-            return 0; // return if already inserted
+            return; // return if already inserted
         }
 
         /* manipulate the text */

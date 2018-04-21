@@ -26,7 +26,7 @@ typedef std::string string;
     } while (false)
 
 
-#ifndef PRODUCTION
+#ifdef DEBUG_MODE
 #define DCHECK(condition, args...) guarantee(condition, ##args)
 #else
 #define DCHECK(condition, args...)

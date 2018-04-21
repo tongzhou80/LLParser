@@ -31,7 +31,6 @@ public:
     };
 
 protected:
-    bool _is_fully_parsed;
     InstParser* _parser;
     InstType _type;
     string _opcode;
@@ -48,9 +47,6 @@ public:
 
     string owner()                            { return _owner; }  // unsafe
     void set_owner(string owner)              { _owner = owner; }
-
-    bool is_fully_parsed()                    { return _is_fully_parsed; }
-    void set_is_fully_parsed(bool v=1)        { _is_fully_parsed = v; }
 
     InstParser* parser()                      { return _parser; }
 
@@ -92,6 +88,9 @@ public:
     virtual Instruction* clone();
 //    Function* function()                      { return _func; }
 //    void set_function(Function* f)            { _func = f; }
+
+    void print_to_stream(std::ostream &os) override ;
+    void print_to_stream(FILE* fp) override ;
 };
 
 

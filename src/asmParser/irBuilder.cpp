@@ -13,6 +13,8 @@
 #include <utilities/flags.h>
 #include <inst/branchInst.h>
 
+int IRBuilder::new_var = 0;
+
 /** Create an instruction from a string
  *
  * This function creates an instruction according to its type and dispatches the parsing
@@ -24,7 +26,7 @@
  * @param llparser: specify which llparser to use, defaults to SysDict::parser
  * @return
  */
-Instruction* IRBuilder::create_instruction(string &text, LLParser* llparser) {
+Instruction* IRBuilder::create_instruction(string text, LLParser* llparser) {
     if (llparser == NULL) {
         llparser = SysDict::parser;
     }
@@ -202,11 +204,9 @@ CallInst* IRBuilder::create_printf_callinst(Module* m, GlobalVariable* gv, strin
 }
 
 string IRBuilder::get_new_local_varname() {
-    time_t now = time(NULL);
-    return "%sopt.local." + std::to_string(now);
+    return "%sopt.local." + std::to_string(new_var++);
 }
 
 string IRBuilder::get_new_global_varname() {
-    time_t now = time(NULL);
-    return "@sopt.global." + std::to_string(now);
+    return "@sopt.global." + std::to_string(new_var++);
 }

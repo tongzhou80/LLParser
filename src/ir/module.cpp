@@ -152,14 +152,14 @@ void Module::insert_function_after(Function *old, Function *inserted) {
 
 
 MetaData* Module::get_debug_info(int i) {
-    return _unnamed_metadata_list.at(i);
-//
-//    if (i < 0 || i > _unnamed_metadata_list.size()) {
-//        return NULL;
-//    }
-//    else {
-//        return _unnamed_metadata_list[i];
-//    }
+    //return _unnamed_metadata_list.at(i);
+
+    if (i < 0 || i > _unnamed_metadata_list.size()) {
+        return NULL;
+    }
+    else {
+        return _unnamed_metadata_list[i];
+    }
 }
 
 void Module::resolve_debug_info() {

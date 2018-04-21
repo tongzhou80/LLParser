@@ -16,10 +16,12 @@ class GlobalVariable;
 
 class IRBuilder {
 public:
+    static int new_var;
+
     static string get_new_local_varname();
     static string get_new_global_varname();
         
-    static Instruction* create_instruction(string& text, LLParser* llparser=NULL);
+    static Instruction* create_instruction(string text, LLParser* llparser=NULL);
     static Function* create_function_declaration(string& text, LLParser* llparser=NULL);
 
     /* Module */
